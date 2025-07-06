@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
-import { currentUser, mockConnections, User } from "@/lib/mock-data"
+import { currentUser, mockConnections, type User } from "@/lib/mock-data"
 import { Star, Edit, BarChart2 } from "lucide-react"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
@@ -62,12 +62,12 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function ProfilePage() {
-    const [user, setUser] = useState(currentUser);
+    const [user, setUser] = useState<User>(currentUser);
     const [isDialogOpen, setDialogOpen] = useState(false);
     
     // We need a separate state for the form inside the dialog
     // to avoid updating the profile page in real-time while editing.
-    const [formData, setFormData] = useState(user);
+    const [formData, setFormData] = useState<User>(user);
     const [emotionalState, setEmotionalState] = useState("Sereno");
 
     const handleSave = () => {
@@ -110,7 +110,7 @@ export default function ProfilePage() {
                          <div>
                             <Label className="text-muted-foreground font-semibold">Objetivos</Label>
                             <p className="text-foreground leading-normal mt-1">
-                                Buscar proveedores para proyectos a corto plazo en tecnología sostenible. Mantener conexiones auténticas sin comprometer la privacidad.
+                                {user.objectives || 'No se han definido objetivos.'}
                             </p>
                          </div>
 
@@ -171,7 +171,14 @@ export default function ProfilePage() {
                                     </div>
                                     <div className="grid grid-cols-4 items-start gap-4">
                                         <Label htmlFor="objectives" className="text-right pt-2">Objetivos</Label>
-                                        <Textarea id="objectives" placeholder="Tus objetivos personales en la plataforma" className="col-span-3" rows={4} />
+                                        <Textarea 
+                                            id="objectives" 
+                                            placeholder="Tus objetivos personales en la plataforma" 
+                                            className="col-span-3" 
+                                            rows={4}
+                                            value={formData.objectives || ''}
+                                            onChange={(e) => setFormData({...formData, objectives: e.target.value})}
+                                        />
                                     </div>
                                 </div>
                                 <DialogFooter>
