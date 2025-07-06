@@ -1,0 +1,143 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { mockConnections, mockTasks, Task } from "@/lib/mock-data"
+import { cva } from "class-variance-authority"
+import { MoreHorizontal, Users, ArrowRight } from "lucide-react"
+import Link from "next/link"
+
+const statusBadgeVariants = cva(
+  "border-transparent",
+  {
+    variants: {
+      status: {
+        Vibrante: "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200",
+        Neutral: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200",
+        Fading: "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200",
+      },
+    },
+  }
+)
+
+function ConnectionsTable() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Conexiones Activas</CardTitle>
+        <CardDescription>Tus conexiones actuales y su estado emocional.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nombre de la Conexión</TableHead>
+              <TableHead>Estado</TableHead>
+              <TableHead>Participantes</TableHead>
+              <TableHead>Duración Restante</TableHead>
+              <TableHead><span className="sr-only">Acciones</span></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {mockConnections.map(conn => (
+              <TableRow key={conn.id}>
+                <TableCell className="font-medium">{conn.name}</TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={statusBadgeVariants({ status: conn.status })}>{conn.status}</Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center -space-x-2">
+                    {conn.participants.map(p => (
+                      <Avatar key={p.id} className="h-8 w-8 border-2 border-background">
+                        <AvatarImage src={p.avatar} />
+                        <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    ))}
+                  </div>
+                </TableCell>
+                <TableCell>{conn.duration}</TableCell>
+                <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" asChild>
+                        <Link href={`/dashboard/connections/${conn.id}`}>
+                            <ArrowRight className="h-4 w-4" />
+                            <span className="sr-only">Ver conexión</span>
+                        </Link>
+                    </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  )
+}
+
+function TaskCard({ task }: { task: Task }) {
+  return (
+    <Card className="hover:shadow-md transition-shadow">
+      <CardContent className="p-4">
+        <p className="text-sm font-medium">{task.title}</p>
+        <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+            <div className="flex items-center gap-1">
+                <Users className="h-3 w-3" />
+                <span>{task.connectionName}</span>
+            </div>
+          <div className="flex items-center -space-x-1">
+             {task.participants.map(p => (
+                <Avatar key={p.id} className="h-5 w-5 border-2 border-card">
+                  <AvatarImage src={p.avatar} />
+                  <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+              ))}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function TasksBoard() {
+  const openTasks = mockTasks.filter(t => t.status === "Abierto");
+  const inProgressTasks = mockTasks.filter(t => t.status === "En Progreso");
+  const doneTasks = mockTasks.filter(t => t.status === "Terminadas");
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Mis Tareas</CardTitle>
+        <CardDescription>Tareas asociadas a tus conexiones, organizadas por estado.</CardDescription>
+      </CardHeader>
+      <CardContent className="grid md:grid-cols-3 gap-6">
+        <div className="space-y-4">
+          <h3 className="font-headline font-semibold">Abierto ({openTasks.length})</h3>
+          <div className="space-y-2">
+            {openTasks.map(task => <TaskCard key={task.id} task={task} />)}
+          </div>
+        </div>
+        <div className="space-y-4">
+          <h3 className="font-headline font-semibold">En Progreso ({inProgressTasks.length})</h3>
+          <div className="space-y-2">
+            {inProgressTasks.map(task => <TaskCard key={task.id} task={task} />)}
+          </div>
+        </div>
+        <div className="space-y-4">
+          <h3 className="font-headline font-semibold">Terminadas ({doneTasks.length})</h3>
+          <div className="space-y-2">
+            {doneTasks.map(task => <TaskCard key={task.id} task={task} />)}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <div className="space-y-6">
+      <ConnectionsTable />
+      <TasksBoard />
+    </div>
+  )
+}
