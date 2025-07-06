@@ -40,12 +40,12 @@ export default function Home() {
                 </div>
               </div>
               <Image
-                src="https://placehold.co/600x400.png"
+                src="https://firebasestudio.googleapis.com/v0/b/firebase-studio-app.appspot.com/o/project%2Fclvgk0sow0006m90o6b2d2j2d%2Fuploads%2F1722881180155-logo.png?alt=media&token=c2c1c73a-0d9c-49a0-9774-63309c6cd58c"
                 width="600"
                 height="400"
-                alt="Hero"
-                data-ai-hint="abstract emotional connection"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
+                alt="AFKDpu Logo"
+                data-ai-hint="treehouse logo"
+                className="mx-auto aspect-video overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
               />
             </div>
           </div>
