@@ -1,13 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Label } from "@/components/ui/label"
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { currentUser, mockConnections } from "@/lib/mock-data"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
+import { currentUser, mockConnections, User } from "@/lib/mock-data"
 import { Star, Edit, BarChart2 } from "lucide-react"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
@@ -57,20 +62,41 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function ProfilePage() {
+    const [user, setUser] = useState(currentUser);
+    const [isDialogOpen, setDialogOpen] = useState(false);
+    
+    // We need a separate state for the form inside the dialog
+    // to avoid updating the profile page in real-time while editing.
+    const [formData, setFormData] = useState(user);
+    const [emotionalState, setEmotionalState] = useState("Sereno");
+
+    const handleSave = () => {
+        setUser(formData);
+        setDialogOpen(false);
+    };
+
+    const handleOpenChange = (open: boolean) => {
+        if (open) {
+            // Reset form data to current user data when dialog opens
+            setFormData(user);
+        }
+        setDialogOpen(open);
+    }
+
     return (
         <div className="grid gap-6 lg:grid-cols-3">
             <div className="lg:col-span-1 space-y-6">
                 <Card>
                     <CardHeader className="items-center text-center">
                         <Avatar className="w-24 h-24 mb-4">
-                            <AvatarImage src={currentUser.avatar} />
-                            <AvatarFallback className="text-3xl">{currentUser.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={user.avatar} />
+                            <AvatarFallback className="text-3xl">{user.name.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <CardTitle className="text-2xl font-headline">{currentUser.name}</CardTitle>
-                        <CardDescription>{currentUser.email}</CardDescription>
+                        <CardTitle className="text-2xl font-headline">{user.name}</CardTitle>
+                        <CardDescription>{user.email}</CardDescription>
                         <div className="flex gap-2 mt-2">
-                            <Badge variant="secondary">{currentUser.role}</Badge>
-                            <Badge variant="outline">Estado: Sereno</Badge>
+                            <Badge variant="secondary">{user.role}</Badge>
+                            <Badge variant="outline">Estado: {emotionalState}</Badge>
                         </div>
                     </CardHeader>
                     <CardContent className="space-y-6 text-sm">
@@ -87,10 +113,75 @@ export default function ProfilePage() {
                                 Buscar proveedores para proyectos a corto plazo en tecnología sostenible. Mantener conexiones auténticas sin comprometer la privacidad.
                             </p>
                          </div>
-                         <Button className="w-full">
-                            <Edit className="mr-2 h-4 w-4" />
-                            Editar Perfil
-                         </Button>
+
+                        <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
+                            <DialogTrigger asChild>
+                                <Button className="w-full">
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Editar Perfil
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                <DialogTitle>Editar Perfil</DialogTitle>
+                                <DialogDescription>
+                                    Realiza cambios en tu perfil. Haz clic en guardar cuando hayas terminado.
+                                </DialogDescription>
+                                </DialogHeader>
+                                <div className="grid gap-4 py-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="avatar" className="text-right">Avatar URL</Label>
+                                        <Input id="avatar" value={formData.avatar} onChange={(e) => setFormData({...formData, avatar: e.target.value})} className="col-span-3" />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="name" className="text-right">Nombre</Label>
+                                        <Input id="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="col-span-3" />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="email" className="text-right">Email</Label>
+                                        <Input id="email" value={formData.email} className="col-span-3" disabled />
+                                    </div>
+                                     <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="role" className="text-right">Rol</Label>
+                                        <Select value={formData.role} onValueChange={(value) => setFormData({...formData, role: value as User['role']})}>
+                                            <SelectTrigger className="col-span-3">
+                                                <SelectValue placeholder="Selecciona un rol" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Cliente">Cliente</SelectItem>
+                                                <SelectItem value="Proveedor">Proveedor</SelectItem>
+                                                <SelectItem value="Empleado">Empleado</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                     <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="state" className="text-right">Estado Emocional</Label>
+                                        <Select value={emotionalState} onValueChange={setEmotionalState}>
+                                            <SelectTrigger className="col-span-3">
+                                                <SelectValue placeholder="Selecciona un estado" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="Vibrante">Vibrante</SelectItem>
+                                                <SelectItem value="Sereno">Sereno</SelectItem>
+                                                <SelectItem value="Neutral">Neutral</SelectItem>
+                                                <SelectItem value="Fading">Fading</SelectItem>
+                                                <SelectItem value="Difuso">Difuso</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="grid grid-cols-4 items-start gap-4">
+                                        <Label htmlFor="objectives" className="text-right pt-2">Objetivos</Label>
+                                        <Textarea id="objectives" placeholder="Tus objetivos personales en la plataforma" className="col-span-3" rows={4} />
+                                    </div>
+                                </div>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button type="button" variant="secondary">Cancelar</Button>
+                                    </DialogClose>
+                                    <Button type="submit" onClick={handleSave}>Guardar Cambios</Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </CardContent>
                 </Card>
             </div>
