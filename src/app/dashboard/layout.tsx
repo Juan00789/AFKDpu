@@ -24,6 +24,7 @@ import {
   Settings,
   LogOut,
   ChevronDown,
+  HelpCircle,
 } from "lucide-react"
 import {
   SidebarProvider,
@@ -99,6 +100,7 @@ const navItems = [
     { href: "/dashboard/tasks", icon: ListTodo, label: "Mis Tareas" },
     { href: "/dashboard/history", icon: History, label: "Historial" },
     { href: "/dashboard/settings", icon: Settings, label: "Configuración" },
+    { href: "/dashboard/quiz", icon: HelpCircle, label: "Cuestionario" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
