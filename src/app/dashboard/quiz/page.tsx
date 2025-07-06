@@ -26,7 +26,7 @@ const quizData = [
     ],
     userAnswer: "b",
     correctAnswer: "a",
-    comment: "El rol del cliente y el proveedor es más flexible, ya que ambos pueden iniciar interacciones, pero un empleado podría actuar como mediador o facilitador, dependiendo del contexto. Tu respuesta no es incorrecta, pero la opción correcta define mejor la interacción entre estos roles.",
+    comment: "Aclaración: Los roles son flexibles. El 'cliente' y el 'proveedor' tienen interacción directa y ambos pueden iniciar conexiones. El 'empleado' a menudo actúa como un intermediario o facilitador de estas interacciones, gestionando o mediando según el contexto.",
   },
   {
     question: "¿Cómo se asegura AFKDpu de que las conexiones sean \"efímeras\" y no permanentes?",
@@ -38,7 +38,7 @@ const quizData = [
     ],
     userAnswer: "d",
     correctAnswer: "b",
-    comment: "El concepto central de \"efímero\" en AFKDpu se basa en establecer reglas de tiempo que limitan la duración de cada conexión. La opción d es más restrictiva que la funcionalidad real.",
+    comment: "Aclaración: El concepto de 'efímero' se basa en la gestión de la duración de las conexiones mediante reglas temporales. No se trata de eliminar usuarios ni de limitar quién puede iniciar una conexión, sino de permitir que cada vínculo tenga un tiempo definido sin compromisos a largo plazo.",
   },
   {
     question: "¿Cuál es el propósito principal de las \"Reglas Automáticas\" en AFKDpu?",
@@ -50,7 +50,7 @@ const quizData = [
     ],
     userAnswer: "b",
     correctAnswer: "c",
-    comment: "Las reglas automáticas en AFKDpu activan y desactivan funciones en función de estados, lo cual es más flexible que solo notificar. La respuesta b también es relevante, pero la opción c describe mejor la función central.",
+    comment: "Aclaración: Las reglas automáticas van más allá de las notificaciones. Su propósito principal es automatizar acciones basadas en el estado emocional y el tiempo de la conexión, como activar un temporizador, sugerir una actualización o habilitar/deshabilitar funciones específicas.",
   },
   {
     question: "¿Qué pasa si una conexión permanece en estado \"Neutral\" por más de 3 días?",
@@ -62,7 +62,7 @@ const quizData = [
     ],
     userAnswer: "a",
     correctAnswer: "b",
-    comment: "AFKDpu está diseñado para sugerir actualizaciones o intervenciones cuando una conexión no progresa, no necesariamente eliminarla. Tu respuesta refleja una idea de finalización, pero no es la función principal.",
+    comment: "Aclaración: AFKDpu no elimina automáticamente una conexión que permanece neutral. En su lugar, está diseñado para ser proactivo y sugerirá una actualización o intervención para ayudar a mejorar la conexión si detecta que no ha habido progreso.",
   },
   {
     question: "¿Qué función tiene el \"Historial de Conexiones Abstractas\" en AFKDpu?",
@@ -74,7 +74,7 @@ const quizData = [
     ],
     userAnswer: "c",
     correctAnswer: "b",
-    comment: "El historial se basa en el seguimiento de las conexiones sin almacenar datos fijos, y no está destinado a gestionar manualmente la duración de las conexiones.",
+    comment: "Aclaración: La función del historial es registrar los estados emocionales y momentos clave de las conexiones de una manera abstracta. No se utiliza para gestionar manualmente la duración ni para almacenar datos fijos como conversaciones detalladas.",
   },
   {
     question: "¿Cómo funciona la notificación contextual de AFKDpu cuando una conexión se vuelve \"Fading\"?",
@@ -86,7 +86,7 @@ const quizData = [
     ],
     userAnswer: "d",
     correctAnswer: "b",
-    comment: "AFKDpu ofrece sugerencias automáticas basadas en el estado emocional de las conexiones, pero no requiere que el proveedor haga la solicitud para enviar una notificación.",
+    comment: "Aclaración: Cuando una conexión se debilita (estado 'Fading'), el sistema envía notificaciones automáticas o sugiere actualizaciones de forma proactiva. No depende de una solicitud explícita del proveedor, sino del estado de la propia conexión.",
   },
   {
     question: "¿Qué significa un estado \"Vibrante\" en AFKDpu?",
@@ -98,7 +98,7 @@ const quizData = [
     ],
     userAnswer: "b",
     correctAnswer: "b",
-    comment: "¡Correcto! \"Vibrante\" refleja un estado emocionalmente activo y con un límite temporal.",
+    comment: "Aclaración: ¡Correcto! Un estado 'Vibrante' se refiere a una conexión activa, emocionalmente intensa y con un límite de duración definido. Es una de las formas clave en que el sistema gestiona el estado y la temporalidad de la interacción.",
   },
 ];
 
