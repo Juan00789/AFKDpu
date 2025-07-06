@@ -45,7 +45,7 @@ export default function Home() {
                 height="400"
                 alt="AFKDpu Logo"
                 data-ai-hint="treehouse logo"
-                className="mx-auto aspect-video overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
+                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
               />
             </div>
           </div>
