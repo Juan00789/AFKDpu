@@ -12,7 +12,7 @@ export default function LoginPage() {
         <CardHeader className="space-y-1 text-center">
            <Link href="/" className="flex items-center gap-2 justify-center mb-4">
              <Share2 className="h-6 w-6 text-primary" />
-             <span className="text-2xl font-bold font-headline text-primary">Ephemeral Connect</span>
+             <span className="text-2xl font-bold font-headline text-primary">AFKDpu</span>
            </Link>
           <CardTitle className="text-2xl font-headline">Iniciar Sesión</CardTitle>
           <CardDescription>Ingresa tu correo electrónico para acceder a tu panel.</CardDescription>

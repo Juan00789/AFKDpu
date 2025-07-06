@@ -14,7 +14,7 @@ export default function RegisterPage() {
         <CardHeader className="space-y-1 text-center">
           <Link href="/" className="flex items-center gap-2 justify-center mb-4">
              <Share2 className="h-6 w-6 text-primary" />
-             <span className="text-2xl font-bold font-headline text-primary">Ephemeral Connect</span>
+             <span className="text-2xl font-bold font-headline text-primary">AFKDpu</span>
            </Link>
           <CardTitle className="text-2xl font-headline">Crear una cuenta</CardTitle>
           <CardDescription>Ingresa tus datos para empezar a crear conexiones.</CardDescription>

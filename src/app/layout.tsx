@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'Ephemeral Connect',
-  description: 'Una plataforma para crear conexiones efímeras entre clientes, proveedores y empleados, basadas en emociones y momentos.',
+  title: 'AFKDpu: Conexiones Reales, Sin Compromisos',
+  description: 'AFKDpu es una plataforma única que te permite crear conexiones efímeras, abstractas y emocionalmente significativas con personas de diferentes roles: clientes, proveedores y empleados.',
 };
 
 export default function RootLayout({

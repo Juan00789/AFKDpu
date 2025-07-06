@@ -33,7 +33,7 @@ const prompt = ai.definePrompt({
   name: 'connectionPromptSuggestionsPrompt',
   input: {schema: ConnectionPromptSuggestionsInputSchema},
   output: {schema: ConnectionPromptSuggestionsOutputSchema},
-  prompt: `You are an AI assistant helping users maintain and improve their connections on the Ephemeral Connect platform.
+  prompt: `You are an AI assistant helping users maintain and improve their connections on the AFKDpu platform.
 
   The user, {{{userName}}}, has a connection called {{{connectionName}}}. The connection is currently in the "{{{connectionState}}}" state.
 

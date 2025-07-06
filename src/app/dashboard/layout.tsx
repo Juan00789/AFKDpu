@@ -137,7 +137,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                  <SidebarTrigger className="sm:hidden" />
                  <div className="flex-1">
                     <h1 className="font-headline text-2xl font-semibold tracking-tight">
-                        {navItems.find(item => pathname.startsWith(item.href))?.label || "Ephemeral Connect"}
+                        {navItems.find(item => pathname.startsWith(item.href))?.label || "AFKDpu"}
                     </h1>
                  </div>
             </header>
