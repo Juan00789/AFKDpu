@@ -3,7 +3,55 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Users, FileText, Clock, History, Bell, PlusCircle, Activity, Wand2, ShieldCheck, Heart } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import Image from "next/image";
+
+const HeroLogo = () => (
+  <svg
+    width="100%"
+    height="100%"
+    viewBox="0 0 600 400"
+    className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
+    aria-label="AFKDpu Logo"
+    data-ai-hint="abstract connection"
+  >
+    <rect width="600" height="400" rx="24" fill="hsl(var(--card))" />
+    <g transform="translate(150, 50) scale(2)">
+      <path
+        d="M75 15 C52.9 15 35 32.9 35 55 C35 77.1 52.9 95 75 95 C97.1 95 115 77.1 115 55 C115 32.9 97.1 15 75 15 Z M75 85 C58.4 85 45 71.6 45 55 C45 38.4 58.4 25 75 25 C91.6 25 105 38.4 105 55 C105 71.6 91.6 85 75 85 Z"
+        fill="hsl(var(--primary))"
+        opacity="0.1"
+      />
+      <circle cx="75" cy="55" r="9" fill="hsl(var(--primary))" />
+      <circle cx="45" cy="95" r="9" fill="hsl(var(--primary))" />
+      <circle cx="105" cy="95" r="9" fill="hsl(var(--primary))" />
+      <path
+        d="M75 64 L48 90"
+        stroke="hsl(var(--primary))"
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.3"
+      />
+      <path
+        d="M75 64 L102 90"
+        stroke="hsl(var(--primary))"
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.3"
+      />
+      <text
+        x="75"
+        y="170"
+        fontFamily="Space Grotesk, sans-serif"
+        fontSize="32"
+        fontWeight="bold"
+        fill="hsl(var(--primary))"
+        textAnchor="middle"
+      >
+        AFKDpu
+      </text>
+    </g>
+  </svg>
+);
+
 
 export default function Home() {
   return (
@@ -39,13 +87,7 @@ export default function Home() {
                   </Button>
                 </div>
               </div>
-              <Image
-                src="/logo.svg"
-                width="600"
-                height="400"
-                alt="AFKDpu Logo"
-                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
-              />
+              <HeroLogo />
             </div>
           </div>
         </section>
