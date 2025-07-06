@@ -40,12 +40,11 @@ export default function Home() {
                 </div>
               </div>
               <Image
-                src="https://placehold.co/600x400.png"
+                src="/logo.svg"
                 width="600"
                 height="400"
                 alt="AFKDpu Logo"
-                data-ai-hint="treehouse logo"
-                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
+                className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
               />
             </div>
           </div>
