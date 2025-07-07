@@ -1,39 +1,53 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users can read their own profile, and other users can read a limited public version.
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.uid == userId;
-    }
-    
-    // Users can read connections they are a part of.
-    // They can create connections.
-    // They can update connections they are a part of.
-    match /connections/{connectionId} {
-      allow read, update: if request.auth.uid in resource.data.userIds;
-      allow create: if request.auth.uid != null;
-    }
-    
-    // Users can read/write messages in connections they are a part of.
-    match /connections/{connectionId}/messages/{messageId} {
-      allow read, write: if request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
+    function isAuthenticated() {
+      return request.auth != null;
     }
 
-    // Allow logged-in users to create reviews.
-    // Allow anyone to read reviews.
-    match /reviews/{reviewId} {
-        allow read: if true;
-        allow create: if request.auth != null;
+    function isOwner(userId) {
+      return request.auth.uid == userId;
     }
 
-    // Allow anyone to read business info for the public page.
-    // Allow writes only if the user's claimedBusinessId matches the document ID.
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.email == 'alcantara00789@gmail.com';
+    }
+
+    // Business data is public read-only for everyone.
+    // Only the admin or the assigned business owner can write.
     match /businesses/{businessId} {
-        allow read: if true;
-        allow write: if request.auth.uid != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId;
+      allow read: if true;
+      allow write: if isAuthenticated() && 
+                    (isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
+    }
+
+    // Users can read any profile, but only write to their own.
+    // Admin can update the claimedBusinessId for any user.
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || 
+                     (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimedBusinessId']));
+    }
+
+    // Connections can only be accessed by participants.
+    match /connections/{connectionId} {
+      allow read, update: if isAuthenticated() && request.auth.uid in resource.data.userIds;
+      allow create: if isAuthenticated() && isOwner(request.resource.data.creatorId);
+
+      // Messages can only be accessed by participants of the parent connection.
+      match /messages/{messageId} {
+        allow read, create: if isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
+      }
+    }
+
+    // Reviews are public, but can only be created by an authenticated user.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if isAuthenticated() && isOwner(request.resource.data.reviewerId);
     }
   }
 }
