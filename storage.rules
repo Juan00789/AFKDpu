@@ -1,10 +1,15 @@
 
+rules_version = '2';
+
 service firebase.storage {
   match /b/{bucket}/o {
-    // Users can only read any avatar, but only write to their own folder.
+    // Avatars can be read by anyone, but only written by the owner.
+    // We also check file size and type for security.
     match /avatars/{userId}/{allPaths=**} {
       allow read;
-      allow write: if request.auth.uid == userId;
+      allow write: if request.auth != null && request.auth.uid == userId
+                   && request.resource.size < 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
     }
   }
 }
