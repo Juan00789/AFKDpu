@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Connection, Message, User } from "@/lib/mock-data";
-import { Send, Loader2, AlertTriangle } from "lucide-react";
+import { Send, Loader2, AlertTriangle, Banknote } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 import { doc, getDoc, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, updateDoc, writeBatch, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -18,6 +18,7 @@ import React from 'react';
 import { formatRelative } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function ConnectionDetailPage() {
   const params = useParams<{ id: string }>();
@@ -25,6 +26,7 @@ export default function ConnectionDetailPage() {
   const [connection, setConnection] = useState<Connection | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [providerDetails, setProviderDetails] = useState<User | null>(null);
 
   const [connectionLoading, setConnectionLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(true);
@@ -69,6 +71,24 @@ export default function ConnectionDetailPage() {
       };
     }
   }, [params.id]);
+  
+  useEffect(() => {
+    if (!connection?.provider?.id) return;
+
+    const fetchProviderDetails = async () => {
+        try {
+            const providerRef = doc(db, 'users', connection.provider.id);
+            const providerSnap = await getDoc(providerRef);
+            if (providerSnap.exists()) {
+                setProviderDetails(providerSnap.data() as User);
+            }
+        } catch (err) {
+            console.error("Error fetching provider details:", err);
+        }
+    };
+
+    fetchProviderDetails();
+  }, [connection]);
 
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -187,6 +207,16 @@ export default function ConnectionDetailPage() {
               </div>
           </CardHeader>
           <CardContent>
+            {appUser?.role === 'Cliente' && providerDetails && (providerDetails.bankName || providerDetails.bankAccountNumber) && (
+              <Alert className="mb-4">
+                  <Banknote className="h-4 w-4" />
+                  <AlertTitle>Información de Pago del Proveedor</AlertTitle>
+                  <AlertDescription>
+                      <p><strong>Banco:</strong> {providerDetails.bankName || 'No especificado'}</p>
+                      <p><strong>No. de Cuenta:</strong> {providerDetails.bankAccountNumber || 'No especificado'}</p>
+                  </AlertDescription>
+              </Alert>
+            )}
             <div className="h-[60vh] flex flex-col">
                  <p className="text-center text-xs text-muted-foreground py-2">Los mensajes se guardan hasta que el destinatario los vea.</p>
                 <Separator />
