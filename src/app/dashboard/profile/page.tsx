@@ -437,19 +437,17 @@ export default function ProfilePage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Megaphone className="h-6 w-6" />
-                                Mi Publicidad
+                                Gestión de Publicidad
                             </CardTitle>
                             <CardDescription>
-                                Gestiona la página de publicidad que se te ha asignado.
+                                Desde aquí puedes editar el contenido de la página que se te ha asignado.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                             <p className="text-sm text-muted-foreground mb-4">
-                                Tienes acceso para editar: <strong>Miguel iPhone Center</strong>.
-                            </p>
-                            <Button asChild className="w-full">
+                           <Button asChild className="w-full">
                                 <Link href="/publicidad-sana">
-                                    Ir a mi página de publicidad
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Editar "Miguel iPhone Center"
                                 </Link>
                             </Button>
                         </CardContent>
