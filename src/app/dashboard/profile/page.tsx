@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -14,7 +15,7 @@ import { type User } from "@/lib/mock-data"
 import { Edit, Upload, Loader2, Save, Star } from "lucide-react"
 import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, updateDoc, increment } from "firebase/firestore";
+import { doc, updateDoc, increment, DocumentData, PartialWithFieldValue } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -104,54 +105,61 @@ export default function ProfilePage() {
 
 
     const handleSave = async () => {
-        if (formData && user) {
-            setIsSaving(true);
-            try {
-                const userRef = doc(db, 'users', user.id);
-                // Destructure to separate the ID from the data to be updated.
-                const { id, ...dataToUpdate } = formData;
-                let pointsAwarded = 0;
+        if (!formData || !user) return;
 
-                // "Actualizarás tu perfil con verdad" commandment logic
-                if (!user.profileCompleted && dataToUpdate.avatar && !dataToUpdate.avatar.includes('placehold.co') && dataToUpdate.objectives && dataToUpdate.objectives.trim().length > 10) {
-                    dataToUpdate.profileCompleted = true;
-                    pointsAwarded = 7;
-                }
+        setIsSaving(true);
+        try {
+            const userRef = doc(db, 'users', user.id);
+            const { id, ...dataToSubmit } = formData;
+            
+            const updatePayload: PartialWithFieldValue<DocumentData> = { ...dataToSubmit };
+            let pointsAwarded = 0;
 
-                if (pointsAwarded > 0) {
-                    // If points are awarded, create a special object for the update
-                    const updateWithPoints = { ...dataToUpdate, points: increment(pointsAwarded) };
-                    await updateDoc(userRef, updateWithPoints);
+            // Logic to award points for completing the profile
+            const profileIsNowComplete = !user.profileCompleted &&
+                                         dataToSubmit.avatar && !dataToSubmit.avatar.includes('placehold.co') &&
+                                         dataToSubmit.objectives && dataToSubmit.objectives.trim().length > 10;
 
-                    // Update the user state in the context
-                    setAppUser(prev => prev ? ({ ...prev, ...formData, points: prev.points + pointsAwarded }) : null);
-                    toast({
-                        title: "¡Perfil Guardado y Puntos Ganados!",
-                        description: `Has ganado ${pointsAwarded} puntos por completar tu perfil.`,
-                    });
-                } else {
-                    // For regular profile updates, use updateDoc with the data.
-                    await updateDoc(userRef, dataToUpdate);
-                    setAppUser(formData);
-                    toast({
-                        title: "¡Perfil Guardado!",
-                        description: "Tus cambios han sido guardados exitosamente.",
-                    });
-                }
-
-                // Update the local user state and close the dialog
-                setUser(formData);
-                setDialogOpen(false);
-            } catch (error) {
-                console.error("Error al guardar el perfil:", error);
-                toast({
-                    variant: "destructive",
-                    title: "Error",
-                    description: "No se pudieron guardar los cambios en tu perfil.",
-                });
-            } finally {
-                setIsSaving(false);
+            if (profileIsNowComplete) {
+                updatePayload.profileCompleted = true;
+                updatePayload.points = increment(7);
+                pointsAwarded = 7;
             }
+
+            await updateDoc(userRef, updatePayload);
+            
+            // Update context and user state
+            const updatedUserInState = {
+                ...formData,
+                points: user.points + pointsAwarded,
+                profileCompleted: profileIsNowComplete || user.profileCompleted
+            };
+            setAppUser(updatedUserInState);
+            setUser(updatedUserInState);
+
+            if (pointsAwarded > 0) {
+                toast({
+                    title: "¡Perfil Guardado y Puntos Ganados!",
+                    description: `Has ganado ${pointsAwarded} puntos por completar tu perfil.`,
+                });
+            } else {
+                toast({
+                    title: "¡Perfil Guardado!",
+                    description: "Tus cambios han sido guardados exitosamente.",
+                });
+            }
+
+            setDialogOpen(false);
+
+        } catch (error) {
+            console.error("Error al guardar el perfil:", error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "No se pudieron guardar los cambios en tu perfil. Revisa las reglas de Firestore.",
+            });
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -302,3 +310,5 @@ export default function ProfilePage() {
         </div>
     )
 }
+
+    
