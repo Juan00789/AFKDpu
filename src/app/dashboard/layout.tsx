@@ -25,6 +25,7 @@ import {
   LogOut,
   ChevronDown,
   HelpCircle,
+  Loader2,
 } from "lucide-react"
 import {
   SidebarProvider,
@@ -40,22 +41,28 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { Logo } from "@/components/Logo"
-import { currentUser } from "@/lib/mock-data"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import { useAuth } from "@/context/AuthContext"
 
 function UserMenu() {
    const { open } = useSidebar();
+   const { appUser, logoutUser } = useAuth();
+
+   if (!appUser) {
+    return null;
+   }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className={`w-full justify-start items-center gap-3 px-2.5 ${open ? '' : 'px-0'}`}>
           <Avatar className="h-8 w-8">
-            <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
-            <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={appUser.avatar} alt={appUser.name} />
+            <AvatarFallback>{appUser.name.charAt(0)}</AvatarFallback>
           </Avatar>
            <div className={`flex flex-col items-start transition-all duration-200 ${open ? 'opacity-100 w-auto' : 'opacity-0 w-0'}`}>
-              <span className="font-medium text-sm truncate">{currentUser.name}</span>
-              <span className="text-xs text-muted-foreground truncate">{currentUser.email}</span>
+              <span className="font-medium text-sm truncate">{appUser.name}</span>
+              <span className="text-xs text-muted-foreground truncate">{appUser.email}</span>
             </div>
           <ChevronDown className={`ml-auto h-4 w-4 shrink-0 transition-opacity ${open ? 'opacity-100' : 'opacity-0'}`} />
         </Button>
@@ -63,9 +70,9 @@ function UserMenu() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{currentUser.name}</p>
+            <p className="text-sm font-medium leading-none">{appUser.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {currentUser.email}
+              {appUser.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -83,11 +90,9 @@ function UserMenu() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link href="/login">
+        <DropdownMenuItem onClick={logoutUser}>
             <LogOut className="mr-2 h-4 w-4" />
             <span>Cerrar sesión</span>
-          </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -105,6 +110,22 @@ const navItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { firebaseUser, loading } = useAuth();
+
+  React.useEffect(() => {
+    if (!loading && !firebaseUser) {
+      router.push('/login');
+    }
+  }, [firebaseUser, loading, router]);
+
+  if (loading || !firebaseUser) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>

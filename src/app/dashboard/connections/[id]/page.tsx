@@ -1,3 +1,4 @@
+'use client';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,9 +7,11 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { SmartPromptSuggestions } from "@/components/SmartPromptSuggestions";
-import { currentUser, mockConnections } from "@/lib/mock-data";
+import { mockConnections } from "@/lib/mock-data";
 import { cva } from "class-variance-authority";
-import { Send, HeartPulse, Minus, TrendingDown } from "lucide-react";
+import { Send, HeartPulse, Minus, TrendingDown, Loader2 } from "lucide-react";
+import { useAuth } from '@/context/AuthContext';
+import React from 'react';
 
 const statusBadgeVariants = cva(
   "border-transparent text-xs",
@@ -24,15 +27,25 @@ const statusBadgeVariants = cva(
 );
 
 export default function ConnectionDetailPage({ params }: { params: { id: string } }) {
+  const { appUser } = useAuth();
   const connection = mockConnections.find(c => c.id === params.id) || mockConnections[0];
-  const otherParticipant = connection.participants.find(p => p.id !== currentUser.id) || connection.participants[0];
+  
+  if (!appUser) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+    );
+  }
+
+  const otherParticipant = connection.participants.find(p => p.id !== appUser.id) || connection.participants[0];
 
   const connectionInfo = {
       connectionName: connection.name,
       connectionState: connection.status,
       lastInteraction: "La última interacción fue una llamada para revisar el progreso del proyecto hace 2 días.",
       rules: "Si la conexión se vuelve 'Fading' por más de 1 hora, enviar una notificación.",
-      userName: currentUser.name,
+      userName: appUser.name,
   };
 
   return (
@@ -80,8 +93,8 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
                        <p className="text-xs text-primary-foreground/80 text-right mt-1">Hace 2 minutos</p>
                     </div>
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={currentUser.avatar} />
-                      <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={appUser.avatar} />
+                      <AvatarFallback>{appUser.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                   </div>
                 </div>

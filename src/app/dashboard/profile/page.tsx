@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,12 +12,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
-import { currentUser, mockConnections, type User } from "@/lib/mock-data"
+import { mockConnections, type User } from "@/lib/mock-data"
 import { Star, Edit, BarChart2, Upload, Loader2 } from "lucide-react"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
 import { storage } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useAuth } from '@/context/AuthContext';
 
 const pastConnections = [
     { id: 'conn-past-1', name: 'Migración de Servidor', status: 'Finalizada', finalState: 'Sereno', duration: '30 días', rating: 5 },
@@ -64,24 +65,35 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function ProfilePage() {
-    const [user, setUser] = useState<User>(currentUser);
+    const { appUser } = useAuth();
+    const [user, setUser] = useState<User | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     
-    const [formData, setFormData] = useState<User>(user);
+    const [formData, setFormData] = useState<User | null>(null);
     const [emotionalState, setEmotionalState] = useState("Sereno");
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    useEffect(() => {
+        if (appUser) {
+            setUser(appUser);
+            setFormData(appUser);
+        }
+    }, [appUser]);
+
+
     const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (!file) return;
+        if (!file || !user) return;
 
         setIsUploading(true);
         try {
             const imageRef = storageRef(storage, `avatars/${user.id}/${file.name}`);
             await uploadBytes(imageRef, file);
             const downloadURL = await getDownloadURL(imageRef);
-            setFormData({ ...formData, avatar: downloadURL });
+            if (formData) {
+              setFormData({ ...formData, avatar: downloadURL });
+            }
         } catch (error) {
             console.error("Error al subir la imagen:", error);
         } finally {
@@ -91,7 +103,9 @@ export default function ProfilePage() {
 
 
     const handleSave = () => {
-        setUser(formData);
+        if (formData) {
+            setUser(formData);
+        }
         setDialogOpen(false);
     };
 
@@ -100,6 +114,14 @@ export default function ProfilePage() {
             setFormData(user);
         }
         setDialogOpen(open);
+    }
+
+    if (!user || !formData) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        );
     }
 
     return (
@@ -182,7 +204,7 @@ export default function ProfilePage() {
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="name" className="text-right">Nombre</Label>
-                                        <Input id="name" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="col-span-3" />
+                                        <Input id="name" value={formData.name} onChange={(e) => setFormData({...formData!, name: e.target.value})} className="col-span-3" />
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="email" className="text-right">Email</Label>
@@ -190,7 +212,7 @@ export default function ProfilePage() {
                                     </div>
                                      <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="role" className="text-right">Rol</Label>
-                                        <Select value={formData.role} onValueChange={(value) => setFormData({...formData, role: value as User['role']})}>
+                                        <Select value={formData.role} onValueChange={(value) => setFormData({...formData!, role: value as User['role']})}>
                                             <SelectTrigger className="col-span-3">
                                                 <SelectValue placeholder="Selecciona un rol" />
                                             </SelectTrigger>
@@ -224,7 +246,7 @@ export default function ProfilePage() {
                                             className="col-span-3" 
                                             rows={4}
                                             value={formData.objectives || ''}
-                                            onChange={(e) => setFormData({...formData, objectives: e.target.value})}
+                                            onChange={(e) => setFormData({...formData!, objectives: e.target.value})}
                                         />
                                     </div>
                                 </div>

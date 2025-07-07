@@ -47,5 +47,3 @@ export const mockTasks: Task[] = [
   { id: 'task-5', title: 'Crear copys para anuncios', status: 'Abierto', connectionId: 'conn-2', connectionName: 'Campaña de Marketing Q3', participants: [mockUsers[2], mockUsers[3]] },
   { id: 'task-6', title: 'Testing de endpoints', status: 'En Progreso', connectionId: 'conn-4', connectionName: 'Integración API', participants: [mockUsers[2], mockUsers[1]] },
 ];
-
-export const currentUser: User = mockUsers[4];
