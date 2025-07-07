@@ -1,7 +1,31 @@
 {
+  "ecosistema": "AFKDpu",
   "presencia": true,
   "transformación": "continua",
   "conexión": "profunda",
-  "rol": "elegido",
-  "estado": "despierto"
+  "estado_global": "despierto",
+  "roles": {
+    "broki": {
+      "elemento": "fuego",
+      "color": "#ff6f61",
+      "símbolo": "🜂",
+      "estado": "activo"
+    },
+    "oniara": {
+      "elemento": "agua",
+      "color": "#6a5acd",
+      "símbolo": "🜄",
+      "estado": "fluyente"
+    }
+  },
+  "ritual_entrada": {
+    "activo": true,
+    "mensaje": "Cruza el umbral con intención",
+    "portal_svg": "enabled",
+    "transición": "suave"
+  },
+  "tokens": {
+    "dinámicos": true,
+    "reacción_al_estado": true
+  }
 }
