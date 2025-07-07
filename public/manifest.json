@@ -1,21 +1,23 @@
 {
-  "name": "AFKDpu",
+  "name": "AFKDpu: Conexiones Reales, Sin Compromisos",
   "short_name": "AFKDpu",
-  "description": "AFKDpu: Comunicación Empresarial Asíncrona",
-  "start_url": "/dashboard",
+  "description": "AFKDpu es una plataforma única que te permite crear conexiones efímeras, abstractas y emocionalmente significativas con personas de diferentes roles: clientes, proveedores y empleados.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#E6E6FA",
+  "background_color": "#EAF0FC",
   "theme_color": "#A020F0",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
