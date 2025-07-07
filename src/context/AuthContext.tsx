@@ -28,15 +28,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
-      try {
-        if (user) {
+      if (user) {
+        try {
           const userRef = doc(db, 'users', user.uid);
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             setAppUser(userSnap.data() as User);
           } else {
-            // This case is for users that existed before firestore integration
-            // or if doc creation failed during registration.
+            // Document doesn't exist, create it. This is for first-time logins or new registrations.
             const newUser: User = {
               id: user.uid,
               name: user.displayName || 'Nuevo Usuario',
@@ -48,16 +47,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             await setDoc(userRef, newUser);
             setAppUser(newUser);
           }
-        } else {
-          setAppUser(null);
+        } catch (error) {
+          console.error("Error al obtener el perfil de Firestore:", error);
+          // Fallback mechanism: If Firestore is inaccessible (e.g., rules issue),
+          // create a temporary user profile from auth data to prevent a logout loop.
+          // This keeps the user logged in and the app functional.
+          const fallbackUser: User = {
+            id: user.uid,
+            name: user.displayName || 'Usuario Temporal',
+            email: user.email!,
+            role: 'Cliente',
+            avatar: user.photoURL || `https://placehold.co/100x100.png`,
+            objectives: 'No se pudieron cargar los datos del perfil. La información no se guardará.'
+          };
+          setAppUser(fallbackUser);
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Firebase Auth Error: Could not get user document.", error);
-        // This is a critical error, likely due to Firestore rules.
-        // We will sign the user out to prevent an inconsistent state.
+      } else {
+        // User is signed out.
         setAppUser(null);
-        await signOut(auth);
-      } finally {
         setLoading(false);
       }
     });
