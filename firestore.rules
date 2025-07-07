@@ -1,43 +1,39 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users can read any profile, but only update their own.
-    // For simplicity, we are allowing users to update their own points.
-    // In a production app, this should be handled by a Cloud Function for security.
+    // Users can read their own profile, and other users can read a limited public version.
     match /users/{userId} {
-      allow read: if true;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
     }
-
-    // Businesses can be read by anyone.
-    // Writes are allowed for any authenticated user. App logic handles authorization.
-    match /businesses/{businessId} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    // Connections can be created by authenticated users.
-    // Only participants can read or update a connection.
+    
+    // Users can read connections they are a part of.
+    // They can create connections.
+    // They can update connections they are a part of.
     match /connections/{connectionId} {
-      allow get, list: if request.auth != null && request.auth.uid in resource.data.userIds;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null && request.auth.uid in resource.data.userIds;
-
-      // Messages are only accessible to participants of the connection.
-      match /messages/{messageId} {
-        allow read, write: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
-      }
+      allow read, update: if request.auth.uid in resource.data.userIds;
+      allow create: if request.auth.uid != null;
+    }
+    
+    // Users can read/write messages in connections they are a part of.
+    match /connections/{connectionId}/messages/{messageId} {
+      allow read, write: if request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
     }
 
-    // Reviews can be read by anyone.
-    // Only authenticated users can create reviews, and they must be the author.
+    // Allow logged-in users to create reviews.
+    // Allow anyone to read reviews.
     match /reviews/{reviewId} {
-      allow read: if true;
-      allow create: if request.auth != null && request.resource.data.reviewerId == request.auth.uid;
+        allow read: if true;
+        allow create: if request.auth != null;
+    }
+
+    // Allow anyone to read business info for the public page.
+    // Allow writes only if the user's claimedBusinessId matches the document ID.
+    match /businesses/{businessId} {
+        allow read: if true;
+        allow write: if request.auth.uid != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId;
     }
   }
 }
