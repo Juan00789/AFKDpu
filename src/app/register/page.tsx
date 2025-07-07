@@ -14,12 +14,19 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { type User } from '@/lib/mock-data';
 
+const roleDescriptions: Record<User['role'], string> = {
+  Cliente: "Podrás crear solicitudes temporales y conectarte emocionalmente con proveedores.",
+  Proveedor: "Podrás ofrecer tus servicios abstractos y recibir conexiones que respeten tus reglas.",
+  Empleado: "Podrás observar conexiones o participar en nombre de una empresa."
+};
+
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [role, setRole] = useState<User['role']>('Cliente');
+  const [language, setLanguage] = useState('es');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { registerUser } = useAuth();
@@ -98,6 +105,23 @@ export default function RegisterPage() {
                     <SelectItem value="Proveedor">Proveedor</SelectItem>
                     <SelectItem value="Empleado">Empleado</SelectItem>
                   </SelectContent>
+                </Select>
+                {role && (
+                    <p className="text-xs text-muted-foreground px-1">
+                        {roleDescriptions[role]}
+                    </p>
+                )}
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="language">Idioma</Label>
+                <Select value={language} onValueChange={setLanguage}>
+                    <SelectTrigger id="language">
+                        <SelectValue placeholder="Elige un idioma..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="es">Español</SelectItem>
+                        <SelectItem value="en">English</SelectItem>
+                    </SelectContent>
                 </Select>
               </div>
               <div className="flex items-center space-x-2">
