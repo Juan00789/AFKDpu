@@ -4,27 +4,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { mockConnections, Service } from "@/lib/mock-data"
+import { Connection } from "@/lib/mock-data"
 import { cva } from "class-variance-authority"
-import { MoreHorizontal, Users, ArrowRight, Clock, Loader2 } from "lucide-react"
+import { ArrowRight, History as HistoryIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import { collection, query, where, onSnapshot, orderBy, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-
-const statusBadgeVariants = cva(
-  "border-transparent",
-  {
-    variants: {
-      status: {
-        Vibrante: "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200",
-        Neutral: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200",
-        Fading: "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200",
-      },
-    },
-  }
-)
 
 const emotionalStateBadgeVariants = cva(
   "border-transparent capitalize text-xs",
@@ -41,168 +28,132 @@ const emotionalStateBadgeVariants = cva(
   }
 );
 
-function ConnectionsTable() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Conexiones Activas</CardTitle>
-        <CardDescription>Tus conexiones actuales y su estado emocional.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre de la Conexión</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Participantes</TableHead>
-              <TableHead>Duración Restante</TableHead>
-              <TableHead><span className="sr-only">Acciones</span></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {mockConnections.map(conn => (
-              <TableRow key={conn.id}>
-                <TableCell className="font-medium">{conn.name}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusBadgeVariants({ status: conn.status })}>{conn.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center -space-x-2">
-                    {conn.participants.map(p => (
-                      <Avatar key={p.id} className="h-8 w-8 border-2 border-background">
-                        <AvatarImage src={p.avatar} />
-                        <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell>{conn.duration}</TableCell>
-                <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/dashboard/connections/${conn.id}`}>
-                            <ArrowRight className="h-4 w-4" />
-                            <span className="sr-only">Ver conexión</span>
-                        </Link>
-                    </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  )
-}
 
-function ServiceCard({ service }: { service: Service }) {
-  return (
-    <Card className="hover:shadow-md transition-shadow">
-       <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-2">
-            <p className="text-sm font-medium pr-2">{service.title}</p>
-            <Badge variant="outline" className={emotionalStateBadgeVariants({ status: service.emotionalState })}>{service.emotionalState}</Badge>
-        </div>
-         <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-            <Clock className="h-3 w-3" />
-            <span>{service.duration}</span>
-        </div>
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <div className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                <span className="truncate">{service.connectionName}</span>
-            </div>
-          <div className="flex items-center -space-x-1">
-             {service.participants.map(p => (
-                <Avatar key={p.id} className="h-5 w-5 border-2 border-card">
-                  <AvatarImage src={p.avatar} />
-                  <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-              ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function ServicesBoard() {
+function ActiveConnectionsSummary() {
   const { appUser } = useAuth();
-  const [services, setServices] = useState<Service[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!appUser) return;
-    setLoading(true);
 
     const q = query(
-      collection(db, "services"),
+      collection(db, "connections"),
       where("userIds", "array-contains", appUser.id),
-      orderBy("createdAt", "desc")
+      where("status", "in", ["En Progreso", "Abierto"]),
+      orderBy("createdAt", "desc"),
+      limit(5)
     );
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const servicesData: Service[] = [];
-      querySnapshot.forEach((doc) => {
-        servicesData.push({
-          id: doc.id,
-          ...doc.data(),
-        } as Service);
-      });
-      setServices(servicesData);
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const connectionsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Connection));
+      setConnections(connectionsData);
       setLoading(false);
     }, (error) => {
-      console.error("Error fetching services: ", error);
+      console.error("Error fetching active connections:", error);
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, [appUser]);
 
-  const openServices = services.filter(t => t.status === "Abierto");
-  const inProgressServices = services.filter(t => t.status === "En Progreso");
-  const doneServices = services.filter(t => t.status === "Terminadas");
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Conexiones Activas</CardTitle>
+          <CardDescription>Un resumen de tus vínculos actuales.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex h-48 items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mis Servicios</CardTitle>
-        <CardDescription>Servicios asociados a tus conexiones, organizados por estado.</CardDescription>
+        <CardTitle>Conexiones Activas</CardTitle>
+        <CardDescription>Un resumen de tus vínculos actuales y su estado emocional.</CardDescription>
       </CardHeader>
-       {loading ? (
-          <CardContent className="flex h-48 items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </CardContent>
+      <CardContent>
+        {connections.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Propósito</TableHead>
+                <TableHead>Estado Emocional</TableHead>
+                <TableHead>Participantes</TableHead>
+                <TableHead>Duración</TableHead>
+                <TableHead><span className="sr-only">Acciones</span></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {connections.map(conn => (
+                <TableRow key={conn.id}>
+                  <TableCell className="font-medium">{conn.purpose}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={emotionalStateBadgeVariants({ status: conn.emotionalState })}>{conn.emotionalState}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center -space-x-2">
+                      {conn.participants.map(p => (
+                        <Avatar key={p.id} className="h-8 w-8 border-2 border-background">
+                          <AvatarImage src={p.avatar} />
+                          <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>{conn.duration}</TableCell>
+                  <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" asChild>
+                          <Link href={`/dashboard/connections/${conn.id}`}>
+                              <ArrowRight className="h-4 w-4" />
+                              <span className="sr-only">Ver conexión</span>
+                          </Link>
+                      </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         ) : (
-          <CardContent className="grid md:grid-cols-3 gap-6">
-            <div className="space-y-4">
-              <h3 className="font-headline font-semibold">Abierto ({openServices.length})</h3>
-              <div className="space-y-2">
-                {openServices.map(service => <ServiceCard key={service.id} service={service} />)}
-              </div>
-            </div>
-            <div className="space-y-4">
-              <h3 className="font-headline font-semibold">En Progreso ({inProgressServices.length})</h3>
-              <div className="space-y-2">
-                {inProgressServices.map(service => <ServiceCard key={service.id} service={service} />)}
-              </div>
-            </div>
-            <div className="space-y-4">
-              <h3 className="font-headline font-semibold">Terminadas ({doneServices.length})</h3>
-              <div className="space-y-2">
-                {doneServices.map(service => <ServiceCard key={service.id} service={service} />)}
-              </div>
-            </div>
-          </CardContent>
-       )}
+          <p className="text-sm text-muted-foreground text-center py-8">No tienes conexiones activas en este momento.</p>
+        )}
+      </CardContent>
     </Card>
   )
 }
 
+
 export default function DashboardPage() {
+  const { appUser } = useAuth();
+  
   return (
     <div className="space-y-6">
-      <ConnectionsTable />
-      <ServicesBoard />
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold font-headline">¡Bienvenido, {appUser?.name}!</h1>
+        <p className="text-muted-foreground">Aquí tienes un resumen de tu actividad reciente en AFKDpu.</p>
+      </div>
+      <ActiveConnectionsSummary />
+       <Card>
+        <CardHeader>
+            <CardTitle>Historial Reciente</CardTitle>
+            <CardDescription>Los últimos eventos importantes en tus conexiones.</CardDescription>
+        </CardHeader>
+        <CardContent>
+             <div className="text-center text-muted-foreground py-8">
+                <HistoryIcon className="mx-auto h-12 w-12 text-gray-300" />
+                <p className="mt-4">El historial de eventos aparecerá aquí.</p>
+                <Button variant="secondary" className="mt-4" asChild>
+                    <Link href="/dashboard/history">Ver todo el historial</Link>
+                </Button>
+            </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

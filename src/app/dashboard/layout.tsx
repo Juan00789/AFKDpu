@@ -102,7 +102,6 @@ function UserMenu() {
 const navItems = [
     { href: "/dashboard", icon: Home, label: "Inicio" },
     { href: "/dashboard/connections", icon: Users, label: "Mis Conexiones" },
-    { href: "/dashboard/tasks", icon: Briefcase, label: "Mis Servicios" },
     { href: "/dashboard/history", icon: History, label: "Historial" },
     { href: "/dashboard/settings", icon: Settings, label: "Configuración" },
     { href: "/dashboard/quiz", icon: HelpCircle, label: "Cuestionario" },
