@@ -45,28 +45,44 @@ interface BusinessData {
   products: Product[];
 }
 
+interface ProductCardProps extends Product {
+    businessPhone: string;
+}
 
-const ProductCard = ({ name, price, category, imageUrl, imageHint }: Product) => (
-  <Card>
-    <CardHeader>
-      <div className="aspect-square relative w-full mb-4">
-        <Image
-          src={imageUrl || 'https://placehold.co/400x400.png'}
-          alt={name}
-          fill
-          className="rounded-t-lg object-cover"
-          data-ai-hint={imageHint}
-        />
-      </div>
-      <CardTitle className="text-xl font-headline">{name}</CardTitle>
-      <CardDescription>{category}</CardDescription>
-    </CardHeader>
-    <CardContent>
-      <p className="text-lg font-semibold">{price}</p>
-      <Button className="w-full mt-4">Ver Producto</Button>
-    </CardContent>
-  </Card>
-);
+const ProductCard = ({ name, price, category, imageUrl, imageHint, businessPhone }: ProductCardProps) => {
+    const handleWhatsAppClick = () => {
+        // Sanitize phone number: remove spaces, parentheses, dashes, and plus signs
+        const cleanPhoneNumber = businessPhone.replace(/[\s()+-]/g, '');
+        const message = encodeURIComponent(`Hola, estoy interesado en el producto: ${name}`);
+        window.open(`https://wa.me/${cleanPhoneNumber}?text=${message}`, '_blank');
+    };
+
+    return (
+        <Card>
+            <CardHeader>
+                <div className="aspect-square relative w-full mb-4">
+                    <Image
+                        src={imageUrl || 'https://placehold.co/400x400.png'}
+                        alt={name}
+                        fill
+                        className="rounded-t-lg object-cover"
+                        data-ai-hint={imageHint}
+                    />
+                </div>
+                <CardTitle className="text-xl font-headline">{name}</CardTitle>
+                <CardDescription>{category}</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p className="text-lg font-semibold">{price}</p>
+                <Button className="w-full mt-4" onClick={handleWhatsAppClick}>
+                    <Phone className="mr-2 h-4 w-4" />
+                    Contactar por WhatsApp
+                </Button>
+            </CardContent>
+        </Card>
+    );
+};
+
 
 export default function PublicidadSanaPage() {
     const [businessData, setBusinessData] = useState<BusinessData | null>(null);
@@ -171,7 +187,7 @@ export default function PublicidadSanaPage() {
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-6">
                     {businessData.products.map((product, index) => (
-                      <ProductCard key={index} {...product} />
+                      <ProductCard key={index} {...product} businessPhone={businessData.phone} />
                     ))}
                   </div>
                 </section>
