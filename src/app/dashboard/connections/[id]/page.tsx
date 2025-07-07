@@ -14,7 +14,8 @@ import { Connection, Message, User } from "@/lib/mock-data";
 import { Send, Loader2, AlertTriangle, Banknote, Star } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 import { doc, getDoc, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, updateDoc, writeBatch, increment } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db, rtdb } from '@/lib/firebase';
+import { ref as rtdbRef, onValue, off, push, serverTimestamp as rtdbServerTimestamp } from 'firebase/database';
 import React from 'react';
 import { formatRelative } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -151,7 +152,6 @@ export default function ConnectionDetailPage() {
           const connData = { id: docSnap.id, ...docSnap.data() } as Connection;
           setConnection(connData);
 
-          // Find and fetch the other user in the connection
           const otherParticipant = connData.participants.find(p => p.id !== appUser.id);
           if (otherParticipant) {
               const userRef = doc(db, 'users', otherParticipant.id);
@@ -171,23 +171,29 @@ export default function ConnectionDetailPage() {
         setConnectionLoading(false);
       });
 
-      const messagesQuery = query(collection(db, 'connections', params.id, 'messages'), orderBy('createdAt', 'asc'));
-      const unsubscribeMsgs = onSnapshot(messagesQuery, (querySnapshot) => {
-        const messagesData: Message[] = [];
-        querySnapshot.forEach((doc) => {
-          messagesData.push({ id: doc.id, ...doc.data() } as Message);
-        });
-        setMessages(messagesData);
+      // Using Realtime Database for messages
+      const messagesRef = rtdbRef(rtdb, `messages/${params.id}`);
+      const unsubscribeMsgs = onValue(messagesRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const messagesArray = Object.keys(data)
+            .map(key => ({ id: key, ...data[key] }))
+            .sort((a, b) => a.createdAt - b.createdAt);
+          setMessages(messagesArray);
+        } else {
+          setMessages([]);
+        }
         setMessagesLoading(false);
       }, (err) => {
-        console.error("Error fetching messages:", err);
+        console.error("Error fetching messages from RTDB:", err);
         setError("Error al cargar los mensajes.");
         setMessagesLoading(false);
       });
 
+
       return () => {
         unsubscribeConn();
-        unsubscribeMsgs();
+        off(messagesRef);
       };
     }
   }, [params.id, appUser]);
@@ -223,9 +229,10 @@ export default function ConnectionDetailPage() {
     if (!newMessage.trim() || !appUser || !params.id) return;
 
     try {
-      await addDoc(collection(db, 'connections', params.id, 'messages'), {
+      const messagesRef = rtdbRef(rtdb, `messages/${params.id}`);
+      await push(messagesRef, {
         text: newMessage,
-        createdAt: serverTimestamp(),
+        createdAt: rtdbServerTimestamp(),
         senderId: appUser.id,
         senderName: appUser.name,
         senderAvatar: appUser.avatar,
@@ -233,7 +240,7 @@ export default function ConnectionDetailPage() {
       setNewMessage("");
     } catch (err) {
       console.error("Error sending message:", err);
-      setError("No se pudo enviar el mensaje. Revisa los permisos.");
+      setError("No se pudo enviar el mensaje. Revisa los permisos de la base de datos.");
     }
   };
 
@@ -294,7 +301,7 @@ export default function ConnectionDetailPage() {
   const formatTimestamp = (timestamp: any) => {
     if (!isClient) return '';
     if (!timestamp) return 'Ahora';
-    const date = timestamp.toDate();
+    const date = typeof timestamp === 'number' ? new Date(timestamp) : timestamp.toDate();
     return formatRelative(date, new Date(), { locale: es });
   };
   
