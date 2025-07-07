@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { type User } from "@/lib/mock-data"
-import { Edit, Upload, Loader2, Save, Megaphone, UserPlus, AlertTriangle, Trash2 } from "lucide-react"
+import { Edit, Upload, Loader2, Save, Megaphone, UserPlus, AlertTriangle, Trash2, Banknote } from "lucide-react"
 import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc, increment, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
@@ -299,6 +299,15 @@ export default function ProfilePage() {
             if ((formData.objectives || '') !== (user.objectives || '')) {
                 updatePayload.objectives = formData.objectives || '';
             }
+
+            if (formData.role === 'Proveedor') {
+                if ((formData.bankName || '') !== (user.bankName || '')) {
+                    updatePayload.bankName = formData.bankName || '';
+                }
+                if ((formData.bankAccountNumber || '') !== (user.bankAccountNumber || '')) {
+                    updatePayload.bankAccountNumber = formData.bankAccountNumber || '';
+                }
+            }
             
             let pointsAwarded = 0;
 
@@ -396,6 +405,16 @@ export default function ProfilePage() {
                             </p>
                         </div>
 
+                        {user.role === 'Proveedor' && (
+                            <div>
+                                <Label className="text-muted-foreground font-semibold">Información Bancaria</Label>
+                                <div className="text-foreground leading-normal mt-1 space-y-1">
+                                    <p><strong>Banco:</strong> {user.bankName || 'No especificado'}</p>
+                                    <p><strong>No. de Cuenta:</strong> {user.bankAccountNumber || 'No especificado'}</p>
+                                </div>
+                            </div>
+                        )}
+
                         <Dialog open={isDialogOpen} onOpenChange={handleOpenChange}>
                             <DialogTrigger asChild>
                                 <Button className="w-full">
@@ -475,6 +494,18 @@ export default function ProfilePage() {
                                             onChange={(e) => setFormData({...formData!, objectives: e.target.value})}
                                         />
                                     </div>
+                                    {formData.role === 'Proveedor' && (
+                                        <>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor="bankName" className="text-right">Banco</Label>
+                                                <Input id="bankName" placeholder="Nombre del banco" value={formData.bankName || ''} onChange={(e) => setFormData({...formData!, bankName: e.target.value})} className="col-span-3" />
+                                            </div>
+                                            <div className="grid grid-cols-4 items-center gap-4">
+                                                <Label htmlFor="bankAccountNumber" className="text-right">No. de Cuenta</Label>
+                                                <Input id="bankAccountNumber" placeholder="Número de cuenta bancaria" value={formData.bankAccountNumber || ''} onChange={(e) => setFormData({...formData!, bankAccountNumber: e.target.value})} className="col-span-3" />
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                                 <DialogFooter>
                                     <DialogClose asChild>

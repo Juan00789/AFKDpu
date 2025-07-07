@@ -8,6 +8,8 @@ export type User = {
   points: number;
   profileCompleted: boolean;
   claimedBusinessId?: string;
+  bankName?: string;
+  bankAccountNumber?: string;
 };
 
 export type Connection = {
