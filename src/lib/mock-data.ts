@@ -1,3 +1,4 @@
+
 export type User = {
   id: string;
   name: string;
@@ -29,7 +30,8 @@ export type Connection = {
   createdAt: {
     seconds: number;
     nanoseconds: number;
-  }
+  };
+  reviewsGiven?: { [key: string]: boolean };
 };
 
 export type Message = {
@@ -39,4 +41,16 @@ export type Message = {
   senderId: string;
   senderName: string;
   senderAvatar: string;
+};
+
+export type Review = {
+  id: string;
+  reviewerId: string;
+  reviewerName: string;
+  reviewerAvatar: string;
+  reviewedUserId: string;
+  connectionId: string;
+  rating: number;
+  comment: string;
+  createdAt: any; // Firestore Timestamp
 };

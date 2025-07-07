@@ -5,13 +5,13 @@ import { useParams } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Connection, Message, User } from "@/lib/mock-data";
-import { Send, Loader2, AlertTriangle, Banknote } from "lucide-react";
+import { Send, Loader2, AlertTriangle, Banknote, Star } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 import { doc, getDoc, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, updateDoc, writeBatch, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -21,13 +21,114 @@ import { es } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Link from 'next/link';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+
+function LeaveReviewForm({ connection, reviewedUser, appUser }: { connection: Connection; reviewedUser: User; appUser: User }) {
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (rating === 0) {
+            toast({ variant: "destructive", title: "Error", description: "Por favor, selecciona una calificación de estrellas." });
+            return;
+        }
+        if (comment.trim().length < 10) {
+            toast({ variant: "destructive", title: "Error", description: "El comentario debe tener al menos 10 caracteres." });
+            return;
+        }
+
+        setIsSubmitting(true);
+        const batch = writeBatch(db);
+
+        try {
+            // 1. Create review document
+            const reviewRef = doc(collection(db, 'reviews'));
+            batch.set(reviewRef, {
+                reviewerId: appUser.id,
+                reviewerName: appUser.name,
+                reviewerAvatar: appUser.avatar,
+                reviewedUserId: reviewedUser.id,
+                connectionId: connection.id,
+                rating,
+                comment,
+                createdAt: serverTimestamp(),
+            });
+
+            // 2. Update reviewed user's points
+            const reviewedUserRef = doc(db, 'users', reviewedUser.id);
+            batch.update(reviewedUserRef, { points: increment(rating) });
+
+            // 3. Mark review as given in the connection
+            const connectionRef = doc(db, 'connections', connection.id);
+            batch.update(connectionRef, {
+                [`reviewsGiven.${appUser.id}`]: true
+            });
+            
+            await batch.commit();
+
+            toast({ title: "¡Reseña Enviada!", description: `Has calificado a ${reviewedUser.name} con ${rating} estrellas.` });
+        } catch (error) {
+            console.error("Error submitting review:", error);
+            toast({ variant: "destructive", title: "Error", description: "No se pudo enviar la reseña." });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    
+    return (
+        <Card className="mt-6 bg-secondary/50">
+            <CardHeader>
+                <CardTitle>Dejar una Reseña para {reviewedUser.name}</CardTitle>
+                <CardDescription>Tu opinión ayuda a construir una comunidad de confianza.</CardDescription>
+            </CardHeader>
+            <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-4">
+                    <div>
+                        <Label>Calificación</Label>
+                        <div className="flex items-center gap-1 mt-2">
+                            {[...Array(5)].map((_, i) => (
+                                <Star
+                                    key={i}
+                                    className={`h-8 w-8 cursor-pointer transition-colors ${i < rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground hover:text-yellow-300'}`}
+                                    onClick={() => setRating(i + 1)}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <Label htmlFor="comment">Comentario</Label>
+                        <Textarea 
+                            id="comment" 
+                            placeholder={`Describe tu experiencia con ${reviewedUser.name}...`} 
+                            rows={4}
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            className="mt-2"
+                        />
+                    </div>
+                </CardContent>
+                <CardFooter>
+                    <Button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+                        Enviar Reseña
+                    </Button>
+                </CardFooter>
+            </form>
+        </Card>
+    );
+}
+
 
 export default function ConnectionDetailPage() {
   const params = useParams<{ id: string }>();
   const { appUser } = useAuth();
   const [connection, setConnection] = useState<Connection | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
+  const [otherUser, setOtherUser] = useState<User | null>(null);
   const [providerDetails, setProviderDetails] = useState<User | null>(null);
 
   const [connectionLoading, setConnectionLoading] = useState(true);
@@ -38,11 +139,23 @@ export default function ConnectionDetailPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (params.id) {
+    if (params.id && appUser) {
       const connectionRef = doc(db, 'connections', params.id);
-      const unsubscribeConn = onSnapshot(connectionRef, (doc) => {
-        if (doc.exists()) {
-          setConnection({ id: doc.id, ...doc.data() } as Connection);
+      const unsubscribeConn = onSnapshot(connectionRef, async (docSnap) => {
+        if (docSnap.exists()) {
+          const connData = { id: docSnap.id, ...docSnap.data() } as Connection;
+          setConnection(connData);
+
+          // Find and fetch the other user in the connection
+          const otherParticipant = connData.participants.find(p => p.id !== appUser.id);
+          if (otherParticipant) {
+              const userRef = doc(db, 'users', otherParticipant.id);
+              const userSnap = await getDoc(userRef);
+              if (userSnap.exists()) {
+                  setOtherUser(userSnap.data() as User);
+              }
+          }
+
         } else {
           setError("No se encontró la conexión.");
         }
@@ -72,7 +185,7 @@ export default function ConnectionDetailPage() {
         unsubscribeMsgs();
       };
     }
-  }, [params.id]);
+  }, [params.id, appUser]);
   
   useEffect(() => {
     if (!connection?.provider?.id) return;
@@ -97,6 +210,8 @@ export default function ConnectionDetailPage() {
       scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
+
+  const [newMessage, setNewMessage] = useState("");
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -176,7 +291,8 @@ export default function ConnectionDetailPage() {
     const date = timestamp.toDate();
     return formatRelative(date, new Date(), { locale: es });
   };
-
+  
+  const hasLeftReview = connection.reviewsGiven && connection.reviewsGiven[appUser.id];
 
   return (
     <div className="grid md:grid-cols-1 gap-6">
@@ -271,20 +387,38 @@ export default function ConnectionDetailPage() {
                   )}
                 </div>
               </ScrollArea>
-              <form className="p-4 border-t" onSubmit={handleSendMessage}>
-                <div className="relative">
-                  <Input 
-                    placeholder="Escribe un mensaje..." 
-                    className="pr-12"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                  />
-                  <Button type="submit" variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8" disabled={!newMessage.trim()}>
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </form>
+              {connection.status !== 'Cerrado' && (
+                <form className="p-4 border-t" onSubmit={handleSendMessage}>
+                  <div className="relative">
+                    <Input 
+                      placeholder="Escribe un mensaje..." 
+                      className="pr-12"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                    />
+                    <Button type="submit" variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8" disabled={!newMessage.trim()}>
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </form>
+              )}
             </div>
+            {connection.status === 'Cerrado' && otherUser && (
+                <div className="p-4 border-t">
+                    {hasLeftReview ? (
+                        <div className="text-center text-muted-foreground py-4">
+                            <p className="font-medium">¡Gracias por tu opinión!</p>
+                            <p className="text-sm">Ya has dejado una reseña para esta conexión.</p>
+                        </div>
+                    ) : (
+                        <LeaveReviewForm 
+                            connection={connection}
+                            reviewedUser={otherUser}
+                            appUser={appUser}
+                        />
+                    )}
+                </div>
+            )}
           </CardContent>
         </Card>
       </div>

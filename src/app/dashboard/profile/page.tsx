@@ -11,11 +11,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
-import { type User } from "@/lib/mock-data"
-import { Edit, Upload, Loader2, Save, Megaphone, UserPlus, AlertTriangle, Trash2, Banknote } from "lucide-react"
+import { type User, type Review } from "@/lib/mock-data"
+import { Edit, Upload, Loader2, Save, Megaphone, UserPlus, AlertTriangle, Trash2, Banknote, Star } from "lucide-react"
 import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, updateDoc, increment, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
+import { doc, updateDoc, increment, collection, query, where, getDocs, writeBatch, orderBy } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
@@ -46,6 +46,56 @@ function ReputationCard({ user }: { user: User }) {
             </CardContent>
         </Card>
     )
+}
+
+function ReviewsCard({ reviews }: { reviews: Review[] }) {
+  if (reviews.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Reseñas</CardTitle>
+          <CardDescription>Opiniones de otros usuarios de la plataforma.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground text-center py-8">Todavía no has recibido ninguna reseña.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Reseñas Recibidas ({reviews.length})</CardTitle>
+        <CardDescription>Opiniones de otros usuarios de la plataforma.</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {reviews.map((review) => (
+          <div key={review.id} className="flex gap-4">
+            <Link href={`/dashboard/users/${review.reviewerId}`}>
+                <Avatar className="h-10 w-10 cursor-pointer">
+                    <AvatarImage src={review.reviewerAvatar} />
+                    <AvatarFallback>{review.reviewerName.charAt(0)}</AvatarFallback>
+                </Avatar>
+            </Link>
+            <div className="flex-1">
+              <div className="flex items-center justify-between">
+                <Link href={`/dashboard/users/${review.reviewerId}`}>
+                    <p className="font-semibold hover:underline">{review.reviewerName}</p>
+                </Link>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-muted-foreground'}`} />
+                  ))}
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">{review.comment}</p>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
 }
 
 const AssignBusinessDialog = () => {
@@ -231,6 +281,7 @@ const AssignBusinessDialog = () => {
 export default function ProfilePage() {
     const { appUser, setAppUser } = useAuth();
     const [user, setUser] = useState<User | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     
     const [formData, setFormData] = useState<User | null>(null);
@@ -243,6 +294,19 @@ export default function ProfilePage() {
         if (appUser) {
             setUser(appUser);
             setFormData(appUser);
+            
+            const fetchReviews = async () => {
+                const reviewsQuery = query(
+                    collection(db, 'reviews'), 
+                    where('reviewedUserId', '==', appUser.id),
+                    orderBy('createdAt', 'desc')
+                );
+                const reviewsSnapshot = await getDocs(reviewsQuery);
+                const reviewsData = reviewsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Review);
+                setReviews(reviewsData);
+            };
+
+            fetchReviews();
         }
     }, [appUser]);
 
@@ -572,8 +636,9 @@ export default function ProfilePage() {
                     </Card>
                 )}
             </div>
-            <div>
+            <div className="space-y-6">
                 <ReputationCard user={user} />
+                <ReviewsCard reviews={reviews} />
             </div>
         </div>
     )
