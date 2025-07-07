@@ -60,6 +60,9 @@ export default function Home() {
         <Logo href="/" />
         <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
           <Button variant="ghost" asChild>
+            <Link href="/publicidad-sana">Publicidad Sana</Link>
+          </Button>
+          <Button variant="ghost" asChild>
             <Link href="/login">Iniciar sesión</Link>
           </Button>
           <Button asChild>
