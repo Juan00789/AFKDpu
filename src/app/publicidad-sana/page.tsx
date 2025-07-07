@@ -1,18 +1,19 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { MapPin, Phone, Clock, Instagram, Star, Loader2, Edit, AlertTriangle, Save, PlusCircle, Trash2 } from "lucide-react";
+import { MapPin, Phone, Clock, Instagram, Star, Loader2, Edit, AlertTriangle, Save, PlusCircle, Trash2, Upload } from "lucide-react";
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { db, storage } from '@/lib/firebase';
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useToast } from '@/hooks/use-toast';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -71,6 +72,8 @@ const EditBusinessDialog = ({ businessData, setBusinessData }: { businessData: B
     const [isOpen, setIsOpen] = useState(false);
     const [editData, setEditData] = useState<BusinessData>(businessData);
     const [isSaving, setIsSaving] = useState(false);
+    const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+    const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
     const { toast } = useToast();
 
     useEffect(() => {
@@ -85,6 +88,28 @@ const EditBusinessDialog = ({ businessData, setBusinessData }: { businessData: B
         const newProducts = [...editData.products];
         newProducts[index] = { ...newProducts[index], [field]: value };
         setEditData(prev => ({ ...prev, products: newProducts }));
+    };
+    
+    const handleProductImageUpload = async (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setUploadingIndex(index);
+        try {
+            const imageRef = storageRef(storage, `business_products/${businessId}/${Date.now()}-${file.name}`);
+            await uploadBytes(imageRef, file);
+            const downloadURL = await getDownloadURL(imageRef);
+            handleProductChange(index, 'imageUrl', downloadURL);
+        } catch (error) {
+            console.error("Error al subir la imagen del producto:", error);
+            toast({
+                variant: "destructive",
+                title: "Error de Carga",
+                description: "No se pudo subir la imagen del producto.",
+            });
+        } finally {
+            setUploadingIndex(null);
+        }
     };
 
     const addProduct = () => {
@@ -164,18 +189,57 @@ const EditBusinessDialog = ({ businessData, setBusinessData }: { businessData: B
                         <Separator />
                         <h3 className="text-lg font-semibold">Productos</h3>
                         {editData.products.map((product, index) => (
-                            <Card key={index} className="p-4">
-                                <div className="space-y-2">
-                                     <div className="flex justify-between items-center">
-                                        <Label>Producto {index + 1}</Label>
-                                        <Button variant="destructive" size="icon" onClick={() => removeProduct(index)}>
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                             <Card key={index} className="p-4 space-y-4">
+                                <div className="flex justify-between items-center">
+                                    <Label>Producto {index + 1}</Label>
+                                    <Button variant="destructive" size="icon" onClick={() => removeProduct(index)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="flex-shrink-0">
+                                        <Image
+                                            src={product.imageUrl || 'https://placehold.co/100x100.png'}
+                                            alt={product.name || 'Product Image'}
+                                            width={80}
+                                            height={80}
+                                            className="rounded-md object-cover aspect-square"
+                                        />
                                     </div>
-                                    <Input placeholder="Nombre del producto" value={product.name} onChange={(e) => handleProductChange(index, 'name', e.target.value)} />
-                                    <Input placeholder="Precio (ej: RD$10,000)" value={product.price} onChange={(e) => handleProductChange(index, 'price', e.target.value)} />
-                                    <Input placeholder="Categoría" value={product.category} onChange={(e) => handleProductChange(index, 'category', e.target.value)} />
-                                    <Input placeholder="URL de la imagen" value={product.imageUrl} onChange={(e) => handleProductChange(index, 'imageUrl', e.target.value)} />
+                                    <div className="w-full space-y-2">
+                                        <Input placeholder="Nombre del producto" value={product.name} onChange={(e) => handleProductChange(index, 'name', e.target.value)} />
+                                        <Input placeholder="Precio (ej: RD$10,000)" value={product.price} onChange={(e) => handleProductChange(index, 'price', e.target.value)} />
+                                        <Input placeholder="Categoría" value={product.category} onChange={(e) => handleProductChange(index, 'category', e.target.value)} />
+                                    </div>
+                                </div>
+                                <div>
+                                    <Input
+                                        id={`product-image-upload-${index}`}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => handleProductImageUpload(index, e)}
+                                        className="hidden"
+                                        ref={(el) => { if(fileInputRefs.current) fileInputRefs.current[index] = el; }}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full"
+                                        onClick={() => fileInputRefs.current?.[index]?.click()}
+                                        disabled={uploadingIndex === index}
+                                    >
+                                        {uploadingIndex === index ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Subiendo...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Upload className="mr-2 h-4 w-4" />
+                                                Cambiar Imagen
+                                            </>
+                                        )}
+                                    </Button>
                                 </div>
                             </Card>
                         ))}
@@ -189,7 +253,7 @@ const EditBusinessDialog = ({ businessData, setBusinessData }: { businessData: B
                     <DialogClose asChild>
                         <Button variant="ghost">Cancelar</Button>
                     </DialogClose>
-                    <Button onClick={handleSave} disabled={isSaving}>
+                    <Button onClick={handleSave} disabled={isSaving || uploadingIndex !== null}>
                         {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Guardar Cambios
                     </Button>
