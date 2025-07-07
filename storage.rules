@@ -1,13 +1,14 @@
 rules_version = '2';
+
 service firebase.storage {
   match /b/{bucket}/o {
-    
-    // Avatar Images
-    // - Anyone can view avatar images.
-    // - An authenticated user can only upload/change/delete their OWN avatar.
+    // Reglas para los avatares de usuario
     match /avatars/{userId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth.uid == userId;
+      // Cualquiera puede ver los avatares (son imágenes de perfil públicas).
+      allow read;
+      
+      // Solo el propietario del perfil puede subir o modificar su propio avatar.
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
   }
 }
