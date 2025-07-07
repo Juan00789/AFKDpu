@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -119,7 +120,7 @@ export default function TasksPage() {
         <Card className="bg-secondary/50">
           <CardHeader>
             <CardTitle>En Progreso ({inProgressServices.length})</CardTitle>
-          </Header>
+          </CardHeader>
           <CardContent className="space-y-3">
             {inProgressServices.map(service => <ServiceCard key={service.id} service={service} />)}
           </CardContent>
@@ -127,7 +128,7 @@ export default function TasksPage() {
         <Card className="bg-secondary/50">
           <CardHeader>
             <CardTitle>Terminadas ({doneServices.length})</CardTitle>
-          </Header>
+          </CardHeader>
           <CardContent className="space-y-3">
             {doneServices.map(service => <ServiceCard key={service.id} service={service} />)}
           </CardContent>
