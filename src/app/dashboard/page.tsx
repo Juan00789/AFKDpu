@@ -14,7 +14,7 @@ import { collection, query, where, onSnapshot, getDocs } from "firebase/firestor
 import { db } from "@/lib/firebase";
 import { AddConnectionDialog } from "@/components/AddServiceDialog";
 
-function ActiveConnectionsSummary() {
+function ActivePortalsSummary() {
   const { appUser } = useAuth();
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -135,7 +135,7 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold font-headline">¡Bienvenido a tu Espacio Interior, {appUser?.name}!</h1>
         <p className="text-muted-foreground">Aquí tienes un resumen de tus portales activos y tu viaje reciente en AFKDpu.</p>
       </div>
-      <ActiveConnectionsSummary />
+      <ActivePortalsSummary />
        <Card>
         <CardHeader>
             <CardTitle>Memorias Recientes</CardTitle>

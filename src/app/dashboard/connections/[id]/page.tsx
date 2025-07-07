@@ -162,12 +162,12 @@ export default function ConnectionDetailPage() {
           }
 
         } else {
-          setError("No se encontró la conexión.");
+          setError("No se encontró el portal.");
         }
         setConnectionLoading(false);
       }, (err) => {
         console.error(err);
-        setError("Error al cargar la conexión.");
+        setError("Error al cargar el portal.");
         setConnectionLoading(false);
       });
 
@@ -264,7 +264,7 @@ export default function ConnectionDetailPage() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "No se pudo actualizar el estado de la conexión."
+        description: "No se pudo actualizar el estado del portal."
       });
     }
   };

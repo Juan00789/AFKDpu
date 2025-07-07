@@ -1,3 +1,4 @@
+
 // use server'
 'use server';
 /**
@@ -12,16 +13,16 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const ConnectionPromptSuggestionsInputSchema = z.object({
-  connectionName: z.string().describe('The name of the connection or its purpose.'),
-  connectionState: z.string().describe('The current state of the connection (e.g., Activo, En espera, Cerrado).'),
-  lastInteraction: z.string().describe('A description of the last interaction with the connection.'),
-  rules: z.string().describe('A description of the rules or context defined for this connection.'),
+  connectionName: z.string().describe('The name of the portal or its purpose.'),
+  connectionState: z.string().describe('The current state of the portal (e.g., Activo, En espera, Cerrado).'),
+  lastInteraction: z.string().describe('A description of the last interaction within the portal.'),
+  rules: z.string().describe('A description of the rules or context defined for this portal.'),
   userName: z.string().describe('The name of the user requesting the suggestions.'),
 });
 export type ConnectionPromptSuggestionsInput = z.infer<typeof ConnectionPromptSuggestionsInputSchema>;
 
 const ConnectionPromptSuggestionsOutputSchema = z.object({
-  suggestions: z.array(z.string()).describe('A list of AI-powered suggestions for updating the connection.'),
+  suggestions: z.array(z.string()).describe('A list of AI-powered suggestions for updating the portal.'),
 });
 export type ConnectionPromptSuggestionsOutput = z.infer<typeof ConnectionPromptSuggestionsOutputSchema>;
 
@@ -35,12 +36,12 @@ const prompt = ai.definePrompt({
   output: {schema: ConnectionPromptSuggestionsOutputSchema},
   prompt: `You are an expert business assistant for AFKDpu, a corporate asynchronous communication platform. Your goal is to help users manage their conversations and tasks effectively.
 
-The user, {{{userName}}}, has a connection for the purpose of: "{{{connectionName}}}".
-The connection's current status is: "{{{connectionState}}}".
+The user, {{{userName}}}, has a portal for the purpose of: "{{{connectionName}}}".
+The portal's current status is: "{{{connectionState}}}".
 The last interaction was: "{{{lastInteraction}}}".
-The rules/context for this connection are: {{{rules}}}.
+The rules/context for this portal are: {{{rules}}}.
 
-Based on this information, provide 3 short, actionable, and professional suggestions to help the user advance the conversation or resolve the task associated with this connection. Return your answer as a JSON array of strings.
+Based on this information, provide 3 short, actionable, and professional suggestions to help the user advance the journey or resolve the task associated with this portal. Return your answer as a JSON array of strings.
 
 For example:
 [

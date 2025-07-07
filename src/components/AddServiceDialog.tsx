@@ -147,7 +147,7 @@ export function AddConnectionDialog() {
         setIsOpen(false);
         form.reset();
     } catch (error) {
-        console.error('Error al crear la conexión: ', error);
+        console.error('Error al abrir el portal: ', error);
         toast({
             variant: 'destructive',
             title: 'Error en la base de datos',
