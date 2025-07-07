@@ -1,10 +1,15 @@
+'use client';
+import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockServices, Service } from "@/lib/mock-data";
-import { Users, Clock } from "lucide-react";
+import { Service } from "@/lib/mock-data";
+import { Users, Clock, Loader2 } from "lucide-react";
 import { AddServiceDialog } from "@/components/AddServiceDialog";
 import { Badge } from "@/components/ui/badge";
 import { cva } from "class-variance-authority";
+import { useAuth } from "@/context/AuthContext";
+import { db } from "@/lib/firebase";
+import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
 
 const emotionalStateBadgeVariants = cva(
   "border-transparent capitalize text-xs",
@@ -36,7 +41,7 @@ function ServiceCard({ service }: { service: Service }) {
         <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
-                <span>{service.connectionName}</span>
+                <span className="break-all">{service.connectionName}</span>
             </div>
           <div className="flex items-center -space-x-1">
              {service.participants.map(p => (
@@ -53,9 +58,49 @@ function ServiceCard({ service }: { service: Service }) {
 }
 
 export default function TasksPage() {
-  const openServices = mockServices.filter(t => t.status === "Abierto");
-  const inProgressServices = mockServices.filter(t => t.status === "En Progreso");
-  const doneServices = mockServices.filter(t => t.status === "Terminadas");
+  const { appUser } = useAuth();
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!appUser) return;
+    setLoading(true);
+
+    const q = query(
+      collection(db, "services"),
+      where("userIds", "array-contains", appUser.id),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const servicesData: Service[] = [];
+      querySnapshot.forEach((doc) => {
+        servicesData.push({
+          id: doc.id,
+          ...doc.data()
+        } as Service);
+      });
+      setServices(servicesData);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching services: ", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [appUser]);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
+  
+  const openServices = services.filter(t => t.status === "Abierto");
+  const inProgressServices = services.filter(t => t.status === "En Progreso");
+  const doneServices = services.filter(t => t.status === "Terminadas");
 
   return (
     <div className="space-y-4">
@@ -74,7 +119,7 @@ export default function TasksPage() {
         <Card className="bg-secondary/50">
           <CardHeader>
             <CardTitle>En Progreso ({inProgressServices.length})</CardTitle>
-          </CardHeader>
+          </Header>
           <CardContent className="space-y-3">
             {inProgressServices.map(service => <ServiceCard key={service.id} service={service} />)}
           </CardContent>
@@ -82,7 +127,7 @@ export default function TasksPage() {
         <Card className="bg-secondary/50">
           <CardHeader>
             <CardTitle>Terminadas ({doneServices.length})</CardTitle>
-          </CardHeader>
+          </Header>
           <CardContent className="space-y-3">
             {doneServices.map(service => <ServiceCard key={service.id} service={service} />)}
           </CardContent>

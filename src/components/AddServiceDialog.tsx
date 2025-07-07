@@ -29,6 +29,10 @@ import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { mockConnections, type Connection } from '@/lib/mock-data';
 import { Textarea } from './ui/textarea';
+import { useAuth } from '@/context/AuthContext';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 
 const addServiceSchema = z.object({
   title: z.string().min(3, { message: 'El título debe tener al menos 3 caracteres.' }),
@@ -43,6 +47,7 @@ type AddServiceForm = z.infer<typeof addServiceSchema>;
 export function AddServiceDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
+  const { appUser } = useAuth();
   const {
     control,
     handleSubmit,
@@ -57,16 +62,50 @@ export function AddServiceDialog() {
     },
   });
 
-  const onSubmit = (data: AddServiceForm) => {
-    console.log('Nuevo servicio:', data);
-    // Here you would typically add the service to your data source.
-    // For this mock app, we'll just show a success toast.
-    toast({
-      title: '¡Servicio agregado!',
-      description: `El servicio "${data.title}" ha sido creado.`,
-    });
-    setIsOpen(false);
-    reset();
+  const onSubmit = async (data: AddServiceForm) => {
+    if (!appUser) {
+        toast({
+            variant: 'destructive',
+            title: 'Error de autenticación',
+            description: 'Debes iniciar sesión para agregar un servicio.',
+        });
+        return;
+    }
+
+    const selectedConnection = mockConnections.find((c) => c.id === data.connectionId);
+    if (!selectedConnection) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: 'La conexión seleccionada no es válida.',
+        });
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, 'services'), {
+            ...data,
+            status: 'Abierto',
+            connectionName: selectedConnection.name,
+            participants: selectedConnection.participants,
+            userIds: selectedConnection.participants.map(p => p.id),
+            createdAt: serverTimestamp(),
+        });
+
+        toast({
+            title: '¡Servicio agregado!',
+            description: `El servicio "${data.title}" ha sido creado.`,
+        });
+        setIsOpen(false);
+        reset();
+    } catch (error) {
+        console.error('Error al agregar el servicio: ', error);
+        toast({
+            variant: 'destructive',
+            title: 'Error en la base de datos',
+            description: 'No se pudo crear el servicio. Revisa las reglas de Firestore.',
+        });
+    }
   };
 
   return (

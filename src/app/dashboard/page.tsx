@@ -1,12 +1,17 @@
+'use client';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { mockConnections, mockServices, Service } from "@/lib/mock-data"
+import { mockConnections, Service } from "@/lib/mock-data"
 import { cva } from "class-variance-authority"
-import { MoreHorizontal, Users, ArrowRight, Clock } from "lucide-react"
+import { MoreHorizontal, Users, ArrowRight, Clock, Loader2 } from "lucide-react"
 import Link from "next/link"
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const statusBadgeVariants = cva(
   "border-transparent",
@@ -121,9 +126,41 @@ function ServiceCard({ service }: { service: Service }) {
 }
 
 function ServicesBoard() {
-  const openServices = mockServices.filter(t => t.status === "Abierto");
-  const inProgressServices = mockServices.filter(t => t.status === "En Progreso");
-  const doneServices = mockServices.filter(t => t.status === "Terminadas");
+  const { appUser } = useAuth();
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!appUser) return;
+    setLoading(true);
+
+    const q = query(
+      collection(db, "services"),
+      where("userIds", "array-contains", appUser.id),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const servicesData: Service[] = [];
+      querySnapshot.forEach((doc) => {
+        servicesData.push({
+          id: doc.id,
+          ...doc.data(),
+        } as Service);
+      });
+      setServices(servicesData);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching services: ", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [appUser]);
+
+  const openServices = services.filter(t => t.status === "Abierto");
+  const inProgressServices = services.filter(t => t.status === "En Progreso");
+  const doneServices = services.filter(t => t.status === "Terminadas");
 
   return (
     <Card>
@@ -131,26 +168,32 @@ function ServicesBoard() {
         <CardTitle>Mis Servicios</CardTitle>
         <CardDescription>Servicios asociados a tus conexiones, organizados por estado.</CardDescription>
       </CardHeader>
-      <CardContent className="grid md:grid-cols-3 gap-6">
-        <div className="space-y-4">
-          <h3 className="font-headline font-semibold">Abierto ({openServices.length})</h3>
-          <div className="space-y-2">
-            {openServices.map(service => <ServiceCard key={service.id} service={service} />)}
-          </div>
-        </div>
-        <div className="space-y-4">
-          <h3 className="font-headline font-semibold">En Progreso ({inProgressServices.length})</h3>
-          <div className="space-y-2">
-            {inProgressServices.map(service => <ServiceCard key={service.id} service={service} />)}
-          </div>
-        </div>
-        <div className="space-y-4">
-          <h3 className="font-headline font-semibold">Terminadas ({doneServices.length})</h3>
-          <div className="space-y-2">
-            {doneServices.map(service => <ServiceCard key={service.id} service={service} />)}
-          </div>
-        </div>
-      </CardContent>
+       {loading ? (
+          <CardContent className="flex h-48 items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+          </CardContent>
+        ) : (
+          <CardContent className="grid md:grid-cols-3 gap-6">
+            <div className="space-y-4">
+              <h3 className="font-headline font-semibold">Abierto ({openServices.length})</h3>
+              <div className="space-y-2">
+                {openServices.map(service => <ServiceCard key={service.id} service={service} />)}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="font-headline font-semibold">En Progreso ({inProgressServices.length})</h3>
+              <div className="space-y-2">
+                {inProgressServices.map(service => <ServiceCard key={service.id} service={service} />)}
+              </div>
+            </div>
+            <div className="space-y-4">
+              <h3 className="font-headline font-semibold">Terminadas ({doneServices.length})</h3>
+              <div className="space-y-2">
+                {doneServices.map(service => <ServiceCard key={service.id} service={service} />)}
+              </div>
+            </div>
+          </CardContent>
+       )}
     </Card>
   )
 }
