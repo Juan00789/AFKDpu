@@ -2,29 +2,24 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Users collection
+    // Users can read any profile, but only write to their own.
     match /users/{userId} {
-      // Any authenticated user can view a user's public profile data (name, avatar, etc.)
-      // This is needed to display participant info in connections.
-      allow get: if request.auth != null;
-
-      // A user can read their full document and update it.
-      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // Connections collection
+
+    // Participants can read/write connections they are a part of.
     match /connections/{connectionId} {
-      // A user can create a connection if they are listed as a participant.
-      allow create: if request.auth != null && request.resource.data.userIds.hasAny([request.auth.uid]);
-
-      // A user can read or update a connection only if they are a participant.
-      allow read, update: if request.auth != null && resource.data.userIds.hasAny([request.auth.uid]);
+      // Create is allowed if the creator is in the participants list.
+      // Read/Update/Delete is allowed if the user is in the participants list.
+      allow read, write: if request.auth != null && resource.data.userIds.hasAny([request.auth.uid]);
     }
-    
-    // Messages sub-collection within a connection
+
+    // Participants can read/create messages in connections they are a part of.
     match /connections/{connectionId}/messages/{messageId} {
-        // A user can read or create messages in a connection only if they are a participant of that connection.
         allow read, create: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
+        // Updates and deletes of messages are not allowed.
+        allow update, delete: if false;
     }
   }
 }
