@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
@@ -19,6 +20,7 @@ import { formatRelative } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import Link from 'next/link';
 
 export default function ConnectionDetailPage() {
   const params = useParams<{ id: string }>();
@@ -198,12 +200,24 @@ export default function ConnectionDetailPage() {
               </div>
             </div>
              <div className="flex items-center -space-x-2">
-                {connection.participants.map((p, index) => (
-                  <Avatar key={`${p.id}-${index}`} className="h-10 w-10 border-2 border-background">
-                    <AvatarImage src={p.avatar} />
-                    <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                ))}
+                {connection.participants.map((p, index) => {
+                    if (p.id === appUser.id) {
+                         return (
+                            <Avatar key={`${p.id}-${index}`} className="h-10 w-10 border-2 border-background">
+                                <AvatarImage src={p.avatar} />
+                                <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                        )
+                    }
+                    return (
+                        <Link href={`/dashboard/users/${p.id}`} key={`${p.id}-${index}`} title={`Ver perfil de ${p.name}`}>
+                            <Avatar className="h-10 w-10 border-2 border-background hover:ring-2 hover:ring-primary cursor-pointer transition-all">
+                                <AvatarImage src={p.avatar} />
+                                <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                        </Link>
+                    )
+                })}
               </div>
           </CardHeader>
           <CardContent>

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -140,6 +141,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const getPageTitle = () => {
     if (pathname === '/dashboard') return "Panel General";
+    if (pathname.startsWith('/dashboard/users/')) return "Perfil de Usuario";
     const activeItem = navItems.find(item => item.href !== '/dashboard' && pathname.startsWith(item.href));
     return activeItem?.label || "AFKDpu";
   }
