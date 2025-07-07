@@ -96,30 +96,15 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
   const handleStatusChange = async (newStatus: "Activo" | "En espera" | "Cerrado") => {
     if (!connection || connection.status === newStatus) return;
 
-    const oldStatus = connection.status;
     const connectionRef = doc(db, 'connections', params.id);
 
     try {
       await updateDoc(connectionRef, { status: newStatus });
-
-      if (newStatus === "Cerrado" && oldStatus !== "Cerrado") {
-        const batch = writeBatch(db);
-        
-        // Award +6 to all participants
-        connection.participants.forEach(p => {
-          const userRef = doc(db, 'users', p.id);
-          batch.update(userRef, { points: increment(6) });
-        });
-
-        // Award +12 to the provider
-        const providerRef = doc(db, 'users', connection.provider.id);
-        batch.update(providerRef, { points: increment(12) });
-
-        await batch.commit();
-
+      
+      if (newStatus === "Cerrado") {
         toast({
-          title: "¡Puntos Asignados!",
-          description: "Los participantes han sido recompensados por completar la conexión."
+          title: "¡Conexión Cerrada!",
+          description: "La conexión ha sido marcada como completada."
         });
       }
 

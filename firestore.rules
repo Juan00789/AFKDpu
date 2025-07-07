@@ -3,32 +3,23 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Los usuarios pueden leer y actualizar su propio perfil.
-    // La creación se maneja a través de las funciones de autenticación.
+    
+    // Users can read any profile, but only create or update their own.
     match /users/{userId} {
-      allow read, update: if request.auth != null && request.auth.uid == userId;
+      allow read;
+      allow create, update: if request.auth.uid == userId;
     }
-
-    // Reglas para las conexiones y sus mensajes.
+    
+    // Connections can be created by a participant.
+    // They can be read or updated only by participants.
     match /connections/{connectionId} {
-      // Permitir leer o actualizar una conexión si el UID del usuario está en la lista de `userIds` de la conexión.
-      allow read, update: if request.auth != null && request.auth.uid in resource.data.userIds;
-      
-      // Permitir crear una conexión si el UID del usuario que la crea está incluido en la lista de `userIds`.
-      allow create: if request.auth != null && request.auth.uid in request.resource.data.userIds;
-      
-      // No permitir eliminar conexiones desde el cliente.
-      allow delete: if false;
-
-      // Reglas para los mensajes dentro de una conexión.
-      match /messages/{messageId} {
-        // Permitir leer y crear mensajes si el usuario es parte de la conexión padre.
-        allow read, create: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
-        
-        // No permitir actualizar o eliminar mensajes desde el cliente para mantener la integridad del historial.
-        allow update, delete: if false;
-      }
+      allow read, update: if request.auth.uid in resource.data.userIds;
+      allow create: if request.auth.uid in request.resource.data.userIds;
+    }
+    
+    // Messages can be read or created only by participants of the parent connection.
+    match /connections/{connectionId}/messages/{messageId} {
+      allow read, create: if get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
     }
   }
 }
