@@ -1,10 +1,21 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { MapPin, Phone, Clock, Instagram, Star } from "lucide-react";
+import { MapPin, Phone, Clock, Instagram, Star, Loader2, Edit } from "lucide-react";
 import Image from 'next/image';
+import { useAuth } from '@/context/AuthContext';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { useToast } from '@/hooks/use-toast';
+import { DialogClose } from '@radix-ui/react-dialog';
+
+const businessId = 'miguel-iphone-center';
 
 const ProductCard = ({ name, price, category, imageUrl, imageHint }: { name: string; price: string; category: string; imageUrl: string; imageHint: string }) => (
   <Card>
@@ -27,6 +38,76 @@ const ProductCard = ({ name, price, category, imageUrl, imageHint }: { name: str
     </CardContent>
   </Card>
 );
+
+function ClaimBusinessButton() {
+    const { appUser, setAppUser } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+
+    const handleClaim = async () => {
+        if (!appUser) return;
+        setIsLoading(true);
+        try {
+            const userRef = doc(db, 'users', appUser.id);
+            await updateDoc(userRef, {
+                claimedBusinessId: businessId
+            });
+            // Update user state in context
+            setAppUser(prevUser => prevUser ? { ...prevUser, claimedBusinessId: businessId } : null);
+            toast({
+                title: "¡Negocio Reclamado!",
+                description: "Ahora puedes gestionar esta página.",
+            });
+        } catch (error) {
+            console.error("Error claiming business:", error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "No se pudo reclamar el negocio. Inténtalo de nuevo."
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (!appUser || appUser.role !== 'Proveedor') {
+        return null; // Don't show the button if not a logged-in provider
+    }
+
+    if (appUser.claimedBusinessId === businessId) {
+        return (
+            <Button className="w-full">
+                <Edit className="mr-2 h-4 w-4" />
+                Gestionar Publicidad
+            </Button>
+        );
+    }
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button variant="outline" className="w-full">¿Eres el propietario?</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Reclamar "Miguel iPhone Center"</DialogTitle>
+                    <DialogDescription>
+                        Al confirmar, tu perfil de proveedor se asociará con este negocio. Podrás gestionar esta página de publicidad. ¿Estás seguro?
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="ghost">Cancelar</Button>
+                    </DialogClose>
+                    <Button onClick={handleClaim} disabled={isLoading}>
+                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Confirmar y Reclamar
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 export default function PublicidadSanaPage() {
   return (
@@ -153,7 +234,7 @@ export default function PublicidadSanaPage() {
                      </div>
                   </CardContent>
                 </Card>
-                <Button variant="outline" className="w-full">¿Eres el propietario?</Button>
+                <ClaimBusinessButton />
               </aside>
             </div>
           </div>

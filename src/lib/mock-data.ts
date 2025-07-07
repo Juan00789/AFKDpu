@@ -7,13 +7,14 @@ export type User = {
   objectives?: string;
   points: number;
   profileCompleted: boolean;
+  claimedBusinessId?: string;
 };
 
 export type Connection = {
   id: string;
   purpose: string;
   status: "Activo" | "En espera" | "Cerrado";
-  participants: Omit<User, 'objectives' | 'points' | 'profileCompleted'>[];
+  participants: Omit<User, 'objectives' | 'points' | 'profileCompleted' | 'claimedBusinessId'>[];
   userIds: string[];
   duration: string;
   rules: string;
