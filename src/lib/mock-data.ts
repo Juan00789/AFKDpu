@@ -13,7 +13,6 @@ export type Connection = {
   status: "Abierto" | "En Progreso" | "Terminadas";
   participants: User[];
   userIds: string[];
-  emotionalState: "Vibrante" | "Neutral" | "Fading" | "Sereno" | "Difuso";
   duration: string;
   rules: string;
   createdAt: {

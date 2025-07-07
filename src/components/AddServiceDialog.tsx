@@ -35,7 +35,6 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const addConnectionSchema = z.object({
   purpose: z.string().min(3, { message: 'El propósito debe tener al menos 3 caracteres.' }),
-  emotionalState: z.enum(["Vibrante", "Neutral", "Fading", "Sereno", "Difuso"], { required_error: "Debes seleccionar un estado emocional." }),
   duration: z.string().min(1, { message: "Debes especificar una duración." }),
   rules: z.string().min(5, { message: "Debes definir al menos una regla." }),
 });
@@ -116,7 +115,7 @@ export function AddConnectionDialog() {
           <DialogHeader>
             <DialogTitle>Crear Nueva Conexión</DialogTitle>
             <DialogDescription>
-              Define el propósito y las reglas para este nuevo vínculo abstracto.
+              Define el propósito y las reglas para este nuevo vínculo de comunicación.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -125,48 +124,26 @@ export function AddConnectionDialog() {
               <Controller
                 name="purpose"
                 control={control}
-                render={({ field }) => <Input id="purpose" placeholder="Ej: Explorar sinergias creativas" {...field} />}
+                render={({ field }) => <Input id="purpose" placeholder="Ej: Revisión de contrato" {...field} />}
               />
               {errors.purpose && <p className="text-sm font-medium text-destructive">{errors.purpose.message}</p>}
             </div>
             
-            <div className="grid gap-2">
-                <Label htmlFor="emotionalState">Estado Emocional Inicial</Label>
-                <Controller
-                    name="emotionalState"
-                    control={control}
-                    render={({ field }) => (
-                    <Select onValueChange={field.onChange} value={field.value}>
-                        <SelectTrigger id="emotionalState">
-                        <SelectValue placeholder="Selecciona un estado..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="Vibrante">Vibrante</SelectItem>
-                            <SelectItem value="Sereno">Sereno</SelectItem>
-                            <SelectItem value="Neutral">Neutral</SelectItem>
-                            <SelectItem value="Fading">Fading</SelectItem>
-                            <SelectItem value="Difuso">Difuso</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    )}
-                />
-                {errors.emotionalState && <p className="text-sm font-medium text-destructive">{errors.emotionalState.message}</p>}
-            </div>
              <div className="grid gap-2">
-              <Label htmlFor="duration">Duración Temporal</Label>
+              <Label htmlFor="duration">Duración Estimada</Label>
               <Controller
                 name="duration"
                 control={control}
-                render={({ field }) => <Input id="duration" placeholder="Ej: 48 horas" {...field} />}
+                render={({ field }) => <Input id="duration" placeholder="Ej: 7 días" {...field} />}
               />
               {errors.duration && <p className="text-sm font-medium text-destructive">{errors.duration.message}</p>}
             </div>
              <div className="grid gap-2">
-                <Label htmlFor="rules">Reglas del Vínculo</Label>
+                <Label htmlFor="rules">Contexto o Reglas</Label>
                 <Controller
                     name="rules"
                     control={control}
-                    render={({ field }) => <Textarea id="rules" placeholder="Ej: Si es 'Fading' por más de 1 hora, notificar." {...field} />}
+                    render={({ field }) => <Textarea id="rules" placeholder="Ej: Se requiere respuesta en 24h hábiles." {...field} />}
                 />
                 {errors.rules && <p className="text-sm font-medium text-destructive">{errors.rules.message}</p>}
             </div>

@@ -11,46 +11,33 @@ import { cva } from "class-variance-authority";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
-
-const emotionalStateBadgeVariants = cva(
-  "border-transparent capitalize text-xs",
-  {
-    variants: {
-      status: {
-        Vibrante: "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200",
-        Neutral: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200",
-        Fading: "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200",
-        Sereno: "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200",
-        Difuso: "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200",
-      },
-    },
-  }
-);
+import Link from "next/link";
 
 function ConnectionCard({ connection }: { connection: Connection }) {
   return (
-    <Card className="hover:shadow-md transition-shadow bg-card">
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-2">
-            <p className="text-sm font-medium pr-2">{connection.purpose}</p>
-            <Badge variant="outline" className={emotionalStateBadgeVariants({ status: connection.emotionalState })}>{connection.emotionalState}</Badge>
-        </div>
-         <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
-            <Clock className="h-3 w-3" />
-            <span>{connection.duration}</span>
-        </div>
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <div className="flex items-center -space-x-1">
-             {connection.participants.map(p => (
-                <Avatar key={p.id} className="h-5 w-5 border-2 border-card">
-                  <AvatarImage src={p.avatar} />
-                  <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-              ))}
+    <Link href={`/dashboard/connections/${connection.id}`} className="block">
+        <Card className="hover:shadow-md transition-shadow bg-card h-full">
+        <CardContent className="p-4 flex flex-col justify-between h-full">
+            <div>
+                <p className="font-medium pr-2 mb-2">{connection.purpose}</p>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground mb-3">
+                    <Clock className="h-3 w-3" />
+                    <span>{connection.duration}</span>
+                </div>
             </div>
-        </div>
-      </CardContent>
-    </Card>
+            <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
+                <div className="flex items-center -space-x-1">
+                {connection.participants.map(p => (
+                    <Avatar key={p.id} className="h-5 w-5 border-2 border-card">
+                    <AvatarImage src={p.avatar} />
+                    <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                ))}
+                </div>
+            </div>
+        </CardContent>
+        </Card>
+    </Link>
   )
 }
 
@@ -104,7 +91,7 @@ export default function ConnectionsKanbanPage() {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold font-headline">Tablero de Conexiones</h2>
-          <p className="text-muted-foreground">Gestiona tus vínculos abstractos por estado.</p>
+          <p className="text-muted-foreground">Gestiona tus conversaciones y tareas por estado.</p>
         </div>
         <AddConnectionDialog />
       </div>

@@ -5,29 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Connection } from "@/lib/mock-data"
-import { cva } from "class-variance-authority"
 import { ArrowRight, History as HistoryIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { collection, query, where, onSnapshot, orderBy, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-
-const emotionalStateBadgeVariants = cva(
-  "border-transparent capitalize text-xs",
-  {
-    variants: {
-      status: {
-        Vibrante: "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200",
-        Neutral: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200",
-        Fading: "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200",
-        Sereno: "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200",
-        Difuso: "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200",
-      },
-    },
-  }
-);
-
 
 function ActiveConnectionsSummary() {
   const { appUser } = useAuth();
@@ -63,7 +46,7 @@ function ActiveConnectionsSummary() {
       <Card>
         <CardHeader>
           <CardTitle>Conexiones Activas</CardTitle>
-          <CardDescription>Un resumen de tus vínculos actuales.</CardDescription>
+          <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
         </CardHeader>
         <CardContent className="flex h-48 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin" />
@@ -76,7 +59,7 @@ function ActiveConnectionsSummary() {
     <Card>
       <CardHeader>
         <CardTitle>Conexiones Activas</CardTitle>
-        <CardDescription>Un resumen de tus vínculos actuales y su estado emocional.</CardDescription>
+        <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
       </CardHeader>
       <CardContent>
         {connections.length > 0 ? (
@@ -84,7 +67,7 @@ function ActiveConnectionsSummary() {
             <TableHeader>
               <TableRow>
                 <TableHead>Propósito</TableHead>
-                <TableHead>Estado Emocional</TableHead>
+                <TableHead>Estado</TableHead>
                 <TableHead>Participantes</TableHead>
                 <TableHead>Duración</TableHead>
                 <TableHead><span className="sr-only">Acciones</span></TableHead>
@@ -95,7 +78,7 @@ function ActiveConnectionsSummary() {
                 <TableRow key={conn.id}>
                   <TableCell className="font-medium">{conn.purpose}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className={emotionalStateBadgeVariants({ status: conn.emotionalState })}>{conn.emotionalState}</Badge>
+                    <Badge variant="outline">{conn.status}</Badge>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center -space-x-2">

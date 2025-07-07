@@ -15,9 +15,9 @@ import { useToast } from '@/hooks/use-toast';
 import { type User } from '@/lib/mock-data';
 
 const roleDescriptions: Record<User['role'], string> = {
-  Cliente: "Podrás crear solicitudes temporales y conectarte emocionalmente con proveedores.",
-  Proveedor: "Podrás ofrecer tus servicios abstractos y recibir conexiones que respeten tus reglas.",
-  Empleado: "Podrás observar conexiones o participar en nombre de una empresa."
+  Cliente: "Interactúa con la empresa, recibe actualizaciones y gestiona tareas.",
+  Proveedor: "Colabora en proyectos, responde a solicitudes y coordina entregas.",
+  Empleado: "Gestiona la comunicación con clientes y proveedores, y colabora en equipos internos."
 };
 
 export default function RegisterPage() {
@@ -72,7 +72,7 @@ export default function RegisterPage() {
              <span className="text-2xl font-bold font-headline text-primary">AFKDpu</span>
            </Link>
           <CardTitle className="text-2xl font-headline">Crear una cuenta</CardTitle>
-          <CardDescription>Ingresa tus datos para empezar a crear conexiones.</CardDescription>
+          <CardDescription>Ingresa tus datos para empezar a comunicarte.</CardDescription>
         </CardHeader>
         <form onSubmit={handleRegister}>
           <CardContent className="grid gap-4">
