@@ -213,7 +213,7 @@ export default function Home() {
         <p className="text-xs text-muted-foreground">&copy; 2024 AFKDpu. Todos los derechos reservados.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="/publicidad-sana" className="text-xs hover:underline underline-offset-4">
-            Principios
+            Publicidad Sana
           </Link>
           <Link href="#" className="text-xs hover:underline underline-offset-4">
             Términos y Condiciones
