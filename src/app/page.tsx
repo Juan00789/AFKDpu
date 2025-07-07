@@ -49,7 +49,7 @@ export default function Home() {
                 width={600}
                 height={400}
                 className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
-                data-ai-hint="brand logo"
+                data-ai-hint="brand logo spiral"
                 priority
               />
             </div>
