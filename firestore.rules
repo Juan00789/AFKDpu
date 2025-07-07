@@ -1,34 +1,37 @@
+
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // --- GENERAL READ RULE ---
-    // All documents are publicly readable. This fixes the "Publicidad Sana" loading issue.
-    match /{document=**} {
-      allow read: if true;
-    }
-
-    // --- SPECIFIC WRITE RULES ---
-
-    // Users can only write to their own document.
-    match /users/{userId} {
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-
-    // Participants can write to a connection and its subcollections (like messages).
-    match /connections/{connectionId}/{subcollection=**} {
-      allow write: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
-    }
-
-    // Logged-in users can create reviews.
-    match /reviews/{reviewId} {
-      allow create: if request.auth != null;
-      allow update, delete: if false; // Reviews are immutable
-    }
-
-    // Only the admin or the assigned provider can edit business data.
+    // PUBLIC READS for business info
     match /businesses/{businessId} {
-      allow write: if request.auth != null && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.email == 'alcantara00789@gmail.com' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
+      allow read: if true;
+      // WRITES only for admin or assigned user
+      allow write: if request.auth != null && (request.auth.token.email == "alcantara00789@gmail.com" || (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId));
+    }
+
+    // Users can be read by anyone, but only updated by the owner
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Participants of a connection can interact with it
+    match /connections/{connectionId} {
+      allow read, update: if request.auth != null && request.auth.uid in resource.data.userIds;
+      allow create: if request.auth != null;
+    }
+
+    // Participants can send and read messages
+    match /connections/{connectionId}/messages/{messageId} {
+      allow read, create: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
+    }
+
+    // Anyone can read reviews, but only authenticated users can create them
+    match /reviews/{reviewId} {
+        allow read: if true;
+        allow create: if request.auth != null;
     }
   }
 }

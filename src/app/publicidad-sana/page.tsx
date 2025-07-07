@@ -99,6 +99,7 @@ export default function PublicidadSanaPage() {
             const businessRef = doc(db, 'businesses', businessId);
             await setDoc(businessRef, defaultData);
             setBusinessData(defaultData);
+            setError(null); // Clear any previous error
             toast({
                 title: "Página inicializada",
                 description: "Se han creado los datos iniciales para la página de publicidad."
@@ -143,10 +144,18 @@ export default function PublicidadSanaPage() {
 
      if (error) {
         return (
-            <div className="flex flex-col h-screen items-center justify-center text-destructive">
-                <AlertTriangle className="h-12 w-12 mb-4" />
-                <h2 className="text-xl font-semibold">Error al cargar</h2>
-                <p>{error}</p>
+            <div className="flex flex-col h-screen items-center justify-center text-center p-4">
+                <AlertTriangle className="h-12 w-12 mb-4 text-destructive" />
+                <h2 className="text-xl font-semibold">Error al Cargar</h2>
+                <p className="text-muted-foreground mt-2">{error}</p>
+                {appUser && appUser.email === 'alcantara00789@gmail.com' && (
+                    <div className="mt-6 flex flex-col items-center gap-4 border-t pt-6 w-full max-w-sm">
+                         <p className="text-sm text-muted-foreground">Como administrador, puedes forzar la reinicialización de los datos de ejemplo. Esto puede solucionar problemas si los datos no existen o los permisos fallaron.</p>
+                        <Button onClick={initializeBusinessData} className="w-full">
+                            Inicializar Página de Ejemplo
+                        </Button>
+                    </div>
+                )}
             </div>
         );
     }
