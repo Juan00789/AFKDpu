@@ -1,3 +1,5 @@
+// REGLAS PARA STORAGE
+// Pega este código en la sección de Reglas de "Storage" en tu consola de Firebase.
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {

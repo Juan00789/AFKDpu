@@ -1,3 +1,5 @@
+// REGLAS PARA FIRESTORE DATABASE
+// Pega este código en la sección de Reglas de "Firestore Database" en tu consola de Firebase.
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
