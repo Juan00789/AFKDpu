@@ -320,24 +320,33 @@ export default function ProfilePage() {
                         </Dialog>
                     </CardContent>
                 </Card>
-                 {user.role === 'Proveedor' && user.claimedBusinessId && (
+                 {(user.email === 'alcantara00789@gmail.com' || (user.role === 'Proveedor' && user.claimedBusinessId)) && (
                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Megaphone className="h-6 w-6" />
-                                Mi Publicidad
+                                {user.email === 'alcantara00789@gmail.com' ? 'Gestión de Publicidad (Admin)' : 'Mi Publicidad'}
                             </CardTitle>
                             <CardDescription>
-                                Gestiona la página de publicidad que has reclamado.
+                                {user.email === 'alcantara00789@gmail.com' 
+                                    ? 'Acceso de administrador para gestionar todas las páginas de publicidad.'
+                                    : 'Gestiona la página de publicidad que has reclamado.'
+                                }
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm text-muted-foreground mb-4">
-                                Has reclamado el negocio: <strong>Miguel iPhone Center</strong>.
-                            </p>
+                            {user.email === 'alcantara00789@gmail.com' ? (
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    Desde aquí puedes supervisar y editar el contenido publicitario de la plataforma.
+                                </p>
+                            ) : (
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    Has reclamado el negocio: <strong>Miguel iPhone Center</strong>.
+                                </p>
+                            )}
                             <Button asChild className="w-full">
                                 <Link href="/publicidad-sana">
-                                    Ir a mi página de publicidad
+                                    {user.email === 'alcantara00789@gmail.com' ? 'Ir al Panel de Publicidad' : 'Ir a mi página de publicidad'}
                                 </Link>
                             </Button>
                         </CardContent>
