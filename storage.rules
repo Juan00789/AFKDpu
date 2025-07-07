@@ -1,13 +1,13 @@
 rules_version = '2';
-
 service firebase.storage {
   match /b/{bucket}/o {
     
-    // Allow anyone to read avatars
+    // Avatar Images
+    // - Anyone can view avatar images.
+    // - An authenticated user can only upload/change/delete their OWN avatar.
     match /avatars/{userId}/{allPaths=**} {
-      allow read;
-      // Allow authenticated users to write only to their own folder
-      allow write: if request.auth != null && request.auth.uid == userId;
+      allow read: if true;
+      allow write: if request.auth.uid == userId;
     }
   }
 }
