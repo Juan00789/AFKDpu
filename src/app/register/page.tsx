@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -5,41 +6,85 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Share2, Loader2 } from "lucide-react";
+import { Share2, Loader2, ArrowRight, User, Briefcase, UserCog } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { type User } from '@/lib/mock-data';
+import { type User as AppUser } from '@/lib/mock-data';
+import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const roleDescriptions: Record<User['role'], string> = {
-  Cliente: "Interactúa con la empresa, recibe actualizaciones y gestiona tareas.",
-  Proveedor: "Colabora en proyectos, responde a solicitudes y coordina entregas.",
-  Empleado: "Gestiona la comunicación con clientes y proveedores, y colabora en equipos internos."
-};
+const roleData: { role: AppUser['role'], icon: React.ElementType, description: string }[] = [
+  {
+    role: "Cliente",
+    icon: User,
+    description: "Interactúa con la empresa, recibe actualizaciones y gestiona tareas."
+  },
+  {
+    role: "Proveedor",
+    icon: Briefcase,
+    description: "Colabora en proyectos, responde a solicitudes y coordina entregas."
+  },
+  {
+    role: "Empleado",
+    icon: UserCog,
+    description: "Gestiona la comunicación con clientes y proveedores, y colabora en equipos internos."
+  }
+];
 
 export default function RegisterPage() {
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
   const [phone, setPhone] = useState('');
-  const [role, setRole] = useState<User['role']>('Cliente');
+  const [role, setRole] = useState<AppUser['role'] | null>(null);
   const [language, setLanguage] = useState('es');
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { registerUser } = useAuth();
   const { toast } = useToast();
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast({
         variant: "destructive",
         title: "Error",
         description: "Las contraseñas no coinciden.",
+      });
+      return;
+    }
+    if (!username || !email || !password) {
+        toast({
+            variant: "destructive",
+            title: "Campos Incompletos",
+            description: "Por favor, completa todos los campos requeridos.",
+        });
+        return;
+    }
+    setStep(2);
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!role) {
+        toast({
+            variant: "destructive",
+            title: "Selecciona un Rol",
+            description: "Debes elegir un rol para continuar.",
+        });
+        return;
+    }
+    if (!termsAccepted) {
+      toast({
+        variant: "destructive",
+        title: "Términos y Condiciones",
+        description: "Debes aceptar los términos y condiciones.",
       });
       return;
     }
@@ -72,88 +117,113 @@ export default function RegisterPage() {
              <Share2 className="h-6 w-6 text-primary" />
              <span className="text-2xl font-bold font-headline text-primary">AFKDpu</span>
            </Link>
-          <CardTitle className="text-2xl font-headline">Crear una cuenta</CardTitle>
-          <CardDescription>Ingresa tus datos para empezar a comunicarte.</CardDescription>
+           {step === 1 && (
+            <>
+                <CardTitle className="text-2xl font-headline">Crear una cuenta (Paso 1 de 2)</CardTitle>
+                <CardDescription>Ingresa tus datos básicos para empezar.</CardDescription>
+            </>
+           )}
+           {step === 2 && (
+            <>
+                <CardTitle className="text-2xl font-headline">El Ritual de Entrada (Paso 2 de 2)</CardTitle>
+                <CardDescription>Elige tu rol. Esta es la identidad que encarnarás en este ecosistema.</CardDescription>
+            </>
+           )}
         </CardHeader>
-        <form onSubmit={handleRegister}>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="email">Correo electrónico</Label>
-              <Input id="email" type="email" placeholder="nombre@ejemplo.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="confirm-password">Confirmar contraseña</Label>
-                <Input id="confirm-password" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-              </div>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="username">Nombre de usuario</Label>
-              <Input id="username" placeholder="Tu nombre" required value={username} onChange={(e) => setUsername(e.target.value)} />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="phone">Teléfono (Opcional)</Label>
-              <Input id="phone" type="tel" placeholder="Ej: 809-123-4567" value={phone} onChange={(e) => setPhone(e.target.value)} />
-            </div>
-             <div className="grid gap-2">
-                <Label htmlFor="role">Selecciona tu rol</Label>
-                <Select value={role} onValueChange={(value) => setRole(value as User['role'])}>
-                  <SelectTrigger id="role">
-                    <SelectValue placeholder="Elige un rol..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Cliente">Cliente</SelectItem>
-                    <SelectItem value="Proveedor">Proveedor</SelectItem>
-                    <SelectItem value="Empleado">Empleado</SelectItem>
-                  </SelectContent>
-                </Select>
-                {role && (
-                    <p className="text-xs text-muted-foreground px-1">
-                        {roleDescriptions[role]}
+        
+        {step === 1 && (
+            <form onSubmit={handleNextStep}>
+                <CardContent className="grid gap-4">
+                    <div className="grid gap-2">
+                        <Label htmlFor="username">Nombre de usuario</Label>
+                        <Input id="username" placeholder="Tu nombre" required value={username} onChange={(e) => setUsername(e.target.value)} />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="email">Correo electrónico</Label>
+                        <Input id="email" type="email" placeholder="nombre@ejemplo.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="password">Contraseña</Label>
+                            <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="confirm-password">Confirmar contraseña</Label>
+                            <Input id="confirm-password" type="password" required value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                        </div>
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="phone">Teléfono (Opcional)</Label>
+                        <Input id="phone" type="tel" placeholder="Ej: 809-123-4567" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="language">Idioma</Label>
+                        <Select value={language} onValueChange={setLanguage}>
+                            <SelectTrigger id="language">
+                                <SelectValue placeholder="Elige un idioma..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="es">Español</SelectItem>
+                                <SelectItem value="en">English</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex flex-col gap-4">
+                    <Button type="submit" className="w-full">
+                        Siguiente <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </CardFooter>
+            </form>
+        )}
+
+        {step === 2 && (
+            <form onSubmit={handleRegister}>
+                <CardContent className="grid gap-4">
+                    <div className="space-y-4">
+                      {roleData.map((item) => (
+                        <div
+                          key={item.role}
+                          className={cn(
+                            "flex items-center space-x-4 rounded-md border p-4 cursor-pointer transition-all",
+                            role === item.role ? "border-primary ring-2 ring-primary" : "border-border"
+                          )}
+                          onClick={() => setRole(item.role)}
+                        >
+                          <item.icon className={cn("h-8 w-8", role === item.role ? "text-primary" : "text-muted-foreground")} />
+                          <div className="flex-1 space-y-1">
+                            <p className="text-sm font-medium leading-none">{item.role}</p>
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex items-center space-x-2 pt-4">
+                        <Checkbox id="terms" checked={termsAccepted} onCheckedChange={(checked) => setTermsAccepted(Boolean(checked))} />
+                        <label
+                        htmlFor="terms"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                        Acepto los <Link href="#" className="underline">términos de servicio</Link> y la <Link href="#" className="underline">política de privacidad</Link>.
+                        </label>
+                    </div>
+                </CardContent>
+                <CardFooter className="flex flex-col gap-4">
+                    <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? <Loader2 className="animate-spin" /> : "Completar Registro"}
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">
+                    ¿Ya tienes una cuenta?{" "}
+                    <Link
+                        href="/login"
+                        className="underline underline-offset-4 hover:text-primary"
+                    >
+                        Iniciar sesión
+                    </Link>
                     </p>
-                )}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="language">Idioma</Label>
-                <Select value={language} onValueChange={setLanguage}>
-                    <SelectTrigger id="language">
-                        <SelectValue placeholder="Elige un idioma..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="es">Español</SelectItem>
-                        <SelectItem value="en">English</SelectItem>
-                    </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" required />
-                  <label
-                    htmlFor="terms"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Acepto los <Link href="#" className="underline">términos de servicio</Link> y la <Link href="#" className="underline">política de privacidad</Link>.
-                  </label>
-                </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin" /> : "Crear cuenta"}
-            </Button>
-            <p className="text-xs text-center text-muted-foreground">
-              ¿Ya tienes una cuenta?{" "}
-              <Link
-                href="/login"
-                className="underline underline-offset-4 hover:text-primary"
-              >
-                Iniciar sesión
-              </Link>
-            </p>
-          </CardFooter>
-        </form>
+                </CardFooter>
+            </form>
+        )}
       </Card>
     </div>
   );
