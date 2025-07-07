@@ -1,58 +1,50 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Helper function to check if user is an admin
     function isAdmin() {
       return request.auth.token.email == 'alcantara00789@gmail.com';
     }
 
-    // Users: Can read any profile, update their own. Points can be incremented by others.
+    // Helper function to check if a user is a participant in a connection
+    function isParticipant(connectionId) {
+      return request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
+    }
+
+    // Users can be read by anyone, but only the user themselves or an admin can write.
     match /users/{userId} {
       allow read: if request.auth != null;
-
-      // Allow a user to update their own profile.
-      // Allow admin to make any change.
-      // Allow any authenticated user to increment points (for reviews).
-      // WARNING: This is permissive for a prototype. For production, point updates
-      // should ideally be handled by a server-side function for better security.
-      allow update: if request.auth.uid == userId || isAdmin() ||
-                       (request.auth.uid != null &&
-                        request.resource.data.points > resource.data.points &&
-                        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']));
-      
-      allow create: if request.auth.uid == userId;
-      allow delete: if false;
+      allow update: if request.auth.uid == userId || isAdmin();
+      // Allow point updates from reviews
+      allow write: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']);
     }
 
-    // Connections: Can be read/updated only by participants.
+    // Connections can only be read/written by participants or admins.
     match /connections/{connectionId} {
-      allow read, update: if request.auth.uid in resource.data.userIds;
-      allow create: if request.resource.data.creatorId == request.auth.uid;
-      allow delete: if false;
-
-      // Messages: Can be read/created only by participants of the parent connection.
-      match /messages/{messageId} {
-        allow read: if request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
-        allow create: if request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds &&
-                         request.resource.data.senderId == request.auth.uid;
-        allow update, delete: if false;
-      }
+      allow read, update, delete: if isParticipant(connectionId) || isAdmin();
+      allow create: if request.auth != null;
     }
 
-    // Reviews: Can be read by any authenticated user, but only created by the reviewer.
+    // Messages can only be read/written by participants of the parent connection.
+    match /connections/{connectionId}/messages/{messageId} {
+      allow read, create: if isParticipant(connectionId);
+      allow update, delete: if false; // Messages are immutable
+    }
+
+    // Reviews can be created by any authenticated user. They are immutable once created.
     match /reviews/{reviewId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth.uid == request.resource.data.reviewerId;
-      allow update, delete: if false;
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if false;
     }
-
-    // Businesses: Publicly readable, but only writable by admin or assigned provider.
+    
+    // Business data can be read by anyone, but only written by an admin or the claimed user.
     match /businesses/{businessId} {
         allow read: if true;
-        allow write: if isAdmin() ||
-                       (request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-                        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
+        allow write: if isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId;
     }
   }
 }

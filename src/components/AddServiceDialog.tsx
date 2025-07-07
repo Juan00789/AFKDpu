@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -35,7 +36,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 
 const addConnectionSchema = z.object({
   purpose: z.string().min(3, { message: 'El propósito debe tener al menos 3 caracteres.' }),
-  providerId: z.string().min(1, { message: "Debes seleccionar un proveedor." }),
+  providerId: z.string().min(1, { message: "Debes seleccionar un viajero." }),
   duration: z.string().min(1, { message: "Debes especificar una duración." }),
   rules: z.string().min(5, { message: "Debes definir al menos una regla." }),
 });
@@ -67,14 +68,13 @@ export function AddConnectionDialog() {
           const q = query(collection(db, 'users'), where('role', '==', 'Proveedor'));
           const querySnapshot = await getDocs(q);
           const providersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
-          // A user cannot create a connection with themselves, so filter them out.
           setProviders(providersData.filter(provider => provider.id !== appUser.id));
         } catch (error) {
           console.error('Error fetching providers:', error);
           toast({
             variant: 'destructive',
             title: 'Error',
-            description: 'No se pudieron cargar los proveedores.',
+            description: 'No se pudieron cargar los viajeros.',
           });
         } finally {
           setLoadingProviders(false);
@@ -89,14 +89,14 @@ export function AddConnectionDialog() {
         toast({
             variant: 'destructive',
             title: 'Error de autenticación',
-            description: 'Debes iniciar sesión para crear una conexión.',
+            description: 'Debes iniciar sesión para abrir un portal.',
         });
         return;
     }
     
     const selectedProvider = providers.find(p => p.id === data.providerId);
     if (!selectedProvider) {
-        toast({ variant: 'destructive', title: 'Error', description: 'Proveedor no válido.' });
+        toast({ variant: 'destructive', title: 'Error', description: 'Viajero no válido.' });
         return;
     }
 
@@ -151,7 +151,7 @@ export function AddConnectionDialog() {
         toast({
             variant: 'destructive',
             title: 'Error en la base de datos',
-            description: 'No se pudo crear la conexión. Revisa las reglas de Firestore.',
+            description: 'No se pudo abrir el portal. Revisa las reglas de Firestore.',
         });
     }
   };
@@ -173,7 +173,7 @@ export function AddConnectionDialog() {
         <DialogHeader>
           <DialogTitle>Abrir un Nuevo Portal</DialogTitle>
           <DialogDescription>
-            Define el propósito de esta nueva conexión para abrir un portal con otro ser.
+            Define el propósito de este nuevo viaje para abrir un portal con otro ser.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

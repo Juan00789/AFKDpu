@@ -135,7 +135,7 @@ export default function RegisterPage() {
             <form onSubmit={handleNextStep}>
                 <CardContent className="grid gap-4">
                     <div className="grid gap-2">
-                        <Label htmlFor="username">Nombre de usuario</Label>
+                        <Label htmlFor="username">Nombre de viajero</Label>
                         <Input id="username" placeholder="Tu nombre" required value={username} onChange={(e) => setUsername(e.target.value)} />
                     </div>
                     <div className="grid gap-2">

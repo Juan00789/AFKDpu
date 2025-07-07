@@ -1,3 +1,4 @@
+
 'use client';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
@@ -29,7 +30,6 @@ function ActiveConnectionsSummary() {
     const unsubscribe = onSnapshot(q, async (snapshot) => {
         let allConnections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Connection));
         
-        // Sort connections by createdAt on the client side to avoid composite index
         allConnections.sort((a, b) => {
             if (a.createdAt && b.createdAt) {
                 return b.createdAt.seconds - a.createdAt.seconds;

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
@@ -49,7 +50,7 @@ export default function Home() {
                 width={600}
                 height={400}
                 className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
-                data-ai-hint="abstract portal vortex"
+                data-ai-hint="duality connection"
                 priority
               />
             </div>
@@ -80,33 +81,33 @@ export default function Home() {
             <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 lg:max-w-none mt-12">
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <Users className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Portal Unificado de Conexiones</h3>
-                <p className="text-sm text-muted-foreground">Centraliza la comunicación con todos tus clientes, proveedores y empleados en una única plataforma.</p>
+                <h3 className="text-lg font-bold font-headline">Portal Unificado de Viajes</h3>
+                <p className="text-sm text-muted-foreground">Centraliza tus viajes con clientes, proveedores y empleados en una única plataforma.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <MessageSquare className="h-8 w-8 mx-auto text-primary" />
                 <h3 className="text-lg font-bold font-headline">Conversaciones Trascendentes</h3>
-                <p className="text-sm text-muted-foreground">Envía mensajes que se guardan de forma segura hasta que el destinatario pueda leerlos y responder, sin la presión del tiempo real.</p>
+                <p className="text-sm text-muted-foreground">Envía mensajes que se guardan de forma segura hasta que el destinatario pueda leerlos, sin la presión del tiempo real.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <Clock className="h-8 w-8 mx-auto text-primary" />
                 <h3 className="text-lg font-bold font-headline">Ciclos de Interacción</h3>
-                <p className="text-sm text-muted-foreground">Clasifica tus conversaciones en "Activo", "En espera" o "Cerrado" para un seguimiento claro y ordenado.</p>
+                <p className="text-sm text-muted-foreground">Clasifica tus portales en "Activo", "En espera" o "Cerrado" para un seguimiento claro y ordenado.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <History className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Memoria de la Conexión</h3>
-                <p className="text-sm text-muted-foreground">Accede al historial de cada conversación para tener siempre a mano el contexto de cada interacción.</p>
+                <h3 className="text-lg font-bold font-headline">Memoria del Viaje</h3>
+                <p className="text-sm text-muted-foreground">Accede a la memoria de cada portal para tener siempre a mano el contexto de cada interacción.</p>
               </div>
                <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <Bell className="h-8 w-8 mx-auto text-primary" />
                 <h3 className="text-lg font-bold font-headline">Ecos del Portal</h3>
-                <p className="text-sm text-muted-foreground">Recibe avisos cuando tengas nuevos mensajes o tareas pendientes, sin sobrecargarte de información.</p>
+                <p className="text-sm text-muted-foreground">Recibe avisos cuando tengas nuevos mensajes, sin sobrecargarte de información.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                  <ShieldCheck className="h-8 w-8 mx-auto text-primary" />
                 <h3 className="text-lg font-bold font-headline">Santuario Seguro</h3>
-                <p className="text-sm text-muted-foreground">Toda la comunicación está protegida, garantizando la confidencialidad de la información de tu empresa.</p>
+                <p className="text-sm text-muted-foreground">Toda la comunicación está protegida, garantizando la confidencialidad de tu viaje.</p>
               </div>
             </div>
           </div>
@@ -116,7 +117,7 @@ export default function Home() {
             <div className="container px-4 md:px-6">
                  <div className="flex flex-col items-center justify-center space-y-4 text-center">
                     <div className="space-y-2">
-                        <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Flujo de Trabajo</div>
+                        <div className="inline-block rounded-lg bg-secondary px-3 py-1 text-sm">Flujo de Viaje</div>
                         <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">Simple y Efectivo</h2>
                     </div>
                 </div>
@@ -125,12 +126,12 @@ export default function Home() {
                         <PlusCircle className="h-10 w-10 mx-auto text-primary mb-4" />
                         <CardTitle className="font-headline mb-2">1. Abre un Portal</CardTitle>
                         <CardContent className="p-0 text-muted-foreground">
-                            Inicia una nueva conexión, definiendo un propósito claro para el viaje que comienza.
+                            Inicia un nuevo viaje, definiendo un propósito claro para la travesía que comienza.
                         </CardContent>
                     </Card>
                      <Card className="p-6 text-center">
                         <Activity className="h-10 w-10 mx-auto text-primary mb-4" />
-                        <CardTitle className="font-headline mb-2">2. Transita la Conexión</CardTitle>
+                        <CardTitle className="font-headline mb-2">2. Transita el Viaje</CardTitle>
                          <CardContent className="p-0 text-muted-foreground">
                             Utiliza el chat para un diálogo profundo. Todo se guarda como memoria del viaje.
                         </CardContent>
@@ -139,7 +140,7 @@ export default function Home() {
                         <Wand2 className="h-10 w-10 mx-auto text-primary mb-4" />
                         <CardTitle className="font-headline mb-2">3. Cierra el Ciclo</CardTitle>
                          <CardContent className="p-0 text-muted-foreground">
-                            Mueve la conexión a través de sus estados naturales para mantener tu espacio interior en armonía.
+                            Mueve el portal a través de sus estados para mantener tu espacio interior en armonía.
                         </CardContent>
                     </Card>
                 </div>

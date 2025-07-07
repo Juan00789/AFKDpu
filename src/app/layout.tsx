@@ -1,3 +1,4 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
@@ -17,8 +18,8 @@ const fontSpaceGrotesk = Space_Grotesk({
 
 
 export const metadata: Metadata = {
-  title: 'Ephemeral Connect: Real Connections, No Strings Attached',
-  description: 'Ephemeral Connect is a unique platform that allows you to create fleeting, abstract, and emotionally significant connections with people in different roles: clients, providers, and employees.',
+  title: 'AFKDpu: Un Portal para Conexiones Conscientes',
+  description: 'Gestiona tus interacciones como viajes simbólicos. Cada conexión es un portal que se abre, se transita y se cierra, dejando una memoria. Un espacio para la comunicación asíncrona y la transformación personal.',
   manifest: '/manifest.json',
 };
 

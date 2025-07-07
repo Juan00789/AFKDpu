@@ -1,3 +1,4 @@
+
 'use client';
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -67,7 +68,6 @@ export default function ConnectionsKanbanPage() {
         } as Connection);
       });
 
-      // Sort connections by createdAt on the client side to avoid composite index
       connectionsData.sort((a, b) => {
         if (a.createdAt && b.createdAt) {
           return b.createdAt.seconds - a.createdAt.seconds;
