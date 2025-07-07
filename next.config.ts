@@ -10,6 +10,9 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+    allowedDevOrigins: ['*.cloudworkstations.dev'],
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
