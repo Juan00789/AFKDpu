@@ -1,8 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockServices, Service } from "@/lib/mock-data";
-import { PlusCircle, Users } from "lucide-react";
+import { Users } from "lucide-react";
+import { AddServiceDialog } from "@/components/AddServiceDialog";
 
 function ServiceCard({ service }: { service: Service }) {
   return (
@@ -40,10 +40,7 @@ export default function TasksPage() {
                  <h1 className="text-2xl font-bold tracking-tight font-headline">Mis Servicios</h1>
                  <p className="text-muted-foreground">Gestiona tus servicios pendientes y completados.</p>
             </div>
-            <Button>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                Agregar Servicio
-            </Button>
+            <AddServiceDialog />
         </div>
       <div className="grid md:grid-cols-3 gap-6 items-start">
         <Card className="bg-secondary/50">
