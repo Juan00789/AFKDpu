@@ -29,6 +29,7 @@ import {
   Loader2,
   Megaphone,
   Shield,
+  TrendingUp,
 } from "lucide-react"
 import {
   SidebarProvider,
@@ -106,6 +107,7 @@ const baseNavItems = [
     { href: "/dashboard", icon: Home, label: "Tu Espacio Interior" },
     { href: "/dashboard/connections", icon: Users, label: "Mis Portales" },
     { href: "/dashboard/history", icon: History, label: "Memorias" },
+    { href: "/dashboard/revenue", icon: TrendingUp, label: "Ingresos Simbólicos" },
 ];
 
 const advertisingNavItem = { href: "/dashboard/advertising", icon: Megaphone, label: "Publicidad" };
