@@ -1,40 +1,18 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // La información del negocio debe ser públicamente legible.
+    // Rule for the 'businesses' collection to be publicly readable
     match /businesses/{businessId} {
       allow read: if true;
-      allow write: if request.auth != null && (
-        request.auth.token.email == 'alcantara00789@gmail.com' || 
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId
-      );
-    }
-    
-    // Los usuarios pueden leer los perfiles públicos de otros, pero solo editar el suyo.
-    match /users/{userId} {
-      allow read: if true;
-      allow update: if request.auth != null && request.auth.uid == userId;
-      allow create, delete: if false; // Prevenir creación o borrado directo.
+      allow write: if request.auth != null;
     }
 
-    // Las conexiones son privadas para sus participantes.
-    match /connections/{connectionId} {
-      allow read, update, delete: if request.auth != null && request.auth.uid in resource.data.userIds;
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.creatorId;
-    }
-
-    // Los mensajes son privados para los participantes de la conexión.
-    match /connections/{connectionId}/messages/{messageId} {
-      allow read, create: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
-      allow update, delete: if false; // Los mensajes no se editan ni se borran.
-    }
-    
-    // Las reseñas son públicas para leer, pero solo se pueden crear si el usuario está autenticado.
-    match /reviews/{reviewId} {
-        allow read: if true;
-        allow create: if request.auth != null;
-        allow update, delete: if false; // Las reseñas no se modifican.
+    // Default rule for all other collections
+    // Allows any authenticated user to read/write anywhere.
+    // This is for development and should be secured before production.
+    match /{path=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }
