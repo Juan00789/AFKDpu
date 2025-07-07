@@ -20,6 +20,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
 import Link from 'next/link';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 function ReputationCard({ user }: { user: User }) {
     const getReputationLevel = (points: number) => {
@@ -503,88 +504,90 @@ export default function ProfilePage() {
                                     Realiza cambios en tu perfil. Haz clic en guardar cuando hayas terminado.
                                 </DialogDescription>
                                 </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="flex flex-col items-center gap-4">
-                                        <Avatar className="w-24 h-24">
-                                            <AvatarImage src={formData.avatar} />
-                                            <AvatarFallback className="text-3xl">{formData.name.charAt(0)}</AvatarFallback>
-                                        </Avatar>
-                                        <Input
-                                            id="avatar-upload"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageUpload}
-                                            className="hidden"
-                                            ref={fileInputRef}
-                                        />
-                                        <Button
-                                            type="button"
-                                            variant="outline"
-                                            onClick={() => fileInputRef.current?.click()}
-                                            disabled={isUploading}
-                                        >
-                                            {isUploading ? (
-                                                <>
-                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                    Subiendo...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Upload className="mr-2 h-4 w-4" />
-                                                    Cambiar Avatar
-                                                </>
-                                            )}
-                                        </Button>
+                                <ScrollArea className="max-h-[60vh] -mx-6 px-6">
+                                    <div className="grid gap-4 py-4">
+                                        <div className="flex flex-col items-center gap-4">
+                                            <Avatar className="w-24 h-24">
+                                                <AvatarImage src={formData.avatar} />
+                                                <AvatarFallback className="text-3xl">{formData.name.charAt(0)}</AvatarFallback>
+                                            </Avatar>
+                                            <Input
+                                                id="avatar-upload"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                className="hidden"
+                                                ref={fileInputRef}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={isUploading}
+                                            >
+                                                {isUploading ? (
+                                                    <>
+                                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                        Subiendo...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Upload className="mr-2 h-4 w-4" />
+                                                        Cambiar Avatar
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="name" className="text-right">Nombre</Label>
+                                            <Input id="name" value={formData.name} onChange={(e) => setFormData({...formData!, name: e.target.value})} className="col-span-3" />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="email" className="text-right">Email</Label>
+                                            <Input id="email" value={formData.email} className="col-span-3" disabled />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="phone" className="text-right">Teléfono</Label>
+                                            <Input id="phone" value={formData.phone || ''} onChange={(e) => setFormData({...formData!, phone: e.target.value})} className="col-span-3" placeholder="Tu número de teléfono" />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="role" className="text-right">Rol</Label>
+                                            <Select value={formData.role} onValueChange={(value) => setFormData({...formData!, role: value as User['role']})}>
+                                                <SelectTrigger className="col-span-3">
+                                                    <SelectValue placeholder="Selecciona un rol" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="Cliente">Cliente</SelectItem>
+                                                    <SelectItem value="Proveedor">Proveedor</SelectItem>
+                                                    <SelectItem value="Empleado">Empleado</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="grid grid-cols-4 items-start gap-4">
+                                            <Label htmlFor="objectives" className="text-right pt-2">Objetivos</Label>
+                                            <Textarea 
+                                                id="objectives" 
+                                                placeholder="Tus objetivos personales en la plataforma" 
+                                                className="col-span-3" 
+                                                rows={4}
+                                                value={formData.objectives || ''}
+                                                onChange={(e) => setFormData({...formData!, objectives: e.target.value})}
+                                            />
+                                        </div>
+                                        {formData.role === 'Proveedor' && (
+                                            <>
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label htmlFor="bankName" className="text-right">Banco</Label>
+                                                    <Input id="bankName" placeholder="Nombre del banco" value={formData.bankName || ''} onChange={(e) => setFormData({...formData!, bankName: e.target.value})} className="col-span-3" />
+                                                </div>
+                                                <div className="grid grid-cols-4 items-center gap-4">
+                                                    <Label htmlFor="bankAccountNumber" className="text-right">No. de Cuenta</Label>
+                                                    <Input id="bankAccountNumber" placeholder="Número de cuenta bancaria" value={formData.bankAccountNumber || ''} onChange={(e) => setFormData({...formData!, bankAccountNumber: e.target.value})} className="col-span-3" />
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="name" className="text-right">Nombre</Label>
-                                        <Input id="name" value={formData.name} onChange={(e) => setFormData({...formData!, name: e.target.value})} className="col-span-3" />
-                                    </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="email" className="text-right">Email</Label>
-                                        <Input id="email" value={formData.email} className="col-span-3" disabled />
-                                    </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="phone" className="text-right">Teléfono</Label>
-                                        <Input id="phone" value={formData.phone || ''} onChange={(e) => setFormData({...formData!, phone: e.target.value})} className="col-span-3" placeholder="Tu número de teléfono" />
-                                    </div>
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="role" className="text-right">Rol</Label>
-                                        <Select value={formData.role} onValueChange={(value) => setFormData({...formData!, role: value as User['role']})}>
-                                            <SelectTrigger className="col-span-3">
-                                                <SelectValue placeholder="Selecciona un rol" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="Cliente">Cliente</SelectItem>
-                                                <SelectItem value="Proveedor">Proveedor</SelectItem>
-                                                <SelectItem value="Empleado">Empleado</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                    <div className="grid grid-cols-4 items-start gap-4">
-                                        <Label htmlFor="objectives" className="text-right pt-2">Objetivos</Label>
-                                        <Textarea 
-                                            id="objectives" 
-                                            placeholder="Tus objetivos personales en la plataforma" 
-                                            className="col-span-3" 
-                                            rows={4}
-                                            value={formData.objectives || ''}
-                                            onChange={(e) => setFormData({...formData!, objectives: e.target.value})}
-                                        />
-                                    </div>
-                                    {formData.role === 'Proveedor' && (
-                                        <>
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="bankName" className="text-right">Banco</Label>
-                                                <Input id="bankName" placeholder="Nombre del banco" value={formData.bankName || ''} onChange={(e) => setFormData({...formData!, bankName: e.target.value})} className="col-span-3" />
-                                            </div>
-                                            <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label htmlFor="bankAccountNumber" className="text-right">No. de Cuenta</Label>
-                                                <Input id="bankAccountNumber" placeholder="Número de cuenta bancaria" value={formData.bankAccountNumber || ''} onChange={(e) => setFormData({...formData!, bankAccountNumber: e.target.value})} className="col-span-3" />
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
+                                </ScrollArea>
                                 <DialogFooter>
                                     <DialogClose asChild>
                                         <Button type="button" variant="secondary">Cancelar</Button>
@@ -657,5 +660,7 @@ export default function ProfilePage() {
         </div>
     )
 }
+
+    
 
     
