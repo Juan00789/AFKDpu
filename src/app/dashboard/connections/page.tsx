@@ -7,7 +7,7 @@ import { Clock, Loader2, UserCheck } from "lucide-react";
 import { AddConnectionDialog } from "@/components/AddServiceDialog";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
-import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import Link from "next/link";
 
 function ConnectionCard({ connection }: { connection: Connection }) {
@@ -55,8 +55,7 @@ export default function ConnectionsKanbanPage() {
 
     const q = query(
       collection(db, "connections"),
-      where("userIds", "array-contains", appUser.id),
-      orderBy("createdAt", "desc")
+      where("userIds", "array-contains", appUser.id)
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -67,6 +66,15 @@ export default function ConnectionsKanbanPage() {
           ...doc.data()
         } as Connection);
       });
+
+      // Sort connections by createdAt on the client side to avoid composite index
+      connectionsData.sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return b.createdAt.seconds - a.createdAt.seconds;
+        }
+        return 0;
+      });
+      
       setConnections(connectionsData);
       setLoading(false);
     }, (error) => {

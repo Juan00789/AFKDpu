@@ -9,7 +9,7 @@ import { ArrowRight, History as HistoryIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { AddConnectionDialog } from "@/components/AddServiceDialog";
 
@@ -21,16 +21,22 @@ function ActiveConnectionsSummary() {
   useEffect(() => {
     if (!appUser) return;
 
-    // This simplified query fetches all user connections and then filters them on the client.
-    // This avoids the need for a manual composite index in Firestore.
     const q = query(
       collection(db, "connections"),
-      where("userIds", "array-contains", appUser.id),
-      orderBy("createdAt", "desc")
+      where("userIds", "array-contains", appUser.id)
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const allConnections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Connection));
+      
+      // Sort connections by createdAt on the client side to avoid composite index
+      allConnections.sort((a, b) => {
+        if (a.createdAt && b.createdAt) {
+          return b.createdAt.seconds - a.createdAt.seconds;
+        }
+        return 0;
+      });
+
       const activeAndWaitingConnections = allConnections
         .filter(c => c.status === "Activo" || c.status === "En espera")
         .slice(0, 5);
