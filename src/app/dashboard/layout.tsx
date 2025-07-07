@@ -26,6 +26,7 @@ import {
   ChevronDown,
   HelpCircle,
   Loader2,
+  Megaphone,
 } from "lucide-react"
 import {
   SidebarProvider,
@@ -99,17 +100,21 @@ function UserMenu() {
   );
 }
 
-const navItems = [
+const baseNavItems = [
     { href: "/dashboard", icon: Home, label: "Panel General" },
     { href: "/dashboard/connections", icon: Users, label: "Mis Conexiones" },
     { href: "/dashboard/history", icon: History, label: "Historial" },
-    { href: "/dashboard/settings", icon: Settings, label: "Configuración" },
 ];
+
+const advertisingNavItem = { href: "/dashboard/advertising", icon: Megaphone, label: "Publicidad" };
+
+const settingsNavItem = { href: "/dashboard/settings", icon: Settings, label: "Configuración" };
+
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { firebaseUser, loading } = useAuth();
+  const { appUser, firebaseUser, loading } = useAuth();
 
   React.useEffect(() => {
     if (!loading && !firebaseUser) {
@@ -124,6 +129,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </div>
     );
   }
+
+  const canSeeAdvertising = appUser && (appUser.email === 'alcantara00789@gmail.com' || !!appUser.claimedBusinessId);
+
+  const navItems = [
+    ...baseNavItems,
+    ...(canSeeAdvertising ? [advertisingNavItem] : []),
+    settingsNavItem
+  ];
 
   const getPageTitle = () => {
     if (pathname === '/dashboard') return "Panel General";

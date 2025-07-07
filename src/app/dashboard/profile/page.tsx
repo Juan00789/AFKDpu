@@ -512,9 +512,9 @@ export default function ProfilePage() {
                         <CardContent className="space-y-4">
                            <AssignBusinessDialog />
                            <Button asChild variant="outline" className="w-full">
-                                <Link href="/publicidad-sana">
+                                <Link href="/dashboard/advertising">
                                     <Edit className="mr-2 h-4 w-4" />
-                                    Editar "Miguel iPhone Center"
+                                    Editar Página de Publicidad
                                 </Link>
                            </Button>
                         </CardContent>
@@ -532,9 +532,9 @@ export default function ProfilePage() {
                         </CardHeader>
                         <CardContent>
                            <Button asChild className="w-full">
-                                <Link href="/publicidad-sana">
+                                <Link href="/dashboard/advertising">
                                     <Edit className="mr-2 h-4 w-4" />
-                                    Editar "Miguel iPhone Center"
+                                    Editar Página de Publicidad
                                 </Link>
                             </Button>
                         </CardContent>
