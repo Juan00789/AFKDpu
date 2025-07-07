@@ -12,10 +12,10 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const ConnectionPromptSuggestionsInputSchema = z.object({
-  connectionName: z.string().describe('The name of the connection.'),
-  connectionState: z.string().describe('The current state of the connection (e.g., Vibrant, Neutral, Fading).'),
+  connectionName: z.string().describe('The name of the connection or its purpose.'),
+  connectionState: z.string().describe('The current state of the connection (e.g., Activo, En espera, Cerrado).'),
   lastInteraction: z.string().describe('A description of the last interaction with the connection.'),
-  rules: z.string().describe('A description of the rules defined for this connection.'),
+  rules: z.string().describe('A description of the rules or context defined for this connection.'),
   userName: z.string().describe('The name of the user requesting the suggestions.'),
 });
 export type ConnectionPromptSuggestionsInput = z.infer<typeof ConnectionPromptSuggestionsInputSchema>;
@@ -33,21 +33,21 @@ const prompt = ai.definePrompt({
   name: 'connectionPromptSuggestionsPrompt',
   input: {schema: ConnectionPromptSuggestionsInputSchema},
   output: {schema: ConnectionPromptSuggestionsOutputSchema},
-  prompt: `You are an AI assistant helping users maintain and improve their connections on the AFKDpu platform.
+  prompt: `You are an expert business assistant for AFKDpu, a corporate asynchronous communication platform. Your goal is to help users manage their conversations and tasks effectively.
 
-  The user, {{{userName}}}, has a connection called {{{connectionName}}}. The connection is currently in the "{{{connectionState}}}" state.
+The user, {{{userName}}}, has a connection for the purpose of: "{{{connectionName}}}".
+The connection's current status is: "{{{connectionState}}}".
+The last interaction was: "{{{lastInteraction}}}".
+The rules/context for this connection are: {{{rules}}}.
 
-  The last interaction with the connection was: {{{lastInteraction}}}.
+Based on this information, provide 3 short, actionable, and professional suggestions to help the user advance the conversation or resolve the task associated with this connection. Return your answer as a JSON array of strings.
 
-The following rules are defined for this connection: {{{rules}}}.
-
-Based on this information, provide 3 suggestions for the user on how they can update the connection's status or next steps to take to improve the connection's health.  The suggestions should be short and actionable. Return your answer as a JSON array of strings.
-  For example:
-  [
-    "Schedule a meeting with the connection to discuss project updates.",
-    "Send a personalized message to check in on their well-being.",
-    "Share a relevant article or resource that might be of interest.",
-  ]
+For example:
+[
+  "Enviar un resumen de los puntos acordados para confirmar el siguiente paso.",
+  "Programar una breve llamada de 15 minutos para aclarar dudas pendientes.",
+  "Compartir la documentación relevante para desbloquear la siguiente fase del proyecto."
+]
   `,
 });
 

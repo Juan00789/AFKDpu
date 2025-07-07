@@ -82,9 +82,9 @@ export default function ConnectionsKanbanPage() {
     );
   }
   
-  const openConnections = connections.filter(c => c.status === "Abierto");
-  const inProgressConnections = connections.filter(c => c.status === "En Progreso");
-  const doneConnections = connections.filter(c => c.status === "Terminadas");
+  const activeConnections = connections.filter(c => c.status === "Activo");
+  const waitingConnections = connections.filter(c => c.status === "En espera");
+  const closedConnections = connections.filter(c => c.status === "Cerrado");
 
   return (
     <div className="space-y-4">
@@ -98,26 +98,26 @@ export default function ConnectionsKanbanPage() {
       <div className="grid md:grid-cols-3 gap-6 items-start">
         <Card className="bg-secondary/50">
           <CardHeader>
-            <CardTitle>Abierto ({openConnections.length})</CardTitle>
+            <CardTitle>Activo ({activeConnections.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {openConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
+            {activeConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
           </CardContent>
         </Card>
         <Card className="bg-secondary/50">
           <CardHeader>
-            <CardTitle>En Progreso ({inProgressConnections.length})</CardTitle>
+            <CardTitle>En espera ({waitingConnections.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {inProgressConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
+            {waitingConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
           </CardContent>
         </Card>
         <Card className="bg-secondary/50">
           <CardHeader>
-            <CardTitle>Terminadas ({doneConnections.length})</CardTitle>
+            <CardTitle>Cerrado ({closedConnections.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {doneConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
+            {closedConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
           </CardContent>
         </Card>
       </div>

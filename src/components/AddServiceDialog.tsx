@@ -75,7 +75,7 @@ export function AddConnectionDialog() {
     try {
         await addDoc(collection(db, 'connections'), {
             ...data,
-            status: 'Abierto',
+            status: 'Activo',
             participants: participants.map(({objectives, ...rest}) => rest), // Firestore doesn't like undefined fields
             userIds,
             createdAt: serverTimestamp(),

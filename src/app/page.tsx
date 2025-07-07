@@ -11,7 +11,7 @@ const HeroLogo = () => (
     viewBox="0 0 600 400"
     className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
     aria-label="AFKDpu Logo"
-    data-ai-hint="abstract communication"
+    data-ai-hint="business communication"
   >
     <rect width="600" height="400" rx="24" fill="hsl(var(--card))" />
     <g transform="translate(150, 50) scale(2)">
@@ -75,7 +75,7 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline text-primary">
-                    AFKDpu: Comunicación Asíncrona para tu Empresa
+                    AFKDpu: Comunicación Empresarial Asíncrona
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
                     Gestiona clientes, proveedores y empleados en un solo lugar. Envía mensajes y tareas que se almacenan hasta que el destinatario esté disponible, garantizando una comunicación fluida y sin interrupciones.
@@ -127,7 +127,7 @@ export default function Home() {
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <Clock className="h-8 w-8 mx-auto text-primary" />
                 <h3 className="text-lg font-bold font-headline">Organización por Estado</h3>
-                <p className="text-sm text-muted-foreground">Clasifica tus conversaciones en "Abiertas", "En Progreso" o "Terminadas" para un seguimiento claro y ordenado.</p>
+                <p className="text-sm text-muted-foreground">Clasifica tus conversaciones en "Activo", "En espera" o "Cerrado" para un seguimiento claro y ordenado.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <History className="h-8 w-8 mx-auto text-primary" />
@@ -213,7 +213,7 @@ export default function Home() {
         <p className="text-xs text-muted-foreground">&copy; 2024 AFKDpu. Todos los derechos reservados.</p>
         <nav className="sm:ml-auto flex gap-4 sm:gap-6">
           <Link href="/publicidad-sana" className="text-xs hover:underline underline-offset-4">
-            Publicidad Sana
+            Principios
           </Link>
           <Link href="#" className="text-xs hover:underline underline-offset-4">
             Términos y Condiciones

@@ -10,7 +10,7 @@ export type User = {
 export type Connection = {
   id: string;
   purpose: string;
-  status: "Abierto" | "En Progreso" | "Terminadas";
+  status: "Activo" | "En espera" | "Cerrado";
   participants: Omit<User, 'objectives'>[];
   userIds: string[];
   duration: string;

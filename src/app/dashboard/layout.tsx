@@ -100,11 +100,10 @@ function UserMenu() {
 }
 
 const navItems = [
-    { href: "/dashboard", icon: Home, label: "Inicio" },
+    { href: "/dashboard", icon: Home, label: "Panel General" },
     { href: "/dashboard/connections", icon: Users, label: "Mis Conexiones" },
     { href: "/dashboard/history", icon: History, label: "Historial" },
     { href: "/dashboard/settings", icon: Settings, label: "Configuración" },
-    { href: "/dashboard/quiz", icon: HelpCircle, label: "Cuestionario" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -126,6 +125,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  const getPageTitle = () => {
+    if (pathname === '/dashboard') return "Panel General";
+    const activeItem = navItems.find(item => item.href !== '/dashboard' && pathname.startsWith(item.href));
+    return activeItem?.label || "AFKDpu";
+  }
+
   return (
     <SidebarProvider>
         <Sidebar>
@@ -138,7 +143,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                  <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                         asChild
-                        isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
+                        isActive={pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href))}
                         tooltip={{children: item.label}}
                     >
                         <Link href={item.href}>
@@ -159,7 +164,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                  <SidebarTrigger className="sm:hidden" />
                  <div className="flex-1">
                     <h1 className="font-headline text-2xl font-semibold tracking-tight">
-                        {navItems.find(item => pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard'))?.label || "AFKDpu"}
+                        {getPageTitle()}
                     </h1>
                  </div>
             </header>

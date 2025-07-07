@@ -23,7 +23,7 @@ function ActiveConnectionsSummary() {
     const q = query(
       collection(db, "connections"),
       where("userIds", "array-contains", appUser.id),
-      where("status", "in", ["En Progreso", "Abierto"]),
+      where("status", "in", ["Activo", "En espera"]),
       orderBy("createdAt", "desc"),
       limit(5)
     );
