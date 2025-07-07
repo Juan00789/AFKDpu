@@ -28,29 +28,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
-      if (user) {
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          setAppUser(userSnap.data() as User);
+      try {
+        if (user) {
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            setAppUser(userSnap.data() as User);
+          } else {
+            // This case is for users that existed before firestore integration
+            // or if doc creation failed during registration.
+            const newUser: User = {
+              id: user.uid,
+              name: user.displayName || 'Nuevo Usuario',
+              email: user.email!,
+              role: 'Cliente',
+              avatar: user.photoURL || `https://placehold.co/100x100.png`,
+              objectives: 'Definir mis objetivos.'
+            };
+            await setDoc(userRef, newUser);
+            setAppUser(newUser);
+          }
         } else {
-          // This case is for users that existed before firestore integration
-          // or if doc creation failed during registration.
-          const newUser: User = {
-            id: user.uid,
-            name: user.displayName || 'Nuevo Usuario',
-            email: user.email!,
-            role: 'Cliente',
-            avatar: user.photoURL || `https://placehold.co/100x100.png`,
-            objectives: 'Definir mis objetivos.'
-          };
-          await setDoc(userRef, newUser);
-          setAppUser(newUser);
+          setAppUser(null);
         }
-      } else {
+      } catch (error) {
+        console.error("Firebase Auth Error: Could not get user document.", error);
+        // This is a critical error, likely due to Firestore rules.
+        // We will sign the user out to prevent an inconsistent state.
         setAppUser(null);
+        await signOut(auth);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => unsubscribe();
