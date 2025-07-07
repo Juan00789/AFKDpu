@@ -27,7 +27,6 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
-import { mockUsers } from '@/lib/mock-data';
 import { Textarea } from './ui/textarea';
 import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
@@ -71,9 +70,7 @@ export function AddConnectionDialog() {
         return;
     }
     
-    // For demonstration, we'll create a connection with a mock user.
-    const otherParticipant = mockUsers[1]; 
-    const participants = [appUser, otherParticipant];
+    const participants = [appUser];
     const userIds = participants.map(p => p.id);
 
     try {

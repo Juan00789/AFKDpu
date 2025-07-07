@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,20 +8,24 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { SmartPromptSuggestions } from "@/components/SmartPromptSuggestions";
-import { mockConnections } from "@/lib/mock-data";
+import { Connection } from "@/lib/mock-data";
 import { cva } from "class-variance-authority";
-import { Send, HeartPulse, Minus, TrendingDown, Loader2 } from "lucide-react";
+import { Send, HeartPulse, Minus, TrendingDown, Loader2, AlertTriangle } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import React from 'react';
 
 const statusBadgeVariants = cva(
-  "border-transparent text-xs",
+  "border-transparent text-xs capitalize",
   {
     variants: {
       status: {
         Vibrante: "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200",
         Neutral: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200",
         Fading: "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200",
+        Sereno: "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200",
+        Difuso: "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200",
       },
     },
   }
@@ -28,9 +33,55 @@ const statusBadgeVariants = cva(
 
 export default function ConnectionDetailPage({ params }: { params: { id: string } }) {
   const { appUser } = useAuth();
-  const connection = mockConnections.find(c => c.id === params.id) || mockConnections[0];
+  const [connection, setConnection] = useState<Connection | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!params.id) return;
+
+    const fetchConnection = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const connectionRef = doc(db, 'connections', params.id);
+        const connectionSnap = await getDoc(connectionRef);
+
+        if (connectionSnap.exists()) {
+          setConnection({ id: connectionSnap.id, ...connectionSnap.data() } as Connection);
+        } else {
+          setError("No se encontró la conexión.");
+        }
+      } catch (err) {
+        console.error(err);
+        setError("Error al cargar la conexión.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchConnection();
+  }, [params.id]);
+
+  if (loading) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col h-screen items-center justify-center text-destructive">
+          <AlertTriangle className="h-12 w-12 mb-4" />
+          <h2 className="text-xl font-semibold">Error</h2>
+          <p>{error}</p>
+      </div>
+    );
+  }
   
-  if (!appUser) {
+  if (!appUser || !connection) {
     return (
         <div className="flex h-screen items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
@@ -41,10 +92,10 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
   const otherParticipant = connection.participants.find(p => p.id !== appUser.id) || connection.participants[0];
 
   const connectionInfo = {
-      connectionName: connection.name,
-      connectionState: connection.status,
+      connectionName: connection.purpose,
+      connectionState: connection.emotionalState,
       lastInteraction: "La última interacción fue una llamada para revisar el progreso del proyecto hace 2 días.",
-      rules: "Si la conexión se vuelve 'Fading' por más de 1 hora, enviar una notificación.",
+      rules: connection.rules,
       userName: appUser.name,
   };
 
@@ -54,10 +105,10 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
         <Card>
           <CardHeader className="flex flex-row items-start justify-between">
             <div>
-              <CardTitle className="font-headline text-2xl">{connection.name}</CardTitle>
+              <CardTitle className="font-headline text-2xl">{connection.purpose}</CardTitle>
               <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="outline" className={statusBadgeVariants({ status: connection.status })}>
-                      {connection.status}
+                  <Badge variant="outline" className={statusBadgeVariants({ status: connection.emotionalState })}>
+                      {connection.emotionalState}
                   </Badge>
                   <span className="text-sm text-muted-foreground">{connection.duration}</span>
               </div>
@@ -119,13 +170,13 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
             <CardDescription>Actualiza el estado para reflejar el sentimiento actual de la conexión.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Button variant={connection.status === 'Vibrante' ? 'default' : 'secondary'} size="sm" className="gap-1.5">
+            <Button variant={connection.emotionalState === 'Vibrante' ? 'default' : 'secondary'} size="sm" className="gap-1.5">
               <HeartPulse className="h-4 w-4" /> Vibrante
             </Button>
-            <Button variant={connection.status === 'Neutral' ? 'default' : 'secondary'} size="sm" className="gap-1.5">
+            <Button variant={connection.emotionalState === 'Neutral' ? 'default' : 'secondary'} size="sm" className="gap-1.5">
               <Minus className="h-4 w-4" /> Neutral
             </Button>
-             <Button variant={connection.status === 'Fading' ? 'destructive' : 'secondary'} size="sm" className="gap-1.5">
+             <Button variant={connection.emotionalState === 'Fading' ? 'destructive' : 'secondary'} size="sm" className="gap-1.5">
               <TrendingDown className="h-4 w-4" /> Fading
             </Button>
           </CardContent>

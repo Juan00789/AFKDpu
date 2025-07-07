@@ -10,9 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
-import { mockUsers, type User } from "@/lib/mock-data"
+import { type User } from "@/lib/mock-data"
 import { Star, Edit, BarChart2, Upload, Loader2, Save } from "lucide-react"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
@@ -21,16 +20,6 @@ import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage
 import { doc, setDoc } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-
-const pastConnections = [
-    { id: 'conn-past-1', name: 'Migración de Servidor', status: 'Finalizada', finalState: 'Sereno', duration: '30 días', rating: 5 },
-    { id: 'conn-past-2', name: 'Auditoría de Seguridad', status: 'Finalizada', finalState: 'Vibrante', duration: '15 días', rating: 4 },
-]
-
-const comments = [
-    { user: mockUsers[0], rating: 5, comment: "Excelente comunicación y proactividad. ¡Un placer trabajar juntos!" },
-    { user: mockUsers[1], rating: 4, comment: "Buen trabajo en general, aunque a veces la comunicación tardaba un poco." },
-]
 
 const emotionalHistory = [
   { state: "Vibrante", hours: 8 },
@@ -352,65 +341,6 @@ export default function ProfilePage() {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Historial de Conexiones</CardTitle>
-                        <CardDescription>Un resumen de tus colaboraciones previas.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Conexión</TableHead>
-                                    <TableHead>Estado Final</TableHead>
-                                    <TableHead>Duración</TableHead>
-                                    <TableHead>Tu Calificación</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {pastConnections.map(conn => (
-                                    <TableRow key={conn.id}>
-                                        <TableCell className="font-medium">{conn.name}</TableCell>
-                                        <TableCell><Badge variant="outline">{conn.finalState}</Badge></TableCell>
-                                        <TableCell>{conn.duration}</TableCell>
-                                        <TableCell>
-                                            <div className="flex items-center">
-                                                {Array(conn.rating).fill(0).map((_, i) => <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
-                                                {Array(5 - conn.rating).fill(0).map((_, i) => <Star key={i} className="h-4 w-4 text-muted-foreground" />)}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
-
-                <Card>
-                     <CardHeader>
-                        <CardTitle>Calificaciones Recibidas</CardTitle>
-                        <CardDescription>Lo que otros dicen de tus colaboraciones.</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {comments.map((c, i) => (
-                            <div key={i} className="flex items-start gap-4">
-                                <Avatar>
-                                    <AvatarImage src={c.user.avatar} />
-                                    <AvatarFallback>{c.user.name.charAt(0)}</AvatarFallback>
-                                </Avatar>
-                                <div className="flex-1">
-                                    <div className="flex items-center justify-between">
-                                        <p className="font-semibold">{c.user.name}</p>
-                                        <div className="flex items-center">
-                                            {Array(c.rating).fill(0).map((_, j) => <Star key={j} className="h-4 w-4 fill-yellow-400 text-yellow-400" />)}
-                                        </div>
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">{c.comment}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
             </div>
         </div>
     )
