@@ -1,13 +1,11 @@
 import type {NextConfig} from 'next';
 import withPWAInit from '@ducanh2912/next-pwa';
 
-const isNetlify = process.env.NETLIFY === 'true';
-
 const withPWA = withPWAInit({
   dest: 'public',
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === 'development' || isNetlify,
+  disable: process.env.NODE_ENV === 'development',
 });
 
 const nextConfig: NextConfig = {
