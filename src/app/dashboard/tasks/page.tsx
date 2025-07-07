@@ -36,7 +36,7 @@ function ServiceCard({ service }: { service: Service }) {
         <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
-                <span className="truncate">{service.connectionName}</span>
+                <span>{service.connectionName}</span>
             </div>
           <div className="flex items-center -space-x-1">
              {service.participants.map(p => (
@@ -59,11 +59,7 @@ export default function TasksPage() {
 
   return (
     <div className="space-y-4">
-        <div className="flex items-center justify-between">
-            <div>
-                 <h1 className="text-2xl font-bold tracking-tight font-headline">Mis Servicios</h1>
-                 <p className="text-muted-foreground">Gestiona tus servicios pendientes y completados.</p>
-            </div>
+        <div className="flex items-center justify-end">
             <AddServiceDialog />
         </div>
       <div className="grid md:grid-cols-3 gap-6 items-start">
