@@ -59,8 +59,9 @@ export default function AdvertisingPage() {
                 const docSnap = await getDoc(businessRef);
                 if (docSnap.exists()) {
                     const data = docSnap.data() as BusinessData;
-                    setBusinessData(data);
-                    setEditData(data);
+                    const sanitizedData = { ...data, products: Array.isArray(data.products) ? data.products : [] };
+                    setBusinessData(sanitizedData);
+                    setEditData(sanitizedData);
                 } else {
                     setEditData(null);
                 }

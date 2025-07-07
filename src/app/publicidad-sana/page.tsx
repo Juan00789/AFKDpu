@@ -116,7 +116,9 @@ export default function PublicidadSanaPage() {
                 const businessRef = doc(db, 'businesses', businessId);
                 const docSnap = await getDoc(businessRef);
                 if (docSnap.exists()) {
-                    setBusinessData(docSnap.data() as BusinessData);
+                    const data = docSnap.data() as BusinessData;
+                    const sanitizedData = { ...data, products: Array.isArray(data.products) ? data.products : [] };
+                    setBusinessData(sanitizedData);
                 } else {
                     setBusinessData(null); // No data found
                 }
