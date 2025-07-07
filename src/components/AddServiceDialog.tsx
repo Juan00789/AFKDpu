@@ -28,10 +28,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
 import { mockConnections, type Connection } from '@/lib/mock-data';
+import { Textarea } from './ui/textarea';
 
 const addServiceSchema = z.object({
   title: z.string().min(3, { message: 'El título debe tener al menos 3 caracteres.' }),
   connectionId: z.string({ required_error: 'Debes seleccionar una conexión.' }),
+  emotionalState: z.enum(["Vibrante", "Neutral", "Fading", "Sereno", "Difuso"], { required_error: "Debes seleccionar un estado emocional." }),
+  duration: z.string().min(1, { message: "Debes especificar una duración." }),
+  rules: z.string().min(5, { message: "Debes definir al menos una regla." }),
 });
 
 type AddServiceForm = z.infer<typeof addServiceSchema>;
@@ -48,6 +52,8 @@ export function AddServiceDialog() {
     resolver: zodResolver(addServiceSchema),
     defaultValues: {
       title: '',
+      duration: '',
+      rules: '',
     },
   });
 
@@ -115,6 +121,46 @@ export function AddServiceDialog() {
                 )}
               />
                {errors.connectionId && <p className="text-sm font-medium text-destructive">{errors.connectionId.message}</p>}
+            </div>
+            <div className="grid gap-2">
+                <Label htmlFor="emotionalState">Estado Emocional Deseado</Label>
+                <Controller
+                    name="emotionalState"
+                    control={control}
+                    render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                        <SelectTrigger id="emotionalState">
+                        <SelectValue placeholder="Selecciona un estado..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="Vibrante">Vibrante</SelectItem>
+                            <SelectItem value="Sereno">Sereno</SelectItem>
+                            <SelectItem value="Neutral">Neutral</SelectItem>
+                            <SelectItem value="Fading">Fading</SelectItem>
+                            <SelectItem value="Difuso">Difuso</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    )}
+                />
+                {errors.emotionalState && <p className="text-sm font-medium text-destructive">{errors.emotionalState.message}</p>}
+            </div>
+             <div className="grid gap-2">
+              <Label htmlFor="duration">Duración</Label>
+              <Controller
+                name="duration"
+                control={control}
+                render={({ field }) => <Input id="duration" placeholder="Ej: 7 días" {...field} />}
+              />
+              {errors.duration && <p className="text-sm font-medium text-destructive">{errors.duration.message}</p>}
+            </div>
+             <div className="grid gap-2">
+                <Label htmlFor="rules">Reglas Vinculadas</Label>
+                <Controller
+                    name="rules"
+                    control={control}
+                    render={({ field }) => <Textarea id="rules" placeholder="Ej: Notificar si el estado es 'Fading' por más de 1 hora" {...field} />}
+                />
+                {errors.rules && <p className="text-sm font-medium text-destructive">{errors.rules.message}</p>}
             </div>
           </div>
           <DialogFooter>

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { mockConnections, mockServices, Service } from "@/lib/mock-data"
 import { cva } from "class-variance-authority"
-import { MoreHorizontal, Users, ArrowRight } from "lucide-react"
+import { MoreHorizontal, Users, ArrowRight, Clock } from "lucide-react"
 import Link from "next/link"
 
 const statusBadgeVariants = cva(
@@ -20,6 +20,21 @@ const statusBadgeVariants = cva(
     },
   }
 )
+
+const emotionalStateBadgeVariants = cva(
+  "border-transparent capitalize text-xs",
+  {
+    variants: {
+      status: {
+        Vibrante: "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900 dark:text-green-200",
+        Neutral: "bg-yellow-100 text-yellow-800 hover:bg-yellow-200 dark:bg-yellow-900 dark:text-yellow-200",
+        Fading: "bg-red-100 text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200",
+        Sereno: "bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200",
+        Difuso: "bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-200",
+      },
+    },
+  }
+);
 
 function ConnectionsTable() {
   return (
@@ -77,12 +92,19 @@ function ConnectionsTable() {
 function ServiceCard({ service }: { service: Service }) {
   return (
     <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-4">
-        <p className="text-sm font-medium">{service.title}</p>
-        <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+       <CardContent className="p-4">
+        <div className="flex justify-between items-start mb-2">
+            <p className="text-sm font-medium pr-2">{service.title}</p>
+            <Badge variant="outline" className={emotionalStateBadgeVariants({ status: service.emotionalState })}>{service.emotionalState}</Badge>
+        </div>
+         <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
+            <Clock className="h-3 w-3" />
+            <span>{service.duration}</span>
+        </div>
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
-                <span>{service.connectionName}</span>
+                <span className="truncate">{service.connectionName}</span>
             </div>
           <div className="flex items-center -space-x-1">
              {service.participants.map(p => (

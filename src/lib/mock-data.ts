@@ -22,6 +22,9 @@ export type Service = {
   connectionId: string;
   connectionName: string;
   participants: User[];
+  emotionalState: "Vibrante" | "Neutral" | "Fading" | "Sereno" | "Difuso";
+  duration: string;
+  rules: string;
 };
 
 export const mockUsers: User[] = [
@@ -40,10 +43,10 @@ export const mockConnections: Connection[] = [
 ];
 
 export const mockServices: Service[] = [
-  { id: 'task-1', title: 'Definir KPIs de campaña', status: 'En Progreso', connectionId: 'conn-2', connectionName: 'Campaña de Marketing Q3', participants: [mockUsers[2], mockUsers[3]] },
-  { id: 'task-2', title: 'Revisión de wireframes', status: 'Terminadas', connectionId: 'conn-3', connectionName: 'Desarrollo App Móvil', participants: [mockUsers[0], mockUsers[3]] },
-  { id: 'task-3', title: 'Kick-off del proyecto', status: 'Terminadas', connectionId: 'conn-1', connectionName: 'Proyecto Phoenix', participants: [mockUsers[0], mockUsers[1]] },
-  { id: 'task-4', title: 'Configurar entorno de desarrollo', status: 'Abierto', connectionId: 'conn-4', connectionName: 'Integración API', participants: [mockUsers[2], mockUsers[1]] },
-  { id: 'task-5', title: 'Crear copys para anuncios', status: 'Abierto', connectionId: 'conn-2', connectionName: 'Campaña de Marketing Q3', participants: [mockUsers[2], mockUsers[3]] },
-  { id: 'task-6', title: 'Testing de endpoints', status: 'En Progreso', connectionId: 'conn-4', connectionName: 'Integración API', participants: [mockUsers[2], mockUsers[1]] },
+  { id: 'task-1', title: 'Definir KPIs de campaña', status: 'En Progreso', connectionId: 'conn-2', connectionName: 'Campaña de Marketing Q3', participants: [mockUsers[2], mockUsers[3]], emotionalState: 'Neutral', duration: '7 días', rules: 'Notificar si pasa a Fading' },
+  { id: 'task-2', title: 'Revisión de wireframes', status: 'Terminadas', connectionId: 'conn-3', connectionName: 'Desarrollo App Móvil', participants: [mockUsers[0], mockUsers[3]], emotionalState: 'Sereno', duration: '15 días', rules: 'Sugerir feedback al finalizar' },
+  { id: 'task-3', title: 'Kick-off del proyecto', status: 'Terminadas', connectionId: 'conn-1', connectionName: 'Proyecto Phoenix', participants: [mockUsers[0], mockUsers[1]], emotionalState: 'Vibrante', duration: '30 días', rules: 'Activar temporizador de 24h' },
+  { id: 'task-4', title: 'Configurar entorno de desarrollo', status: 'Abierto', connectionId: 'conn-4', connectionName: 'Integración API', participants: [mockUsers[2], mockUsers[1]], emotionalState: 'Vibrante', duration: '10 días', rules: 'Notificar al completar' },
+  { id: 'task-5', title: 'Crear copys para anuncios', status: 'Abierto', connectionId: 'conn-2', connectionName: 'Campaña de Marketing Q3', participants: [mockUsers[2], mockUsers[3]], emotionalState: 'Neutral', duration: '5 días', rules: 'Sugerir actualización si es Neutral > 3 días' },
+  { id: 'task-6', title: 'Testing de endpoints', status: 'En Progreso', connectionId: 'conn-4', connectionName: 'Integración API', participants: [mockUsers[2], mockUsers[1]], emotionalState: 'Difuso', duration: '12 días', rules: 'Notificar si sigue Difuso > 1h' },
 ];
