@@ -19,6 +19,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
 import { storage } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 
 const pastConnections = [
     { id: 'conn-past-1', name: 'Migración de Servidor', status: 'Finalizada', finalState: 'Sereno', duration: '30 días', rating: 5 },
@@ -73,6 +74,7 @@ export default function ProfilePage() {
     const [emotionalState, setEmotionalState] = useState("Sereno");
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { toast } = useToast();
 
     useEffect(() => {
         if (appUser) {
@@ -94,8 +96,30 @@ export default function ProfilePage() {
             if (formData) {
               setFormData({ ...formData, avatar: downloadURL });
             }
-        } catch (error) {
+             toast({
+                title: "¡Éxito!",
+                description: "Tu avatar ha sido actualizado.",
+            });
+        } catch (error: any) {
             console.error("Error al subir la imagen:", error);
+            let errorMessage = "Ocurrió un error al subir la imagen.";
+            if (error.code) {
+                switch (error.code) {
+                    case 'storage/unauthorized':
+                        errorMessage = "Error de permisos. Revisa las reglas de Storage en tu consola de Firebase.";
+                        break;
+                    case 'auth/invalid-api-key':
+                        errorMessage = "La clave de API no es válida. Por favor, verifícala en tu consola de Firebase.";
+                        break;
+                    default:
+                        errorMessage = `Error de Firebase: ${error.code}`;
+                }
+            }
+             toast({
+                variant: "destructive",
+                title: "Error de Carga",
+                description: errorMessage,
+            });
         } finally {
             setIsUploading(false);
         }
