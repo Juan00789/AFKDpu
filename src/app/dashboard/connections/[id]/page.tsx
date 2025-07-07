@@ -12,9 +12,10 @@ import { Connection } from "@/lib/mock-data";
 import { cva } from "class-variance-authority";
 import { Send, HeartPulse, Minus, TrendingDown, Loader2, AlertTriangle } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import React from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 const statusBadgeVariants = cva(
   "border-transparent text-xs capitalize",
@@ -36,6 +37,8 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
   const [connection, setConnection] = useState<Connection | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingState, setUpdatingState] = useState<Connection['emotionalState'] | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!params.id) return;
@@ -62,6 +65,32 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
 
     fetchConnection();
   }, [params.id]);
+
+  const handleStateUpdate = async (newState: Connection['emotionalState']) => {
+    if (!connection) return;
+    setUpdatingState(newState);
+    try {
+        const connectionRef = doc(db, 'connections', connection.id);
+        await updateDoc(connectionRef, {
+            emotionalState: newState
+        });
+        setConnection(prev => prev ? { ...prev, emotionalState: newState } : null);
+        toast({
+            title: "Estado Actualizado",
+            description: `La conexión ahora es "${newState}".`,
+        });
+    } catch (err) {
+        console.error("Error updating connection state:", err);
+        setError("Error al actualizar la conexión. Revisa los permisos de Firestore.");
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "No se pudo actualizar el estado de la conexión.",
+        });
+    } finally {
+        setUpdatingState(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -170,14 +199,14 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
             <CardDescription>Actualiza el estado para reflejar el sentimiento actual de la conexión.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            <Button variant={connection.emotionalState === 'Vibrante' ? 'default' : 'secondary'} size="sm" className="gap-1.5">
-              <HeartPulse className="h-4 w-4" /> Vibrante
+            <Button variant={connection.emotionalState === 'Vibrante' ? 'default' : 'secondary'} size="sm" className="gap-1.5" onClick={() => handleStateUpdate('Vibrante')} disabled={!!updatingState}>
+              {updatingState === 'Vibrante' ? <Loader2 className="h-4 w-4 animate-spin" /> : <HeartPulse className="h-4 w-4" />} Vibrante
             </Button>
-            <Button variant={connection.emotionalState === 'Neutral' ? 'default' : 'secondary'} size="sm" className="gap-1.5">
-              <Minus className="h-4 w-4" /> Neutral
+            <Button variant={connection.emotionalState === 'Neutral' ? 'default' : 'secondary'} size="sm" className="gap-1.5" onClick={() => handleStateUpdate('Neutral')} disabled={!!updatingState}>
+              {updatingState === 'Neutral' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Minus className="h-4 w-4" />} Neutral
             </Button>
-             <Button variant={connection.emotionalState === 'Fading' ? 'destructive' : 'secondary'} size="sm" className="gap-1.5">
-              <TrendingDown className="h-4 w-4" /> Fading
+             <Button variant={connection.emotionalState === 'Fading' ? 'destructive' : 'secondary'} size="sm" className="gap-1.5" onClick={() => handleStateUpdate('Fading')} disabled={!!updatingState}>
+              {updatingState === 'Fading' ? <Loader2 className="h-4 w-4 animate-spin" /> : <TrendingDown className="h-4 w-4" />} Fading
             </Button>
           </CardContent>
         </Card>
