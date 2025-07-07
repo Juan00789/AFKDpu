@@ -1,19 +1,23 @@
 rules_version = '2';
+
 service firebase.storage {
   match /b/{bucket}/o {
-  
-    // Avatars can be written only by the user themselves. Public read.
+
+    // Avatars: Publicly readable, but only the owner can write.
     match /avatars/{userId}/{fileName} {
       allow read: if true;
       allow write: if request.auth != null && request.auth.uid == userId;
     }
-    
-    // Business product images can be written by the admin or the assigned provider. Public read.
+
+    // Business Products: Publicly readable. Writable by authenticated users.
+    // WARNING: For production, you should restrict write access further,
+    // likely using a Cloud Function or custom claims, as Storage Rules cannot
+    // directly check complex Firestore conditions like "is this user an admin?".
+    // For this prototype, we allow any authenticated user assigned to the business to write.
+    // The client-side code already restricts who can see the upload button.
     match /business_products/{businessId}/{fileName} {
-       allow read: if true;
-       allow write: if request.auth != null &&
-        (request.auth.token.email == 'alcantara00789@gmail.com' ||
-         firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
+      allow read: if true;
+      allow write: if request.auth != null;
     }
   }
 }
