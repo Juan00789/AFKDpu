@@ -13,7 +13,6 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -22,7 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PlusCircle, Loader2 } from 'lucide-react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useToast } from '@/hooks/use-toast';
@@ -31,6 +30,7 @@ import { useAuth } from '@/context/AuthContext';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp, query, where, getDocs, doc, writeBatch, increment } from 'firebase/firestore';
 import { User } from '@/lib/mock-data';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 
 const addConnectionSchema = z.object({
@@ -48,12 +48,8 @@ export function AddConnectionDialog() {
   const [loadingProviders, setLoadingProviders] = useState(true);
   const { toast } = useToast();
   const { appUser, setAppUser } = useAuth();
-  const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<AddConnectionForm>({
+  
+  const form = useForm<AddConnectionForm>({
     resolver: zodResolver(addConnectionSchema),
     defaultValues: {
       purpose: '',
@@ -108,12 +104,10 @@ export function AddConnectionDialog() {
     const batch = writeBatch(db);
 
     try {
-        // 1. Check if it's the user's first service
         const connectionsQuery = query(collection(db, "connections"), where("creatorId", "==", appUser.id));
         const userConnections = await getDocs(connectionsQuery);
         const isFirstService = userConnections.empty;
 
-        // 2. Add connection document
         const connectionRef = doc(collection(db, 'connections'));
         batch.set(connectionRef, {
             ...data,
@@ -129,7 +123,6 @@ export function AddConnectionDialog() {
             createdAt: serverTimestamp(),
         });
         
-        // 3. Award points for first service
         if (isFirstService) {
             const userRef = doc(db, 'users', appUser.id);
             batch.update(userRef, { points: increment(10) });
@@ -151,7 +144,7 @@ export function AddConnectionDialog() {
         }
 
         setIsOpen(false);
-        reset();
+        form.reset();
     } catch (error) {
         console.error('Error al crear la conexión: ', error);
         toast({
@@ -166,7 +159,7 @@ export function AddConnectionDialog() {
     <Dialog open={isOpen} onOpenChange={(open) => {
         setIsOpen(open);
         if (!open) {
-            reset();
+            form.reset();
         }
     }}>
       <DialogTrigger asChild>
@@ -176,34 +169,39 @@ export function AddConnectionDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogHeader>
-            <DialogTitle>Crear Nuevo Servicio</DialogTitle>
-            <DialogDescription>
-              Define el propósito y selecciona un proveedor para iniciar.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="purpose">Propósito del Servicio</Label>
-              <Controller
-                name="purpose"
-                control={control}
-                render={({ field }) => <Input id="purpose" placeholder="Ej: Consulta técnica de producto" {...field} />}
-              />
-              {errors.purpose && <p className="text-sm font-medium text-destructive">{errors.purpose.message}</p>}
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="providerId">Seleccionar Proveedor</Label>
-              <Controller
-                name="providerId"
-                control={control}
-                render={({ field }) => (
-                  <Select onValueChange={field.onChange} value={field.value} disabled={loadingProviders}>
-                    <SelectTrigger id="providerId">
-                      <SelectValue placeholder={loadingProviders ? "Cargando proveedores..." : "Elige un proveedor"} />
-                    </SelectTrigger>
+        <DialogHeader>
+          <DialogTitle>Crear Nuevo Servicio</DialogTitle>
+          <DialogDescription>
+            Define el propósito y selecciona un proveedor para iniciar.
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="purpose"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Propósito del Servicio</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ej: Consulta técnica de producto" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="providerId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Seleccionar Proveedor</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingProviders}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder={loadingProviders ? "Cargando proveedores..." : "Elige un proveedor"} />
+                      </SelectTrigger>
+                    </FormControl>
                     <SelectContent>
                       {providers.map(provider => (
                         <SelectItem key={provider.id} value={provider.id}>
@@ -212,40 +210,47 @@ export function AddConnectionDialog() {
                       ))}
                     </SelectContent>
                   </Select>
-                )}
-              />
-              {errors.providerId && <p className="text-sm font-medium text-destructive">{errors.providerId.message}</p>}
-            </div>
-            
-             <div className="grid gap-2">
-              <Label htmlFor="duration">Duración Estimada</Label>
-              <Controller
-                name="duration"
-                control={control}
-                render={({ field }) => <Input id="duration" placeholder="Ej: 3 días" {...field} />}
-              />
-              {errors.duration && <p className="text-sm font-medium text-destructive">{errors.duration.message}</p>}
-            </div>
-             <div className="grid gap-2">
-                <Label htmlFor="rules">Contexto o Reglas</Label>
-                <Controller
-                    name="rules"
-                    control={control}
-                    render={({ field }) => <Textarea id="rules" placeholder="Ej: Se requiere respuesta en 24h hábiles." {...field} />}
-                />
-                {errors.rules && <p className="text-sm font-medium text-destructive">{errors.rules.message}</p>}
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-                <Button type="button" variant="secondary" disabled={isSubmitting}>Cancelar</Button>
-            </DialogClose>
-            <Button type="submit" disabled={isSubmitting || loadingProviders}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Guardar Conexión
-            </Button>
-          </DialogFooter>
-        </form>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="duration"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Duración Estimada</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Ej: 3 días" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="rules"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contexto o Reglas</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Ej: Se requiere respuesta en 24h hábiles." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <DialogClose asChild>
+                  <Button type="button" variant="secondary" disabled={form.formState.isSubmitting}>Cancelar</Button>
+              </DialogClose>
+              <Button type="submit" disabled={form.formState.isSubmitting || loadingProviders}>
+                {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Guardar Conexión
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
