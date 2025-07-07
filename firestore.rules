@@ -1,15 +1,38 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // PUBLIC READ: Allow anyone to read business data for the public page.
+    
+    // Anyone can read business data (for public pages)
+    // Write access is restricted to the admin or the assigned user.
     match /businesses/{businessId} {
       allow read: if true;
+      allow write: if request.auth != null &&
+        (request.auth.token.email == 'alcantara00789@gmail.com' ||
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
     }
 
-    // AUTHENTICATED ACCESS: Allow any authenticated user full access to other collections.
-    // This is for development purposes and should be secured before production.
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    // Users can read any other user's profile
+    // Users can only update their own profile
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Connections can be read/written by participants
+    match /connections/{connectionId} {
+      allow read, update: if request.auth != null && request.auth.uid in resource.data.userIds;
+      allow create: if request.auth != null;
+    }
+    
+    // Messages can be read/written by participants of the parent connection
+    match /connections/{connectionId}/messages/{messageId} {
+       allow read, create: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
+    }
+    
+    // Reviews can be created by any logged-in user and read by anyone.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
     }
   }
 }
