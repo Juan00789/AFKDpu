@@ -3,36 +3,23 @@ import React from 'react';
 
 export const CurrencyIcon = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
   <svg
-    viewBox="0 0 300 300"
+    viewBox="0 0 600 600"
     xmlns="http://www.w3.org/2000/svg"
+    fill="none"
     className={cn(className)}
     {...props}
   >
     <defs>
-      <radialGradient id="grad1" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stopColor="#E6E6FA" stopOpacity={1}>
-          <animate attributeName="stop-color" values="#E6E6FA;#D8BFD8;#E6E6FA" dur="8s" repeatCount="indefinite"></animate>
-        </stop>
-        <stop offset="100%" stopColor="#A020F0" stopOpacity={1} />
+      <radialGradient id="portalGradient" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8"/>
+        <stop offset="100%" stopColor="#4b0082" stopOpacity="1"/>
       </radialGradient>
     </defs>
-    <circle cx="150" cy="150" r="140" fill="url(#grad1)" stroke="#ffffff" strokeWidth="4"/>
-    <circle cx="150" cy="150" r="100" fill="#00008B" stroke="#FFFFFF" strokeWidth="3"/>
-    <text x="150" y="155" fontSize="24" textAnchor="middle" fill="#FFFFFF" fontFamily="Space Grotesk, sans-serif">AFKDpu</text>
-    <path
-      d="M50,150 Q90,100 130,150 Q90,200 50,150"
-      fill="#A020F0"
-      opacity="0.7"
-      className="origin-center animate-symbol-pulse"
-    />
-    <path
-      d="M250,150 Q210,100 170,150 Q210,200 250,150"
-      fill="#00008B"
-      opacity="0.7"
-      className="origin-center animate-symbol-pulse"
-      style={{ animationDelay: '2s' }}
-    />
-    <text x="80" y="270" fontSize="14" textAnchor="middle" fill="#A020F0" fontFamily="Verdana">BROKI</text>
-    <text x="220" y="270" fontSize="14" textAnchor="middle" fill="#00008B" fontFamily="Verdana">ONIARA</text>
+    <circle cx="300" cy="300" r="280" stroke="#4b0082" strokeWidth="4" fill="url(#portalGradient)" />
+    <circle cx="300" cy="300" r="200" stroke="#8a2be2" strokeWidth="2" strokeDasharray="10,10" />
+    <path d="M300 120 Q320 300 300 480 Q280 300 300 120 Z" fill="#ffffff22" stroke="#ffffffaa" strokeWidth="2"/>
+    <text x="300" y="315" fontSize="32" textAnchor="middle" fill="#ffffff" style={{fontFamily: "var(--font-space-grotesk), sans-serif"}}>
+      ENTRA
+    </text>
   </svg>
 );
