@@ -13,11 +13,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { mockConnections, type User } from "@/lib/mock-data"
-import { Star, Edit, BarChart2, Upload, Loader2 } from "lucide-react"
+import { Star, Edit, BarChart2, Upload, Loader2, Save } from "lucide-react"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
-import { storage } from '@/lib/firebase';
+import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -66,13 +67,14 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function ProfilePage() {
-    const { appUser } = useAuth();
+    const { appUser, setAppUser } = useAuth();
     const [user, setUser] = useState<User | null>(null);
     const [isDialogOpen, setDialogOpen] = useState(false);
     
     const [formData, setFormData] = useState<User | null>(null);
     const [emotionalState, setEmotionalState] = useState("Sereno");
     const [isUploading, setIsUploading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { toast } = useToast();
 
@@ -96,10 +98,6 @@ export default function ProfilePage() {
             if (formData) {
               setFormData({ ...formData, avatar: downloadURL });
             }
-             toast({
-                title: "¡Éxito!",
-                description: "Tu avatar ha sido actualizado.",
-            });
         } catch (error: any) {
             console.error("Error al subir la imagen:", error);
             let errorMessage = "Ocurrió un error al subir la imagen.";
@@ -126,11 +124,30 @@ export default function ProfilePage() {
     };
 
 
-    const handleSave = () => {
-        if (formData) {
-            setUser(formData);
+    const handleSave = async () => {
+        if (formData && user) {
+            setIsSaving(true);
+            try {
+                const userRef = doc(db, 'users', user.id);
+                await setDoc(userRef, formData);
+                setAppUser(formData);
+                setUser(formData);
+                toast({
+                    title: "¡Perfil Guardado!",
+                    description: "Tus cambios han sido guardados exitosamente.",
+                });
+                setDialogOpen(false);
+            } catch (error) {
+                console.error("Error al guardar el perfil:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "No se pudieron guardar los cambios en tu perfil.",
+                });
+            } finally {
+                setIsSaving(false);
+            }
         }
-        setDialogOpen(false);
     };
 
     const handleOpenChange = (open: boolean) => {
@@ -278,7 +295,19 @@ export default function ProfilePage() {
                                     <DialogClose asChild>
                                         <Button type="button" variant="secondary">Cancelar</Button>
                                     </DialogClose>
-                                    <Button type="submit" onClick={handleSave} disabled={isUploading}>Guardar Cambios</Button>
+                                    <Button type="submit" onClick={handleSave} disabled={isUploading || isSaving}>
+                                      {isSaving ? (
+                                          <>
+                                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                              Guardando...
+                                          </>
+                                      ) : (
+                                          <>
+                                              <Save className="mr-2 h-4 w-4" />
+                                              Guardar Cambios
+                                          </>
+                                      )}
+                                    </Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>

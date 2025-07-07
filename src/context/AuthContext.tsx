@@ -1,9 +1,10 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, Dispatch, SetStateAction } from 'react';
 import { onAuthStateChanged, User as FirebaseUser, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
-import { User, mockUsers } from '@/lib/mock-data';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { User } from '@/lib/mock-data';
 import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
@@ -13,6 +14,7 @@ interface AuthContextType {
   registerUser: (email: string, pass: string, name: string) => Promise<any>;
   loginUser: (email: string, pass: string) => Promise<any>;
   logoutUser: () => Promise<any>;
+  setAppUser: Dispatch<SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,18 +26,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (user) {
-        const foundUser = mockUsers.find(u => u.email === user.email);
-        setAppUser(foundUser || {
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setAppUser(userSnap.data() as User);
+        } else {
+          // This case is for users that existed before firestore integration
+          // or if doc creation failed during registration.
+          const newUser: User = {
             id: user.uid,
             name: user.displayName || 'Nuevo Usuario',
             email: user.email!,
             role: 'Cliente',
             avatar: user.photoURL || `https://placehold.co/100x100.png`,
             objectives: 'Definir mis objetivos.'
-        });
+          };
+          await setDoc(userRef, newUser);
+          setAppUser(newUser);
+        }
       } else {
         setAppUser(null);
       }
@@ -47,7 +58,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const registerUser = async (email: string, pass: string, name: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(userCredential.user, { displayName: name, photoURL: `https://placehold.co/100x100.png` });
+    const user = userCredential.user;
+    const photoURL = `https://placehold.co/100x100.png`;
+    await updateProfile(user, { displayName: name, photoURL });
+
+    const newUser: User = {
+      id: user.uid,
+      name,
+      email,
+      role: 'Cliente',
+      avatar: photoURL,
+      objectives: 'Definir mis objetivos.'
+    };
+    await setDoc(doc(db, "users", user.uid), newUser);
+    
+    setAppUser(newUser);
     return userCredential;
   };
 
@@ -62,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ firebaseUser, appUser, loading, registerUser, loginUser, logoutUser }}>
+    <AuthContext.Provider value={{ firebaseUser, appUser, loading, registerUser, loginUser, logoutUser, setAppUser }}>
       {children}
     </AuthContext.Provider>
   );
