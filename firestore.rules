@@ -1,53 +1,34 @@
-
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-
-    function isAdmin() {
-      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.email == 'alcantara00789@gmail.com';
-    }
-
-    // Business data is public read-only for everyone.
-    // Only the admin or the assigned business owner can write.
-    match /businesses/{businessId} {
+    
+    // --- GENERAL READ RULE ---
+    // All documents are publicly readable. This fixes the "Publicidad Sana" loading issue.
+    match /{document=**} {
       allow read: if true;
-      allow write: if isAuthenticated() && 
-                    (isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
     }
 
-    // Users can read any profile, but only write to their own.
-    // Admin can update the claimedBusinessId for any user.
+    // --- SPECIFIC WRITE RULES ---
+
+    // Users can only write to their own document.
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) || 
-                     (isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimedBusinessId']));
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Connections can only be accessed by participants.
-    match /connections/{connectionId} {
-      allow read, update: if isAuthenticated() && request.auth.uid in resource.data.userIds;
-      allow create: if isAuthenticated() && isOwner(request.resource.data.creatorId);
-
-      // Messages can only be accessed by participants of the parent connection.
-      match /messages/{messageId} {
-        allow read, create: if isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
-      }
+    // Participants can write to a connection and its subcollections (like messages).
+    match /connections/{connectionId}/{subcollection=**} {
+      allow write: if request.auth != null && request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
     }
 
-    // Reviews are public, but can only be created by an authenticated user.
+    // Logged-in users can create reviews.
     match /reviews/{reviewId} {
-      allow read: if true;
-      allow create: if isAuthenticated() && isOwner(request.resource.data.reviewerId);
+      allow create: if request.auth != null;
+      allow update, delete: if false; // Reviews are immutable
+    }
+
+    // Only the admin or the assigned provider can edit business data.
+    match /businesses/{businessId} {
+      allow write: if request.auth != null && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.email == 'alcantara00789@gmail.com' || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
     }
   }
 }
