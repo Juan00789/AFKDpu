@@ -12,7 +12,8 @@ const firebaseConfig = {
 };
 
 if (!firebaseConfig.apiKey) {
-  throw new Error("Falta la API Key de Firebase. Revisa tu archivo .env.");
+  console.error("Falta la API Key de Firebase. Revisa tu archivo .env. Puede que necesites reiniciar el servidor.");
+  throw new Error("Falta la API Key de Firebase. Revisa tu archivo .env. Puede que necesites reiniciar el servidor.");
 }
 
 // Initialize Firebase
