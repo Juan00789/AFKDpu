@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, User as FirebaseUser, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { onAuthStateChanged, User as FirebaseUser, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { User, mockUsers } from '@/lib/mock-data';
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,7 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   appUser: User | null;
   loading: boolean;
-  registerUser: (email: string, pass: string) => Promise<any>;
+  registerUser: (email: string, pass: string, name: string) => Promise<any>;
   loginUser: (email: string, pass: string) => Promise<any>;
   logoutUser: () => Promise<any>;
 }
@@ -45,8 +45,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const registerUser = (email: string, pass: string) => {
-    return createUserWithEmailAndPassword(auth, email, pass);
+  const registerUser = async (email: string, pass: string, name: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(userCredential.user, { displayName: name, photoURL: `https://placehold.co/100x100.png` });
+    return userCredential;
   };
 
   const loginUser = (email: string, pass: string) => {

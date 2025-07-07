@@ -17,6 +17,8 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [role, setRole] = useState('Cliente');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { registerUser } = useAuth();
@@ -34,13 +36,19 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await registerUser(email, password);
+      await registerUser(email, password, username);
       router.push('/dashboard');
     } catch (error: any) {
+      let errorMessage = "Ocurrió un error durante el registro.";
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "Este correo electrónico ya está en uso.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "La contraseña debe tener al menos 6 caracteres.";
+      }
       toast({
         variant: "destructive",
         title: "Error de registro",
-        description: error.message,
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -76,18 +84,18 @@ export default function RegisterPage() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="username">Nombre de usuario</Label>
-              <Input id="username" placeholder="Tu nombre" required />
+              <Input id="username" placeholder="Tu nombre" required value={username} onChange={(e) => setUsername(e.target.value)} />
             </div>
              <div className="grid gap-2">
                 <Label htmlFor="role">Selecciona tu rol</Label>
-                <Select defaultValue="client">
+                <Select value={role} onValueChange={(value) => setRole(value as any)}>
                   <SelectTrigger id="role">
                     <SelectValue placeholder="Elige un rol..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="client">Cliente</SelectItem>
-                    <SelectItem value="provider">Proveedor</SelectItem>
-                    <SelectItem value="employee">Empleado</SelectItem>
+                    <SelectItem value="Cliente">Cliente</SelectItem>
+                    <SelectItem value="Proveedor">Proveedor</SelectItem>
+                    <SelectItem value="Empleado">Empleado</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
