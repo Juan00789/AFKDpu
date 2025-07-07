@@ -4,47 +4,48 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if user is an admin
     function isAdmin() {
       return request.auth.token.email == 'alcantara00789@gmail.com';
     }
 
-    // Helper function to check if a user is a participant in a connection
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
     function isParticipant(connectionId) {
       return request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
     }
 
-    // Users can be read by anyone, but only the user themselves or an admin can write.
     match /users/{userId} {
-      allow read: if request.auth != null;
-      allow update: if request.auth.uid == userId || isAdmin();
-      // Allow point updates from reviews
-      allow write: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['points']);
+      allow read: if true;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || 
+                      (request.resource.data.points == resource.data.points + 1 ||
+                       request.resource.data.points == resource.data.points + 2 ||
+                       request.resource.data.points == resource.data.points + 3 ||
+                       request.resource.data.points == resource.data.points + 4 ||
+                       request.resource.data.points == resource.data.points + 5 ||
+                       request.resource.data.points == resource.data.points + 7 ||
+                       request.resource.data.points == resource.data.points + 10);
     }
 
-    // Connections can only be read/written by participants or admins.
     match /connections/{connectionId} {
-      allow read, update, delete: if isParticipant(connectionId) || isAdmin();
-      allow create: if request.auth != null;
+      allow read, update: if isParticipant(connectionId);
+      allow create: if request.auth.uid != null;
     }
 
-    // Messages can only be read/written by participants of the parent connection.
     match /connections/{connectionId}/messages/{messageId} {
       allow read, create: if isParticipant(connectionId);
-      allow update, delete: if false; // Messages are immutable
     }
 
-    // Reviews can be created by any authenticated user. They are immutable once created.
     match /reviews/{reviewId} {
-        allow read: if true;
-        allow create: if request.auth != null;
-        allow update, delete: if false;
+      allow read: if true;
+      allow create: if request.auth.uid != null;
     }
     
-    // Business data can be read by anyone, but only written by an admin or the claimed user.
     match /businesses/{businessId} {
-        allow read: if true;
-        allow write: if isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId;
+      allow read: if true;
+      allow update, create: if isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId;
     }
   }
 }

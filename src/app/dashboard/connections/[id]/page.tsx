@@ -247,7 +247,7 @@ export default function ConnectionDetailPage() {
       
       if (newStatus === "Cerrado") {
         toast({
-          title: "¡Conexión Cerrada!",
+          title: "¡Portal Cerrado!",
           description: "La conexión ha sido marcada como completada."
         });
       }
