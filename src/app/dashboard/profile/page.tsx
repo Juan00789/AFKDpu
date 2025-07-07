@@ -14,7 +14,7 @@ import { type User } from "@/lib/mock-data"
 import { Edit, Upload, Loader2, Save, Star } from "lucide-react"
 import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc, updateDoc, increment } from "firebase/firestore";
+import { doc, updateDoc, increment } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
@@ -108,32 +108,39 @@ export default function ProfilePage() {
             setIsSaving(true);
             try {
                 const userRef = doc(db, 'users', user.id);
-                let dataToSave = { ...formData };
+                // Destructure to separate the ID from the data to be updated.
+                const { id, ...dataToUpdate } = formData;
                 let pointsAwarded = 0;
 
-                // "Actualizarás tu perfil con verdad" commandment
-                if (!user.profileCompleted && dataToSave.avatar && !dataToSave.avatar.includes('placehold.co') && dataToSave.objectives && dataToSave.objectives.trim().length > 10) {
-                    dataToSave.profileCompleted = true;
+                // "Actualizarás tu perfil con verdad" commandment logic
+                if (!user.profileCompleted && dataToUpdate.avatar && !dataToUpdate.avatar.includes('placehold.co') && dataToUpdate.objectives && dataToUpdate.objectives.trim().length > 10) {
+                    dataToUpdate.profileCompleted = true;
                     pointsAwarded = 7;
                 }
 
                 if (pointsAwarded > 0) {
-                    await updateDoc(userRef, { ...dataToSave, points: increment(pointsAwarded) });
-                    setAppUser(prev => prev ? ({ ...prev, ...dataToSave, points: prev.points + pointsAwarded }) : null);
+                    // If points are awarded, create a special object for the update
+                    const updateWithPoints = { ...dataToUpdate, points: increment(pointsAwarded) };
+                    await updateDoc(userRef, updateWithPoints);
+
+                    // Update the user state in the context
+                    setAppUser(prev => prev ? ({ ...prev, ...formData, points: prev.points + pointsAwarded }) : null);
                     toast({
                         title: "¡Perfil Guardado y Puntos Ganados!",
                         description: `Has ganado ${pointsAwarded} puntos por completar tu perfil.`,
                     });
                 } else {
-                    await setDoc(userRef, dataToSave, { merge: true });
-                    setAppUser(dataToSave);
+                    // For regular profile updates, use updateDoc with the data.
+                    await updateDoc(userRef, dataToUpdate);
+                    setAppUser(formData);
                     toast({
                         title: "¡Perfil Guardado!",
                         description: "Tus cambios han sido guardados exitosamente.",
                     });
                 }
 
-                setUser(dataToSave);
+                // Update the local user state and close the dialog
+                setUser(formData);
                 setDialogOpen(false);
             } catch (error) {
                 console.error("Error al guardar el perfil:", error);
