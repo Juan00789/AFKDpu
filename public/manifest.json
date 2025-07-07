@@ -1,7 +1,7 @@
 {
   "name": "Ephemeral Connect",
   "short_name": "Ephemeral",
-  "description": "Ephemeral Connect is a unique platform that allows you to create ephemeral, abstract, and emotionally significant connections.",
+  "description": "Ephemeral Connect is a unique platform that allows you to create fleeting, abstract, and emotionally significant connections with people in different roles: clients, providers, and employees.",
   "icons": [
     {
       "src": "/logo.png",
@@ -12,6 +12,12 @@
       "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "theme_color": "#A020F0",
