@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,9 +13,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { currentUser, mockConnections, type User } from "@/lib/mock-data"
-import { Star, Edit, BarChart2 } from "lucide-react"
+import { Star, Edit, BarChart2, Upload, Loader2 } from "lucide-react"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
+import { storage } from '@/lib/firebase';
+import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const pastConnections = [
     { id: 'conn-past-1', name: 'Migración de Servidor', status: 'Finalizada', finalState: 'Sereno', duration: '30 días', rating: 5 },
@@ -65,10 +67,28 @@ export default function ProfilePage() {
     const [user, setUser] = useState<User>(currentUser);
     const [isDialogOpen, setDialogOpen] = useState(false);
     
-    // We need a separate state for the form inside the dialog
-    // to avoid updating the profile page in real-time while editing.
     const [formData, setFormData] = useState<User>(user);
     const [emotionalState, setEmotionalState] = useState("Sereno");
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        try {
+            const imageRef = storageRef(storage, `avatars/${user.id}/${file.name}`);
+            await uploadBytes(imageRef, file);
+            const downloadURL = await getDownloadURL(imageRef);
+            setFormData({ ...formData, avatar: downloadURL });
+        } catch (error) {
+            console.error("Error al subir la imagen:", error);
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
 
     const handleSave = () => {
         setUser(formData);
@@ -77,7 +97,6 @@ export default function ProfilePage() {
 
     const handleOpenChange = (open: boolean) => {
         if (open) {
-            // Reset form data to current user data when dialog opens
             setFormData(user);
         }
         setDialogOpen(open);
@@ -129,9 +148,37 @@ export default function ProfilePage() {
                                 </DialogDescription>
                                 </DialogHeader>
                                 <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="avatar" className="text-right">Avatar URL</Label>
-                                        <Input id="avatar" value={formData.avatar} onChange={(e) => setFormData({...formData, avatar: e.target.value})} className="col-span-3" />
+                                    <div className="flex flex-col items-center gap-4">
+                                        <Avatar className="w-24 h-24">
+                                            <AvatarImage src={formData.avatar} />
+                                            <AvatarFallback className="text-3xl">{formData.name.charAt(0)}</AvatarFallback>
+                                        </Avatar>
+                                        <Input
+                                            id="avatar-upload"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            className="hidden"
+                                            ref={fileInputRef}
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={isUploading}
+                                        >
+                                            {isUploading ? (
+                                                <>
+                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                    Subiendo...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload className="mr-2 h-4 w-4" />
+                                                    Cambiar Avatar
+                                                </>
+                                            )}
+                                        </Button>
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="name" className="text-right">Nombre</Label>
@@ -185,7 +232,7 @@ export default function ProfilePage() {
                                     <DialogClose asChild>
                                         <Button type="button" variant="secondary">Cancelar</Button>
                                     </DialogClose>
-                                    <Button type="submit" onClick={handleSave}>Guardar Cambios</Button>
+                                    <Button type="submit" onClick={handleSave} disabled={isUploading}>Guardar Cambios</Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
