@@ -73,7 +73,7 @@ function ActiveConnectionsSummary() {
             <CardTitle>Conexiones Activas</CardTitle>
             <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
         </div>
-        {appUser?.role === "Cliente" && <AddConnectionDialog />}
+        <AddConnectionDialog />
       </CardHeader>
       <CardContent>
         {connections.length > 0 ? (

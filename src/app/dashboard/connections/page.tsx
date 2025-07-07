@@ -104,7 +104,7 @@ export default function ConnectionsKanbanPage() {
           <h2 className="text-2xl font-bold font-headline">Tablero de Conexiones</h2>
           <p className="text-muted-foreground">Gestiona tus conversaciones y tareas por estado.</p>
         </div>
-        {appUser?.role === 'Cliente' && <AddConnectionDialog />}
+        <AddConnectionDialog />
       </div>
       <div className="grid md:grid-cols-3 gap-6 items-start">
         <Card className="bg-secondary/50">
