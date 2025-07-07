@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -34,11 +35,15 @@ export default function ForgotPasswordPage() {
         description: "Si tu cuenta existe, recibirás un enlace para restablecer tu contraseña.",
       });
     } catch (error: any) {
-      console.error(error);
+      console.error("Password reset error:", error);
+      let description = "No se pudo enviar el correo. Inténtalo de nuevo.";
+      if (error.code === 'auth/invalid-email') {
+          description = "El formato del correo electrónico no es válido.";
+      }
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo enviar el correo. Inténtalo de nuevo.",
+        title: "Error al enviar correo",
+        description: description,
       });
     } finally {
       setLoading(false);
