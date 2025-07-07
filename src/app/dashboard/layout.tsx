@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -28,6 +27,7 @@ import {
   HelpCircle,
   Loader2,
   Megaphone,
+  Shield,
 } from "lucide-react"
 import {
   SidebarProvider,
@@ -108,7 +108,7 @@ const baseNavItems = [
 ];
 
 const advertisingNavItem = { href: "/dashboard/advertising", icon: Megaphone, label: "Publicidad" };
-
+const adminNavItem = { href: "/dashboard/admin", icon: Shield, label: "Admin" };
 const settingsNavItem = { href: "/dashboard/settings", icon: Settings, label: "Configuración" };
 
 
@@ -132,10 +132,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   const canSeeAdvertising = appUser && (appUser.email === 'alcantara00789@gmail.com' || !!appUser.claimedBusinessId);
+  const canSeeAdmin = appUser && appUser.email === 'alcantara00789@gmail.com';
 
   const navItems = [
     ...baseNavItems,
     ...(canSeeAdvertising ? [advertisingNavItem] : []),
+    ...(canSeeAdmin ? [adminNavItem] : []),
     settingsNavItem
   ];
 
