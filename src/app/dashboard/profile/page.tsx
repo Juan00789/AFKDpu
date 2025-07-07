@@ -110,15 +110,21 @@ export default function ProfilePage() {
         setIsSaving(true);
         try {
             const userRef = doc(db, 'users', user.id);
-            const { id, ...dataToSubmit } = formData;
+            const updatePayload: { [key: string]: any } = {};
+
+            // Build a payload with only the fields that have actually changed
+            if (formData.name !== user.name) updatePayload.name = formData.name;
+            if (formData.role !== user.role) updatePayload.role = formData.role;
+            if (formData.avatar !== user.avatar) updatePayload.avatar = formData.avatar;
+            if ((formData.objectives || '') !== (user.objectives || '')) {
+                updatePayload.objectives = formData.objectives || '';
+            }
             
-            const updatePayload: PartialWithFieldValue<DocumentData> = { ...dataToSubmit };
             let pointsAwarded = 0;
 
-            // Logic to award points for completing the profile
             const profileIsNowComplete = !user.profileCompleted &&
-                                         dataToSubmit.avatar && !dataToSubmit.avatar.includes('placehold.co') &&
-                                         dataToSubmit.objectives && dataToSubmit.objectives.trim().length > 10;
+                                         formData.avatar && !formData.avatar.includes('placehold.co') &&
+                                         formData.objectives && formData.objectives.trim().length > 10;
 
             if (profileIsNowComplete) {
                 updatePayload.profileCompleted = true;
@@ -126,10 +132,19 @@ export default function ProfilePage() {
                 pointsAwarded = 7;
             }
 
-            await updateDoc(userRef, updatePayload);
+            if (Object.keys(updatePayload).length > 0) {
+                await updateDoc(userRef, updatePayload);
+            } else {
+                 toast({
+                    title: "Sin cambios",
+                    description: "No se detectaron cambios para guardar.",
+                });
+                setIsSaving(false);
+                setDialogOpen(false);
+                return;
+            }
             
-            // Update context and user state
-            const updatedUserInState = {
+            const updatedUserInState: User = {
                 ...formData,
                 points: user.points + pointsAwarded,
                 profileCompleted: profileIsNowComplete || user.profileCompleted
@@ -155,8 +170,8 @@ export default function ProfilePage() {
             console.error("Error al guardar el perfil:", error);
             toast({
                 variant: "destructive",
-                title: "Error",
-                description: "No se pudieron guardar los cambios en tu perfil. Revisa las reglas de Firestore.",
+                title: "Error al guardar",
+                description: "No se pudieron guardar los cambios. Revisa los permisos de la base de datos.",
             });
         } finally {
             setIsSaving(false);
@@ -310,5 +325,3 @@ export default function ProfilePage() {
         </div>
     )
 }
-
-    
