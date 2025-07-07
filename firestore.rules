@@ -3,49 +3,11 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function isAdmin() {
-      return request.auth.token.email == 'alcantara00789@gmail.com';
-    }
-
-    function isOwner(userId) {
-      return request.auth.uid == userId;
-    }
-
-    function isParticipant(connectionId) {
-      return request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
-    }
-
-    match /users/{userId} {
-      allow read: if true;
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) || 
-                      (request.resource.data.points == resource.data.points + 1 ||
-                       request.resource.data.points == resource.data.points + 2 ||
-                       request.resource.data.points == resource.data.points + 3 ||
-                       request.resource.data.points == resource.data.points + 4 ||
-                       request.resource.data.points == resource.data.points + 5 ||
-                       request.resource.data.points == resource.data.points + 7 ||
-                       request.resource.data.points == resource.data.points + 10);
-    }
-
-    match /connections/{connectionId} {
-      allow read, update: if isParticipant(connectionId);
-      allow create: if request.auth.uid != null;
-    }
-
-    match /connections/{connectionId}/messages/{messageId} {
-      allow read, create: if isParticipant(connectionId);
-    }
-
-    match /reviews/{reviewId} {
-      allow read: if true;
-      allow create: if request.auth.uid != null;
-    }
-    
-    match /businesses/{businessId} {
-      allow read: if true;
-      allow update, create: if isAdmin() || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId;
+    // This rule allows any authenticated user to read and write to any document.
+    // WARNING: This is insecure for production. You should secure your data
+    // before launching your app.
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }

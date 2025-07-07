@@ -3,13 +3,11 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    match /avatars/{userId}/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-    match /business_products/{businessId}/{allPaths=**} {
-       allow read: if true;
-       allow write: if request.auth != null && (get(/databases/(default)/documents/users/$(request.auth.uid)).data.email == 'alcantara00789@gmail.com' || get(/databases/(default)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId);
+    // This rule allows any authenticated user to read and write any file.
+    // WARNING: This is insecure for production. You should secure your data
+    // before launching your app.
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }
