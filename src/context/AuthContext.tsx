@@ -11,7 +11,7 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   appUser: User | null;
   loading: boolean;
-  registerUser: (email: string, pass: string, name: string) => Promise<any>;
+  registerUser: (email: string, pass: string, name: string, role: User['role']) => Promise<any>;
   loginUser: (email: string, pass: string) => Promise<any>;
   logoutUser: () => Promise<any>;
   setAppUser: Dispatch<SetStateAction<User | null>>;
@@ -56,7 +56,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const registerUser = async (email: string, pass: string, name: string) => {
+  const registerUser = async (email: string, pass: string, name: string, role: User['role']) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const user = userCredential.user;
     const photoURL = `https://placehold.co/100x100.png`;
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       id: user.uid,
       name,
       email,
-      role: 'Cliente',
+      role,
       avatar: photoURL,
       objectives: 'Definir mis objetivos.'
     };

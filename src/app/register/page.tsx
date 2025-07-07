@@ -12,13 +12,14 @@ import { Share2, Loader2 } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { type User } from '@/lib/mock-data';
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [role, setRole] = useState('Cliente');
+  const [role, setRole] = useState<User['role']>('Cliente');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { registerUser } = useAuth();
@@ -36,7 +37,7 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await registerUser(email, password, username);
+      await registerUser(email, password, username, role);
       router.push('/dashboard');
     } catch (error: any) {
       let errorMessage = "Ocurrió un error durante el registro.";
@@ -88,7 +89,7 @@ export default function RegisterPage() {
             </div>
              <div className="grid gap-2">
                 <Label htmlFor="role">Selecciona tu rol</Label>
-                <Select value={role} onValueChange={(value) => setRole(value as any)}>
+                <Select value={role} onValueChange={(value) => setRole(value as User['role'])}>
                   <SelectTrigger id="role">
                     <SelectValue placeholder="Elige un rol..." />
                   </SelectTrigger>
