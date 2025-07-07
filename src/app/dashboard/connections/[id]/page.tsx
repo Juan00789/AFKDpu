@@ -3,18 +3,20 @@ import { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Connection, Message } from "@/lib/mock-data";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Connection, Message, User } from "@/lib/mock-data";
 import { Send, Loader2, AlertTriangle } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
-import { doc, getDoc, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, updateDoc, writeBatch, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import React from 'react';
 import { formatRelative } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ConnectionDetailPage({ params }: { params: { id: string } }) {
   const { appUser } = useAuth();
@@ -25,34 +27,28 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
   const [connectionLoading, setConnectionLoading] = useState(true);
   const [messagesLoading, setMessagesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (params.id) {
-      const fetchConnection = async () => {
-        setConnectionLoading(true);
-        setError(null);
-        try {
-          const connectionRef = doc(db, 'connections', params.id);
-          const connectionSnap = await getDoc(connectionRef);
-
-          if (connectionSnap.exists()) {
-            setConnection({ id: connectionSnap.id, ...connectionSnap.data() } as Connection);
-          } else {
-            setError("No se encontró la conexión.");
-          }
-        } catch (err) {
-          console.error(err);
-          setError("Error al cargar la conexión.");
-        } finally {
-          setConnectionLoading(false);
+      const connectionRef = doc(db, 'connections', params.id);
+      const unsubscribeConn = onSnapshot(connectionRef, (doc) => {
+        if (doc.exists()) {
+          setConnection({ id: doc.id, ...doc.data() } as Connection);
+        } else {
+          setError("No se encontró la conexión.");
         }
-      };
-      fetchConnection();
+        setConnectionLoading(false);
+      }, (err) => {
+        console.error(err);
+        setError("Error al cargar la conexión.");
+        setConnectionLoading(false);
+      });
 
       const messagesQuery = query(collection(db, 'connections', params.id, 'messages'), orderBy('createdAt', 'asc'));
-      const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+      const unsubscribeMsgs = onSnapshot(messagesQuery, (querySnapshot) => {
         const messagesData: Message[] = [];
         querySnapshot.forEach((doc) => {
           messagesData.push({ id: doc.id, ...doc.data() } as Message);
@@ -65,7 +61,10 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
         setMessagesLoading(false);
       });
 
-      return () => unsubscribe();
+      return () => {
+        unsubscribeConn();
+        unsubscribeMsgs();
+      };
     }
   }, [params.id]);
 
@@ -93,6 +92,47 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
       setError("No se pudo enviar el mensaje. Revisa los permisos.");
     }
   };
+
+  const handleStatusChange = async (newStatus: "Activo" | "En espera" | "Cerrado") => {
+    if (!connection || connection.status === newStatus) return;
+
+    const oldStatus = connection.status;
+    const connectionRef = doc(db, 'connections', params.id);
+
+    try {
+      await updateDoc(connectionRef, { status: newStatus });
+
+      if (newStatus === "Cerrado" && oldStatus !== "Cerrado") {
+        const batch = writeBatch(db);
+        
+        // Award +6 to all participants
+        connection.participants.forEach(p => {
+          const userRef = doc(db, 'users', p.id);
+          batch.update(userRef, { points: increment(6) });
+        });
+
+        // Award +12 to the provider
+        const providerRef = doc(db, 'users', connection.provider.id);
+        batch.update(providerRef, { points: increment(12) });
+
+        await batch.commit();
+
+        toast({
+          title: "¡Puntos Asignados!",
+          description: "Los participantes han sido recompensados por completar la conexión."
+        });
+      }
+
+    } catch (err) {
+      console.error("Error updating status:", err);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo actualizar el estado de la conexión."
+      });
+    }
+  };
+
 
   const isLoading = connectionLoading;
 
@@ -136,9 +176,18 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
           <CardHeader className="flex flex-row items-start justify-between">
             <div>
               <CardTitle className="font-headline text-2xl">{connection.purpose}</CardTitle>
-              <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="outline">{connection.status}</Badge>
-                  <span className="text-sm text-muted-foreground">{connection.duration}</span>
+              <div className="flex items-center gap-4 mt-2">
+                <Select value={connection.status} onValueChange={handleStatusChange}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Cambiar estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Activo">Activo</SelectItem>
+                    <SelectItem value="En espera">En espera</SelectItem>
+                    <SelectItem value="Cerrado">Cerrado</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span className="text-sm text-muted-foreground">{connection.duration}</span>
               </div>
             </div>
              <div className="flex items-center -space-x-2">

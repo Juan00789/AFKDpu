@@ -1,13 +1,10 @@
-
 'use client';
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Connection } from "@/lib/mock-data";
-import { Users, Clock, Loader2 } from "lucide-react";
+import { Clock, Loader2, UserCheck } from "lucide-react";
 import { AddConnectionDialog } from "@/components/AddServiceDialog";
-import { Badge } from "@/components/ui/badge";
-import { cva } from "class-variance-authority";
 import { useAuth } from "@/context/AuthContext";
 import { db } from "@/lib/firebase";
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
@@ -24,6 +21,12 @@ function ConnectionCard({ connection }: { connection: Connection }) {
                     <Clock className="h-3 w-3" />
                     <span>{connection.duration}</span>
                 </div>
+                 {connection.provider && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground mb-3">
+                        <UserCheck className="h-3 w-3" />
+                        <span>{connection.provider.name}</span>
+                    </div>
+                )}
             </div>
             <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
                 <div className="flex items-center -space-x-1">
@@ -93,7 +96,7 @@ export default function ConnectionsKanbanPage() {
           <h2 className="text-2xl font-bold font-headline">Tablero de Conexiones</h2>
           <p className="text-muted-foreground">Gestiona tus conversaciones y tareas por estado.</p>
         </div>
-        <AddConnectionDialog />
+        {appUser?.role === 'Cliente' && <AddConnectionDialog />}
       </div>
       <div className="grid md:grid-cols-3 gap-6 items-start">
         <Card className="bg-secondary/50">

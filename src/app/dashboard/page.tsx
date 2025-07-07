@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { collection, query, where, onSnapshot, orderBy, limit } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { AddConnectionDialog } from "@/components/AddServiceDialog";
 
 function ActiveConnectionsSummary() {
   const { appUser } = useAuth();
@@ -57,9 +58,12 @@ function ActiveConnectionsSummary() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Conexiones Activas</CardTitle>
-        <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+            <CardTitle>Conexiones Activas</CardTitle>
+            <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
+        </div>
+        {appUser?.role === "Cliente" && <AddConnectionDialog />}
       </CardHeader>
       <CardContent>
         {connections.length > 0 ? (

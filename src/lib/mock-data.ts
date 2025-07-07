@@ -5,16 +5,24 @@ export type User = {
   role: "Cliente" | "Proveedor" | "Empleado";
   avatar: string;
   objectives?: string;
+  points: number;
+  profileCompleted: boolean;
 };
 
 export type Connection = {
   id: string;
   purpose: string;
   status: "Activo" | "En espera" | "Cerrado";
-  participants: Omit<User, 'objectives'>[];
+  participants: Omit<User, 'objectives' | 'points' | 'profileCompleted'>[];
   userIds: string[];
   duration: string;
   rules: string;
+  creatorId: string;
+  provider: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
   createdAt: {
     seconds: number;
     nanoseconds: number;

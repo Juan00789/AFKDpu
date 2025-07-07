@@ -42,7 +42,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               email: user.email!,
               role: 'Cliente',
               avatar: user.photoURL || `https://placehold.co/100x100.png`,
-              objectives: 'Definir mis objetivos.'
+              objectives: 'Definir mis objetivos.',
+              points: 0,
+              profileCompleted: false,
             };
             await setDoc(userRef, newUser);
             setAppUser(newUser);
@@ -58,7 +60,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             email: user.email!,
             role: 'Cliente',
             avatar: user.photoURL || `https://placehold.co/100x100.png`,
-            objectives: 'No se pudieron cargar los datos del perfil. La información no se guardará.'
+            objectives: 'No se pudieron cargar los datos del perfil. La información no se guardará.',
+            points: 0,
+            profileCompleted: false,
           };
           setAppUser(fallbackUser);
         } finally {
@@ -86,7 +90,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       role,
       avatar: photoURL,
-      objectives: 'Definir mis objetivos.'
+      objectives: 'Definir mis objetivos.',
+      points: 0,
+      profileCompleted: false,
     };
     await setDoc(doc(db, "users", user.uid), newUser);
     
