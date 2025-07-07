@@ -1,13 +1,13 @@
-
 rules_version = '2';
+
 service firebase.storage {
   match /b/{bucket}/o {
-    // Allow public read access to all files, needed for avatars.
-    match /{allPaths=**} {
+    // Rules for user avatars
+    match /avatars/{userId}/{allPaths=**} {
+      // Anyone can read profile pictures
       allow read;
-    }
-    // Allow write only to a user's own avatar folder.
-    match /avatars/{userId}/{fileName} {
+      
+      // Only the authenticated user can write to their own avatar path
       allow write: if request.auth != null && request.auth.uid == userId;
     }
   }
