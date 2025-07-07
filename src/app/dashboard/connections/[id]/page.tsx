@@ -137,6 +137,11 @@ export default function ConnectionDetailPage() {
   const { toast } = useToast();
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (params.id && appUser) {
@@ -287,6 +292,7 @@ export default function ConnectionDetailPage() {
   }
 
   const formatTimestamp = (timestamp: any) => {
+    if (!isClient) return '';
     if (!timestamp) return 'Ahora';
     const date = timestamp.toDate();
     return formatRelative(date, new Date(), { locale: es });
