@@ -1,17 +1,14 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Rule for the 'businesses' collection to be publicly readable
+    // PUBLIC READ: Allow anyone to read business data for the public page.
     match /businesses/{businessId} {
       allow read: if true;
-      allow write: if request.auth != null;
     }
 
-    // Default rule for all other collections
-    // Allows any authenticated user to read/write anywhere.
-    // This is for development and should be secured before production.
-    match /{path=**} {
+    // AUTHENTICATED ACCESS: Allow any authenticated user full access to other collections.
+    // This is for development purposes and should be secured before production.
+    match /{document=**} {
       allow read, write: if request.auth != null;
     }
   }
