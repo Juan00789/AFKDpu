@@ -12,10 +12,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { type User } from "@/lib/mock-data"
-import { Edit, Upload, Loader2, Save, Megaphone } from "lucide-react"
+import { Edit, Upload, Loader2, Save, Megaphone, UserPlus, AlertTriangle } from "lucide-react"
 import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, updateDoc, increment, DocumentData, PartialWithFieldValue } from "firebase/firestore";
+import { doc, updateDoc, increment, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { CurrencyIcon } from '@/components/CurrencyIcon';
@@ -47,6 +47,98 @@ function ReputationCard({ user }: { user: User }) {
         </Card>
     )
 }
+
+const AssignBusinessDialog = () => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [email, setEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const { toast } = useToast();
+    const businessId = 'miguel-iphone-center';
+
+    const handleAssign = async () => {
+        if (!email) {
+            toast({ variant: "destructive", title: "Error", description: "Por favor, introduce un correo." });
+            return;
+        }
+        setIsLoading(true);
+        try {
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where("email", "==", email), where("role", "==", "Proveedor"));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                toast({
+                    variant: "destructive",
+                    title: "No encontrado",
+                    description: "No se encontró un proveedor con ese correo electrónico.",
+                });
+                setIsLoading(false);
+                return;
+            }
+
+            const batch = writeBatch(db);
+            const providerDoc = querySnapshot.docs[0];
+            batch.update(doc(db, 'users', providerDoc.id), {
+                claimedBusinessId: businessId
+            });
+            await batch.commit();
+
+            toast({
+                title: "¡Asignación Exitosa!",
+                description: `El negocio se ha asignado a ${email}.`,
+            });
+            setIsOpen(false);
+            setEmail('');
+
+        } catch (error) {
+            console.error("Error asignando negocio:", error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "No se pudo asignar el negocio. Revisa los permisos.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button className="w-full">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Asignar Publicidad
+                </Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Asignar Gestión de Publicidad</DialogTitle>
+                    <DialogDescription>
+                        Introduce el correo del proveedor para darle acceso a la gestión de la página "Miguel iPhone Center".
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="py-4 space-y-2">
+                    <Label htmlFor="provider-email">Correo del Proveedor</Label>
+                    <Input 
+                        id="provider-email" 
+                        type="email" 
+                        placeholder="proveedor@ejemplo.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="ghost">Cancelar</Button>
+                    </DialogClose>
+                    <Button onClick={handleAssign} disabled={isLoading}>
+                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Confirmar Asignación"}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 
 export default function ProfilePage() {
@@ -114,7 +206,6 @@ export default function ProfilePage() {
             const userRef = doc(db, 'users', user.id);
             const updatePayload: { [key: string]: any } = {};
 
-            // Build a payload with only the fields that have actually changed
             if (formData.name !== user.name) updatePayload.name = formData.name;
             if (formData.role !== user.role) updatePayload.role = formData.role;
             if (formData.avatar !== user.avatar) updatePayload.avatar = formData.avatar;
@@ -320,33 +411,45 @@ export default function ProfilePage() {
                         </Dialog>
                     </CardContent>
                 </Card>
-                 {(user.email === 'alcantara00789@gmail.com' || (user.role === 'Proveedor' && user.claimedBusinessId)) && (
-                    <Card>
+                 {user.email === 'alcantara00789@gmail.com' ? (
+                     <Card>
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <Megaphone className="h-6 w-6" />
-                                {user.email === 'alcantara00789@gmail.com' ? 'Gestión de Publicidad (Admin)' : 'Mi Publicidad'}
+                                Gestión de Publicidad (Admin)
                             </CardTitle>
                             <CardDescription>
-                                {user.email === 'alcantara00789@gmail.com' 
-                                    ? 'Acceso de administrador para gestionar todas las páginas de publicidad.'
-                                    : 'Gestiona la página de publicidad que has reclamado.'
-                                }
+                                Asigna la gestión de páginas de publicidad a los proveedores.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                           <AssignBusinessDialog />
+                           <Button asChild variant="outline" className="w-full">
+                                <Link href="/publicidad-sana">
+                                    <Edit className="mr-2 h-4 w-4" />
+                                    Editar "Miguel iPhone Center"
+                                </Link>
+                           </Button>
+                        </CardContent>
+                    </Card>
+                ) : user.role === 'Proveedor' && user.claimedBusinessId && (
+                     <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Megaphone className="h-6 w-6" />
+                                Mi Publicidad
+                            </CardTitle>
+                            <CardDescription>
+                                Gestiona la página de publicidad que se te ha asignado.
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {user.email === 'alcantara00789@gmail.com' ? (
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Desde aquí puedes supervisar y editar el contenido publicitario de la plataforma.
-                                </p>
-                            ) : (
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    Has reclamado el negocio: <strong>Miguel iPhone Center</strong>.
-                                </p>
-                            )}
+                             <p className="text-sm text-muted-foreground mb-4">
+                                Tienes acceso para editar: <strong>Miguel iPhone Center</strong>.
+                            </p>
                             <Button asChild className="w-full">
                                 <Link href="/publicidad-sana">
-                                    {user.email === 'alcantara00789@gmail.com' ? 'Ir al Panel de Publicidad' : 'Ir a mi página de publicidad'}
+                                    Ir a mi página de publicidad
                                 </Link>
                             </Button>
                         </CardContent>

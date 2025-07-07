@@ -67,67 +67,6 @@ const ProductCard = ({ name, price, category, imageUrl, imageHint }: Product) =>
   </Card>
 );
 
-function ClaimBusinessButton() {
-    const { appUser, setAppUser } = useAuth();
-    const [isLoading, setIsLoading] = useState(false);
-    const { toast } = useToast();
-
-    const handleClaim = async () => {
-        if (!appUser) return;
-        setIsLoading(true);
-        try {
-            const userRef = doc(db, 'users', appUser.id);
-            await updateDoc(userRef, {
-                claimedBusinessId: businessId
-            });
-            // Update user state in context
-            setAppUser(prevUser => prevUser ? { ...prevUser, claimedBusinessId: businessId } : null);
-            toast({
-                title: "¡Negocio Reclamado!",
-                description: "Ahora puedes gestionar esta página.",
-            });
-        } catch (error) {
-            console.error("Error claiming business:", error);
-            toast({
-                variant: "destructive",
-                title: "Error",
-                description: "No se pudo reclamar el negocio. Inténtalo de nuevo."
-            });
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    if (!appUser || appUser.role !== 'Proveedor' || appUser.claimedBusinessId) {
-        return null;
-    }
-
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button variant="outline" className="w-full">¿Eres el propietario?</Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Reclamar "Miguel iPhone Center"</DialogTitle>
-                    <DialogDescription>
-                        Al confirmar, tu perfil de proveedor se asociará con este negocio. Podrás gestionar esta página de publicidad. ¿Estás seguro?
-                    </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="ghost">Cancelar</Button>
-                    </DialogClose>
-                    <Button onClick={handleClaim} disabled={isLoading}>
-                        {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Confirmar y Reclamar
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 const EditBusinessDialog = ({ businessData, setBusinessData }: { businessData: BusinessData, setBusinessData: (data: BusinessData) => void }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [editData, setEditData] = useState<BusinessData>(businessData);
@@ -271,7 +210,7 @@ export default function PublicidadSanaPage() {
     const canEdit = appUser && (appUser.email === 'alcantara00789@gmail.com' || appUser.claimedBusinessId === businessId);
 
     const initializeBusinessData = async () => {
-        if (!canEdit) return; // Only admin/owner can initialize
+        if (!appUser || appUser.email !== 'alcantara00789@gmail.com') return; // Only admin can initialize
         const defaultData: BusinessData = {
             name: "Miguel iPhone Center",
             tagline: "Tienda especializada en Apple",
@@ -350,7 +289,7 @@ export default function PublicidadSanaPage() {
                 <AlertTriangle className="h-12 w-12 mb-4 text-muted-foreground" />
                 <h2 className="text-xl font-semibold">Página de Publicidad no encontrada</h2>
                 <p className="text-muted-foreground mt-2">No se encontró información para este negocio.</p>
-                {canEdit && (
+                {appUser && appUser.email === 'alcantara00789@gmail.com' && (
                     <Button onClick={initializeBusinessData} className="mt-6">
                         Inicializar Página de Ejemplo
                     </Button>
@@ -455,10 +394,8 @@ export default function PublicidadSanaPage() {
                      </div>
                   </CardContent>
                 </Card>
-                {canEdit ? (
+                {canEdit && (
                     <EditBusinessDialog businessData={businessData} setBusinessData={setBusinessData} />
-                ) : (
-                    <ClaimBusinessButton />
                 )}
               </aside>
             </div>
