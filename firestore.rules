@@ -1,13 +1,43 @@
-// REGLAS PARA FIRESTORE DATABASE
-// Pega este código en la sección de Reglas de "Firestore Database" en tu consola de Firebase.
+
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    // WARNING: These rules are permissive and are intended for development/prototyping.
-    // They allow any authenticated user to read and write all data.
-    // For a production app, you should implement more granular security rules.
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+
+    // Users can read any profile, but only update their own.
+    // For simplicity, we are allowing users to update their own points.
+    // In a production app, this should be handled by a Cloud Function for security.
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Businesses can be read by anyone.
+    // Writes are allowed for any authenticated user. App logic handles authorization.
+    match /businesses/{businessId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Connections can be created by authenticated users.
+    // Only participants can read or update a connection.
+    match /connections/{connectionId} {
+      allow get, list: if request.auth != null && request.auth.uid in resource.data.userIds;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && request.auth.uid in resource.data.userIds;
+
+      // Messages are only accessible to participants of the connection.
+      match /messages/{messageId} {
+        allow read, write: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
+      }
+    }
+
+    // Reviews can be read by anyone.
+    // Only authenticated users can create reviews, and they must be the author.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.reviewerId == request.auth.uid;
     }
   }
 }
