@@ -7,35 +7,43 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Share2, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
-  const { loginUser } = useAuth();
+  const { sendPasswordReset } = useAuth();
   const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      await loginUser(email, password);
-      router.push('/dashboard');
-    } catch (error: any) {
+    if (!email) {
       toast({
         variant: "destructive",
-        title: "Error de inicio de sesión",
-        description: "El correo o la contraseña son incorrectos.",
+        title: "Error",
+        description: "Por favor, ingresa tu correo electrónico.",
+      });
+      return;
+    }
+    setLoading(true);
+    try {
+      await sendPasswordReset(email);
+      toast({
+        title: "Correo Enviado",
+        description: "Si tu cuenta existe, recibirás un enlace para restablecer tu contraseña.",
+      });
+    } catch (error: any) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "No se pudo enviar el correo. Inténtalo de nuevo.",
       });
     } finally {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-secondary/50">
@@ -45,36 +53,27 @@ export default function LoginPage() {
              <Share2 className="h-6 w-6 text-primary" />
              <span className="text-2xl font-bold font-headline text-primary">AFKDpu</span>
            </Link>
-          <CardTitle className="text-2xl font-headline">Iniciar Sesión</CardTitle>
-          <CardDescription>Ingresa tu correo electrónico para acceder a tu panel.</CardDescription>
+          <CardTitle className="text-2xl font-headline">¿Olvidaste tu Contraseña?</CardTitle>
+          <CardDescription>Ingresa tu correo y te enviaremos un enlace para restablecerla.</CardDescription>
         </CardHeader>
-        <form onSubmit={handleLogin}>
+        <form onSubmit={handleResetPassword}>
           <CardContent className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Correo electrónico</Label>
               <Input id="email" type="email" placeholder="nombre@ejemplo.com" required value={email} onChange={e => setEmail(e.target.value)} />
             </div>
-            <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Contraseña</Label>
-                <Link href="/forgot-password" className="ml-auto inline-block text-xs underline">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <Input id="password" type="password" required value={password} onChange={e => setPassword(e.target.value)} />
-            </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="animate-spin" /> : "Iniciar sesión"}
+              {loading ? <Loader2 className="animate-spin" /> : "Enviar enlace"}
             </Button>
              <p className="text-xs text-center text-muted-foreground">
-              ¿No tienes una cuenta?{" "}
+              ¿Recordaste tu contraseña?{" "}
               <Link
-                href="/register"
+                href="/login"
                 className="underline underline-offset-4 hover:text-primary"
               >
-                Regístrate
+                Iniciar sesión
               </Link>
             </p>
           </CardFooter>

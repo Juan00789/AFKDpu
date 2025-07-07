@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, ReactNode, Dispatch, SetStateAction } from 'react';
-import { onAuthStateChanged, User as FirebaseUser, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from 'firebase/auth';
+import { onAuthStateChanged, User as FirebaseUser, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, sendPasswordResetEmail } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { User } from '@/lib/mock-data';
@@ -14,6 +14,7 @@ interface AuthContextType {
   registerUser: (email: string, pass: string, name: string, role: User['role']) => Promise<any>;
   loginUser: (email: string, pass: string) => Promise<any>;
   logoutUser: () => Promise<any>;
+  sendPasswordReset: (email: string) => Promise<void>;
   setAppUser: Dispatch<SetStateAction<User | null>>;
 }
 
@@ -110,8 +111,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const sendPasswordReset = (email: string) => {
+    return sendPasswordResetEmail(auth, email);
+  };
+
   return (
-    <AuthContext.Provider value={{ firebaseUser, appUser, loading, registerUser, loginUser, logoutUser, setAppUser }}>
+    <AuthContext.Provider value={{ firebaseUser, appUser, loading, registerUser, loginUser, logoutUser, sendPasswordReset, setAppUser }}>
       {children}
     </AuthContext.Provider>
   );
