@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
-import { mockConnections, type User } from "@/lib/mock-data"
+import { mockUsers, type User } from "@/lib/mock-data"
 import { Star, Edit, BarChart2, Upload, Loader2, Save } from "lucide-react"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Cell } from "recharts"
@@ -28,8 +28,8 @@ const pastConnections = [
 ]
 
 const comments = [
-    { user: mockConnections[0].participants[0], rating: 5, comment: "Excelente comunicación y proactividad. ¡Un placer trabajar juntos!" },
-    { user: mockConnections[1].participants[0], rating: 4, comment: "Buen trabajo en general, aunque a veces la comunicación tardaba un poco." },
+    { user: mockUsers[0], rating: 5, comment: "Excelente comunicación y proactividad. ¡Un placer trabajar juntos!" },
+    { user: mockUsers[1], rating: 4, comment: "Buen trabajo en general, aunque a veces la comunicación tardaba un poco." },
 ]
 
 const emotionalHistory = [
