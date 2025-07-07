@@ -2,20 +2,24 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    
-    // PUBLIC READ for all images
+    // Public read access for all files.
+    // Write access is restricted.
     match /{allPaths=**} {
       allow read: if true;
     }
-
-    // Authenticated users can write to their own avatar directory
+    
+    // Users can only write to their own avatar folder.
     match /avatars/{userId}/{fileName} {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Authenticated and assigned users can upload product images
+    // Only authorized users can write to business product image folders.
     match /business_products/{businessId}/{fileName} {
-      allow write: if request.auth != null && (request.auth.token.email == "alcantara00789@gmail.com" || (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId));
+       allow write: if request.auth != null && (
+                    request.auth.token.email == 'alcantara00789@gmail.com' ||
+                    (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId != null &&
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId)
+                  );
     }
   }
 }

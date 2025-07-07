@@ -150,9 +150,9 @@ export default function PublicidadSanaPage() {
                 <p className="text-muted-foreground mt-2">{error}</p>
                 {appUser && appUser.email === 'alcantara00789@gmail.com' && (
                     <div className="mt-6 flex flex-col items-center gap-4 border-t pt-6 w-full max-w-sm">
-                         <p className="text-sm text-muted-foreground">Como administrador, puedes forzar la reinicialización de los datos de ejemplo. Esto puede solucionar problemas si los datos no existen o los permisos fallaron.</p>
+                         <p className="text-sm text-muted-foreground">Como administrador, puedes forzar la reinicialización de los datos de ejemplo. La mejor forma de hacerlo es desde el <Link href="/dashboard/advertising" className="underline">editor de publicidad</Link>.</p>
                         <Button onClick={initializeBusinessData} className="w-full">
-                            Inicializar Página de Ejemplo
+                            Forzar Inicialización Aquí
                         </Button>
                     </div>
                 )}
@@ -164,11 +164,11 @@ export default function PublicidadSanaPage() {
         return (
             <div className="flex flex-col h-screen items-center justify-center text-center p-4">
                 <AlertTriangle className="h-12 w-12 mb-4 text-muted-foreground" />
-                <h2 className="text-xl font-semibold">Página de Publicidad no encontrada</h2>
-                <p className="text-muted-foreground mt-2">No se encontró información para este negocio.</p>
+                <h2 className="text-xl font-semibold">Página no disponible</h2>
+                <p className="text-muted-foreground mt-2">No se encontró información para este negocio en este momento.</p>
                 {appUser && appUser.email === 'alcantara00789@gmail.com' && (
-                    <Button onClick={initializeBusinessData} className="mt-6">
-                        Inicializar Página de Ejemplo
+                     <Button asChild className="mt-6">
+                        <Link href="/dashboard/advertising">Ir al Editor para Inicializar</Link>
                     </Button>
                 )}
             </div>

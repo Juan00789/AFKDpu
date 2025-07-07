@@ -7,13 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, AlertTriangle, Save, PlusCircle, Trash2, Upload } from "lucide-react";
+import { Loader2, AlertTriangle, Save, PlusCircle, Trash2, Upload, Eye } from "lucide-react";
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, storage } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useToast } from '@/hooks/use-toast';
+import Link from 'next/link';
 
 const businessId = 'miguel-iphone-center';
 
@@ -79,6 +80,44 @@ export default function AdvertisingPage() {
             setLoading(false);
         }
     }, [canEdit, toast]);
+
+     const initializeBusinessData = async () => {
+        if (!appUser || appUser.email !== 'alcantara00789@gmail.com') return;
+        const defaultData: BusinessData = {
+            name: "Miguel iPhone Center",
+            tagline: "Tienda especializada en Apple",
+            pageTitle: "Publicidad Sana: Un Caso de Estudio",
+            pageDescription: "Analizamos cómo \"Miguel iPhone Center\" aplica los principios de una comunicación honesta y transparente, construyendo confianza con sus clientes.",
+            address: "Sosua: La Union, Edificio 79, 1er piso Calle Del Cable, Puerto Plata 57000",
+            phone: "(829) 399-0735",
+            hours: "Cerrado ⋅ Abre a las 9 a. m.",
+            instagramUrl: "https://instagram.com",
+            reviewQuote: "Miguel iPhone Center es la única tienda dedicada 100% a la marca Apple. Somos lo más parecido a una App Store en cuanto a nuestro servicio (no estética). En todo Puerto Plata es el único lugar donde encontrarás todos los accesorios originales Apple....",
+            reviewSource: "5.0 (17 opiniones en Google)",
+            products: [
+              { name: "iPhone XR Factory Unlocked", price: "RD$13,500.00", category: "Telefonos Moviles", imageUrl: "https://placehold.co/400x400.png", imageHint: "iphone xr" },
+              { name: "iPhone XS Max 512GB", price: "RD$18,500.00", category: "Telefonos Moviles", imageUrl: "https://placehold.co/400x400.png", imageHint: "iphone xs" },
+              { name: "iPhone XS MAX Factory Unlocked", price: "RD$16,000.00 - 18,000.00", category: "Telefonos Moviles", imageUrl: "https://placehold.co/400x400.png", imageHint: "iphone xs" },
+              { name: "ipad y iPhone", price: "RD$4,000.00 - 10,000.00", category: "Dispositivos Apple", imageUrl: "https://placehold.co/400x400.png", imageHint: "ipad iphone" }
+            ]
+        };
+        setIsSaving(true);
+        try {
+            const businessRef = doc(db, 'businesses', businessId);
+            await setDoc(businessRef, defaultData);
+            setBusinessData(defaultData);
+            setEditData(defaultData);
+            toast({
+                title: "Página inicializada",
+                description: "Se han creado los datos iniciales para la página de publicidad."
+            });
+        } catch (error) {
+            console.error(error);
+            toast({ variant: "destructive", title: "Error", description: "No se pudieron inicializar los datos." });
+        } finally {
+            setIsSaving(false);
+        }
+    };
     
     if (loading) {
         return (
@@ -103,7 +142,13 @@ export default function AdvertisingPage() {
             <div className="flex flex-col h-[calc(100vh-10rem)] items-center justify-center text-center p-4">
                 <AlertTriangle className="h-12 w-12 mb-4 text-muted-foreground" />
                 <h2 className="text-xl font-semibold">Página de Publicidad no encontrada</h2>
-                <p className="text-muted-foreground mt-2">No se encontró información para este negocio. Es posible que un administrador necesite inicializarla.</p>
+                <p className="text-muted-foreground mt-2">No se encontró información para este negocio. Como administrador, puedes restaurarla.</p>
+                 {appUser && appUser.email === 'alcantara00789@gmail.com' && (
+                    <Button onClick={initializeBusinessData} className="mt-6" disabled={isSaving}>
+                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Inicializar Página de Ejemplo
+                    </Button>
+                )}
             </div>
         )
     }
@@ -303,7 +348,13 @@ export default function AdvertisingPage() {
                  </div>
             </div>
              <Card className="sticky bottom-4 z-10 mt-6">
-                <CardFooter className="p-4 flex items-center justify-end">
+                <CardFooter className="p-4 flex items-center justify-between">
+                     <Button variant="outline" asChild>
+                        <Link href="/publicidad-sana" target="_blank">
+                            <Eye className="mr-2 h-4 w-4" />
+                            Vista Previa
+                        </Link>
+                    </Button>
                      <Button onClick={handleSave} disabled={isSaving || uploadingIndex !== null}>
                         {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
                         Guardar todos los cambios
