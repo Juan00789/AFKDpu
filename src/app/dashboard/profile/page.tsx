@@ -5,14 +5,14 @@ import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { type User } from "@/lib/mock-data"
-import { Edit, Upload, Loader2, Save, Megaphone, UserPlus, AlertTriangle } from "lucide-react"
+import { Edit, Upload, Loader2, Save, Megaphone, UserPlus, AlertTriangle, Trash2 } from "lucide-react"
 import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc, increment, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
@@ -52,8 +52,34 @@ const AssignBusinessDialog = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [loadingAssigned, setLoadingAssigned] = useState(true);
+    const [assignedProvider, setAssignedProvider] = useState<{ id: string, email: string } | null>(null);
     const { toast } = useToast();
     const businessId = 'miguel-iphone-center';
+
+    useEffect(() => {
+        if (isOpen) {
+            const fetchAssignedProvider = async () => {
+                setLoadingAssigned(true);
+                try {
+                    const q = query(collection(db, 'users'), where("claimedBusinessId", "==", businessId));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        const providerDoc = querySnapshot.docs[0];
+                        setAssignedProvider({ id: providerDoc.id, email: providerDoc.data().email });
+                    } else {
+                        setAssignedProvider(null);
+                    }
+                } catch (error) {
+                    console.error("Error fetching assigned provider:", error);
+                    toast({ variant: "destructive", title: "Error", description: "No se pudo verificar la asignación actual." });
+                } finally {
+                    setLoadingAssigned(false);
+                }
+            };
+            fetchAssignedProvider();
+        }
+    }, [isOpen, toast]);
 
     const handleAssign = async () => {
         if (!email) {
@@ -61,6 +87,7 @@ const AssignBusinessDialog = () => {
             return;
         }
         setIsLoading(true);
+
         try {
             const usersRef = collection(db, 'users');
             const q = query(usersRef, where("email", "==", email), where("role", "==", "Proveedor"));
@@ -76,11 +103,26 @@ const AssignBusinessDialog = () => {
                 return;
             }
 
+            const newProviderDoc = querySnapshot.docs[0];
+            const newProviderId = newProviderDoc.id;
+
+            if (assignedProvider && newProviderId === assignedProvider.id) {
+                toast({ title: "Sin cambios", description: `El negocio ya está asignado a ${email}.` });
+                setIsLoading(false);
+                setIsOpen(false);
+                return;
+            }
+
             const batch = writeBatch(db);
-            const providerDoc = querySnapshot.docs[0];
-            batch.update(doc(db, 'users', providerDoc.id), {
-                claimedBusinessId: businessId
-            });
+
+            if (assignedProvider) {
+                const oldUserRef = doc(db, 'users', assignedProvider.id);
+                batch.update(oldUserRef, { claimedBusinessId: "" });
+            }
+
+            const newUserRef = doc(db, 'users', newProviderId);
+            batch.update(newUserRef, { claimedBusinessId: businessId });
+
             await batch.commit();
 
             toast({
@@ -102,6 +144,27 @@ const AssignBusinessDialog = () => {
         }
     };
 
+    const handleRemoveAssignment = async () => {
+        if (!assignedProvider) return;
+        setIsLoading(true);
+        try {
+            const userRef = doc(db, 'users', assignedProvider.id);
+            await updateDoc(userRef, { claimedBusinessId: "" });
+            toast({ title: "Asignación Removida", description: `Se ha removido el acceso para ${assignedProvider.email}.` });
+            setAssignedProvider(null);
+            setEmail('');
+        } catch (error) {
+            console.error("Error removiendo asignación:", error);
+            toast({
+                variant: "destructive",
+                title: "Error",
+                description: "No se pudo remover la asignación."
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogTrigger asChild>
@@ -112,29 +175,53 @@ const AssignBusinessDialog = () => {
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Asignar Gestión de Publicidad</DialogTitle>
+                    <DialogTitle>Gestionar Asignación de Publicidad</DialogTitle>
                     <DialogDescription>
-                        Introduce el correo del proveedor para darle acceso a la gestión de la página "Miguel iPhone Center".
+                        Asigna o remueve el acceso de un proveedor a la página "Miguel iPhone Center".
                     </DialogDescription>
                 </DialogHeader>
-                <div className="py-4 space-y-2">
-                    <Label htmlFor="provider-email">Correo del Proveedor</Label>
-                    <Input 
-                        id="provider-email" 
-                        type="email" 
-                        placeholder="proveedor@ejemplo.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                </div>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="ghost">Cancelar</Button>
-                    </DialogClose>
-                    <Button onClick={handleAssign} disabled={isLoading}>
-                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Confirmar Asignación"}
-                    </Button>
-                </DialogFooter>
+                {loadingAssigned ? (
+                    <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin" /></div>
+                ) : (
+                    <div className="space-y-4">
+                        <Card className="bg-muted/50">
+                            <CardHeader className="p-4">
+                                <CardTitle className="text-sm font-medium">Estado Actual</CardTitle>
+                                <CardDescription className="text-base font-semibold text-foreground">
+                                    {assignedProvider ? `Asignado a: ${assignedProvider.email}` : "No asignado"}
+                                </CardDescription>
+                            </CardHeader>
+                            {assignedProvider && (
+                                <CardFooter className="p-4 pt-0">
+                                    <Button variant="destructive" className="w-full" onClick={handleRemoveAssignment} disabled={isLoading}>
+                                        {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Trash2 className="mr-2 h-4 w-4" />}
+                                        Remover Asignación
+                                    </Button>
+                                </CardFooter>
+                            )}
+                        </Card>
+
+                        <div className="py-2 space-y-2">
+                            <Label htmlFor="provider-email">Correo del Proveedor a Asignar</Label>
+                            <Input
+                                id="provider-email"
+                                type="email"
+                                placeholder="proveedor@ejemplo.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
+                        </div>
+
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button variant="ghost" disabled={isLoading}>Cancelar</Button>
+                            </DialogClose>
+                            <Button onClick={handleAssign} disabled={isLoading || !email}>
+                                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : "Confirmar Asignación"}
+                            </Button>
+                        </DialogFooter>
+                    </div>
+                )}
             </DialogContent>
         </Dialog>
     );
@@ -460,3 +547,5 @@ export default function ProfilePage() {
         </div>
     )
 }
+
+    
