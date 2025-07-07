@@ -75,41 +75,6 @@ export default function PublicidadSanaPage() {
     const { toast } = useToast();
     const { appUser } = useAuth();
 
-    const initializeBusinessData = async () => {
-        if (!appUser || appUser.email !== 'alcantara00789@gmail.com') return; // Only admin can initialize
-        const defaultData: BusinessData = {
-            name: "Miguel iPhone Center",
-            tagline: "Tienda especializada en Apple",
-            pageTitle: "Publicidad Sana: Un Caso de Estudio",
-            pageDescription: "Analizamos cómo \"Miguel iPhone Center\" aplica los principios de una comunicación honesta y transparente, construyendo confianza con sus clientes.",
-            address: "Sosua: La Union, Edificio 79, 1er piso Calle Del Cable, Puerto Plata 57000",
-            phone: "(829) 399-0735",
-            hours: "Cerrado ⋅ Abre a las 9 a. m.",
-            instagramUrl: "https://instagram.com",
-            reviewQuote: "Miguel iPhone Center es la única tienda dedicada 100% a la marca Apple. Somos lo más parecido a una App Store en cuanto a nuestro servicio (no estética). En todo Puerto Plata es el único lugar donde encontrarás todos los accesorios originales Apple....",
-            reviewSource: "5.0 (17 opiniones en Google)",
-            products: [
-              { name: "iPhone XR Factory Unlocked", price: "RD$13,500.00", category: "Telefonos Moviles", imageUrl: "https://placehold.co/400x400.png", imageHint: "iphone xr" },
-              { name: "iPhone XS Max 512GB", price: "RD$18,500.00", category: "Telefonos Moviles", imageUrl: "https://placehold.co/400x400.png", imageHint: "iphone xs" },
-              { name: "iPhone XS MAX Factory Unlocked", price: "RD$16,000.00 - 18,000.00", category: "Telefonos Moviles", imageUrl: "https://placehold.co/400x400.png", imageHint: "iphone xs" },
-              { name: "ipad y iPhone", price: "RD$4,000.00 - 10,000.00", category: "Dispositivos Apple", imageUrl: "https://placehold.co/400x400.png", imageHint: "ipad iphone" }
-            ]
-        };
-        try {
-            const businessRef = doc(db, 'businesses', businessId);
-            await setDoc(businessRef, defaultData);
-            setBusinessData(defaultData);
-            setError(null); // Clear any previous error
-            toast({
-                title: "Página inicializada",
-                description: "Se han creado los datos iniciales para la página de publicidad."
-            });
-        } catch (error) {
-            console.error(error);
-            setError("No se pudieron inicializar los datos. Revisa los permisos de Firestore.");
-        }
-    };
-
     useEffect(() => {
         const fetchBusinessData = async () => {
             setLoading(true);
@@ -148,13 +113,10 @@ export default function PublicidadSanaPage() {
                 <AlertTriangle className="h-12 w-12 mb-4 text-destructive" />
                 <h2 className="text-xl font-semibold">Error al Cargar</h2>
                 <p className="text-muted-foreground mt-2">{error}</p>
-                {appUser && appUser.email === 'alcantara00789@gmail.com' && (
-                    <div className="mt-6 flex flex-col items-center gap-4 border-t pt-6 w-full max-w-sm">
-                         <p className="text-sm text-muted-foreground">Como administrador, puedes forzar la reinicialización de los datos de ejemplo. La mejor forma de hacerlo es desde el <Link href="/dashboard/advertising" className="underline">editor de publicidad</Link>.</p>
-                        <Button onClick={initializeBusinessData} className="w-full">
-                            Forzar Inicialización Aquí
-                        </Button>
-                    </div>
+                 {appUser && appUser.email === 'alcantara00789@gmail.com' && (
+                     <Button asChild className="mt-6">
+                        <Link href="/dashboard/advertising">Ir al Editor para Inicializar</Link>
+                    </Button>
                 )}
             </div>
         );
