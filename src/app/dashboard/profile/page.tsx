@@ -360,6 +360,9 @@ export default function ProfilePage() {
             if (formData.name !== user.name) updatePayload.name = formData.name;
             if (formData.role !== user.role) updatePayload.role = formData.role;
             if (formData.avatar !== user.avatar) updatePayload.avatar = formData.avatar;
+            if ((formData.phone || '') !== (user.phone || '')) {
+                updatePayload.phone = formData.phone || '';
+            }
             if ((formData.objectives || '') !== (user.objectives || '')) {
                 updatePayload.objectives = formData.objectives || '';
             }
@@ -469,6 +472,13 @@ export default function ProfilePage() {
                             </p>
                         </div>
 
+                        <div>
+                            <Label className="text-muted-foreground font-semibold">Teléfono</Label>
+                            <p className="text-foreground leading-normal mt-1">
+                                {user.phone || 'No especificado'}
+                            </p>
+                        </div>
+
                         {user.role === 'Proveedor' && (
                             <div>
                                 <Label className="text-muted-foreground font-semibold">Información Bancaria</Label>
@@ -534,7 +544,11 @@ export default function ProfilePage() {
                                         <Label htmlFor="email" className="text-right">Email</Label>
                                         <Input id="email" value={formData.email} className="col-span-3" disabled />
                                     </div>
-                                        <div className="grid grid-cols-4 items-center gap-4">
+                                    <div className="grid grid-cols-4 items-center gap-4">
+                                        <Label htmlFor="phone" className="text-right">Teléfono</Label>
+                                        <Input id="phone" value={formData.phone || ''} onChange={(e) => setFormData({...formData!, phone: e.target.value})} className="col-span-3" placeholder="Tu número de teléfono" />
+                                    </div>
+                                    <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="role" className="text-right">Rol</Label>
                                         <Select value={formData.role} onValueChange={(value) => setFormData({...formData!, role: value as User['role']})}>
                                             <SelectTrigger className="col-span-3">

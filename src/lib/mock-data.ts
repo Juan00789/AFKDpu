@@ -5,6 +5,7 @@ export type User = {
   email: string;
   role: "Cliente" | "Proveedor" | "Empleado";
   avatar: string;
+  phone?: string;
   objectives?: string;
   points: number;
   profileCompleted: boolean;

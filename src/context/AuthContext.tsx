@@ -11,7 +11,7 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   appUser: User | null;
   loading: boolean;
-  registerUser: (email: string, pass: string, name: string, role: User['role']) => Promise<any>;
+  registerUser: (email: string, pass: string, name: string, role: User['role'], phone: string) => Promise<any>;
   loginUser: (email: string, pass: string) => Promise<any>;
   logoutUser: () => Promise<any>;
   sendPasswordReset: (email: string) => Promise<void>;
@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               email: user.email!,
               role: 'Cliente',
               avatar: user.photoURL || `https://placehold.co/100x100.png`,
+              phone: user.phoneNumber || '',
               objectives: 'Definir mis objetivos.',
               points: 0,
               profileCompleted: false,
@@ -61,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             email: user.email!,
             role: 'Cliente',
             avatar: user.photoURL || `https://placehold.co/100x100.png`,
+            phone: user.phoneNumber || '',
             objectives: 'No se pudieron cargar los datos del perfil. La información no se guardará.',
             points: 0,
             profileCompleted: false,
@@ -79,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
-  const registerUser = async (email: string, pass: string, name: string, role: User['role']) => {
+  const registerUser = async (email: string, pass: string, name: string, role: User['role'], phone: string) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const user = userCredential.user;
     const photoURL = `https://placehold.co/100x100.png`;
@@ -91,6 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       role,
       avatar: photoURL,
+      phone,
       objectives: 'Definir mis objetivos.',
       points: 0,
       profileCompleted: false,

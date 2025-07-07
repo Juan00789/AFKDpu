@@ -189,6 +189,12 @@ export default function UserProfilePage() {
                                     {user.objectives || 'No se han definido objetivos.'}
                                 </p>
                             </div>
+                             <div>
+                                <Label className="text-muted-foreground font-semibold">Teléfono</Label>
+                                <p className="text-foreground leading-normal mt-1">
+                                    {user.phone || 'No especificado'}
+                                </p>
+                            </div>
                         </CardContent>
                     </Card>
                      <ReviewsCard reviews={reviews} />

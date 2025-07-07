@@ -25,6 +25,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [phone, setPhone] = useState('');
   const [role, setRole] = useState<User['role']>('Cliente');
   const [language, setLanguage] = useState('es');
   const [loading, setLoading] = useState(false);
@@ -44,7 +45,7 @@ export default function RegisterPage() {
     }
     setLoading(true);
     try {
-      await registerUser(email, password, username, role);
+      await registerUser(email, password, username, role, phone);
       router.push('/dashboard');
     } catch (error: any) {
       let errorMessage = "Ocurrió un error durante el registro.";
@@ -93,6 +94,10 @@ export default function RegisterPage() {
             <div className="grid gap-2">
               <Label htmlFor="username">Nombre de usuario</Label>
               <Input id="username" placeholder="Tu nombre" required value={username} onChange={(e) => setUsername(e.target.value)} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="phone">Teléfono (Opcional)</Label>
+              <Input id="phone" type="tel" placeholder="Ej: 809-123-4567" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
              <div className="grid gap-2">
                 <Label htmlFor="role">Selecciona tu rol</Label>
