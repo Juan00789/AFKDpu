@@ -134,13 +134,13 @@ export function AddConnectionDialog() {
         if (isFirstService) {
             setAppUser(prev => prev ? ({ ...prev, points: prev.points + 10 }) : null);
             toast({
-                title: '¡Conexión Creada y Puntos Ganados!',
-                description: `Has ganado 10 puntos por tu primer servicio.`,
+                title: '¡Portal Abierto y Puntos Ganados!',
+                description: `Has ganado 10 puntos por tu primer viaje.`,
             });
         } else {
              toast({
-                title: '¡Conexión Creada!',
-                description: `La conexión "${data.purpose}" ha sido creada.`,
+                title: '¡Portal Abierto!',
+                description: `El portal "${data.purpose}" ha sido abierto.`,
             });
         }
 
@@ -166,14 +166,14 @@ export function AddConnectionDialog() {
       <DialogTrigger asChild>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Agregar Servicio
+          Abrir Portal
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Crear Nuevo Servicio</DialogTitle>
+          <DialogTitle>Abrir un Nuevo Portal</DialogTitle>
           <DialogDescription>
-            Define el propósito y selecciona un proveedor para iniciar.
+            Define el propósito de esta nueva conexión para abrir un portal con otro ser.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -183,9 +183,9 @@ export function AddConnectionDialog() {
               name="purpose"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Propósito del Servicio</FormLabel>
+                  <FormLabel>Propósito del Portal</FormLabel>
                   <FormControl>
-                    <Input placeholder="Ej: Consulta técnica de producto" {...field} />
+                    <Input placeholder="Ej: Exploración de colaboración creativa" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -196,11 +196,11 @@ export function AddConnectionDialog() {
               name="providerId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Seleccionar Proveedor</FormLabel>
+                  <FormLabel>Seleccionar Viajero</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingProviders}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={loadingProviders ? "Cargando proveedores..." : "Elige un proveedor"} />
+                        <SelectValue placeholder={loadingProviders ? "Cargando viajeros..." : "Elige un viajero"} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -220,7 +220,7 @@ export function AddConnectionDialog() {
               name="duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Duración Estimada</FormLabel>
+                  <FormLabel>Duración Estimada del Viaje</FormLabel>
                   <FormControl>
                     <Input placeholder="Ej: 3 días" {...field} />
                   </FormControl>
@@ -233,9 +233,9 @@ export function AddConnectionDialog() {
               name="rules"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contexto o Reglas</FormLabel>
+                  <FormLabel>Intención o Contexto del Viaje</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Ej: Se requiere respuesta en 24h hábiles." {...field} />
+                    <Textarea placeholder="Ej: Se requiere presencia y respuesta en 24h." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -247,7 +247,7 @@ export function AddConnectionDialog() {
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting || loadingProviders}>
                 {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Guardar Conexión
+                Abrir Portal
               </Button>
             </DialogFooter>
           </form>

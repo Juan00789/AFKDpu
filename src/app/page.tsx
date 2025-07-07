@@ -31,25 +31,25 @@ export default function Home() {
               <div className="flex flex-col justify-center space-y-4">
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none font-headline text-primary">
-                    AFKDpu: Comunicación Empresarial Asíncrona
+                    AFKDpu: Un Portal para Conexiones Conscientes
                   </h1>
                   <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                    Gestiona clientes, proveedores y empleados en un solo lugar. Envía mensajes y tareas que se almacenan hasta que el destinatario esté disponible, garantizando una comunicación fluida y sin interrupciones.
+                    Gestiona tus interacciones como viajes simbólicos. Cada conexión es un portal que se abre, se transita y se cierra, dejando una memoria. Un espacio para la comunicación asíncrona y la transformación personal.
                   </p>
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button size="lg" asChild>
-                    <Link href="/register">Empieza a optimizar tu comunicación</Link>
+                    <Link href="/register">Inicia tu Viaje</Link>
                   </Button>
                 </div>
               </div>
               <Image
-                src="/logo.png"
-                alt="AFKDpu Logo"
+                src="https://placehold.co/600x400.png"
+                alt="AFKDpu Portal"
                 width={600}
                 height={400}
                 className="mx-auto aspect-[3/2] overflow-hidden rounded-xl object-contain sm:w-full lg:order-last"
-                data-ai-hint="brand logo spiral"
+                data-ai-hint="abstract portal vortex"
                 priority
               />
             </div>
@@ -62,7 +62,7 @@ export default function Home() {
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">¿Qué es AFKDpu?</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  AFKDpu es una plataforma de comunicación empresarial que facilita la coordinación entre clientes, proveedores y empleados a través de un sistema de mensajería asíncrona. Olvídate de la comunicación instantánea que exige atención inmediata. Cada conversación y tarea se gestiona de forma persistente, permitiendo que cada participante responda a su propio ritmo.
+                  AFKDpu es un ecosistema para la comunicación consciente. Facilita la coordinación entre roles a través de un sistema de portales de conexión asíncronos. Cada portal es un espacio sagrado para el diálogo y la colaboración, respetando el ritmo y la presencia de cada participante.
                 </p>
               </div>
             </div>
@@ -80,32 +80,32 @@ export default function Home() {
             <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-3 lg:max-w-none mt-12">
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <Users className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Gestión Unificada de Contactos</h3>
+                <h3 className="text-lg font-bold font-headline">Portal Unificado de Conexiones</h3>
                 <p className="text-sm text-muted-foreground">Centraliza la comunicación con todos tus clientes, proveedores y empleados en una única plataforma.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <MessageSquare className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Chat Asíncrono y Persistente</h3>
+                <h3 className="text-lg font-bold font-headline">Conversaciones Trascendentes</h3>
                 <p className="text-sm text-muted-foreground">Envía mensajes que se guardan de forma segura hasta que el destinatario pueda leerlos y responder, sin la presión del tiempo real.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <Clock className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Organización por Estado</h3>
+                <h3 className="text-lg font-bold font-headline">Ciclos de Interacción</h3>
                 <p className="text-sm text-muted-foreground">Clasifica tus conversaciones en "Activo", "En espera" o "Cerrado" para un seguimiento claro y ordenado.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <History className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Historial Completo</h3>
+                <h3 className="text-lg font-bold font-headline">Memoria de la Conexión</h3>
                 <p className="text-sm text-muted-foreground">Accede al historial de cada conversación para tener siempre a mano el contexto de cada interacción.</p>
               </div>
                <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                 <Bell className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Notificaciones Inteligentes</h3>
+                <h3 className="text-lg font-bold font-headline">Ecos del Portal</h3>
                 <p className="text-sm text-muted-foreground">Recibe avisos cuando tengas nuevos mensajes o tareas pendientes, sin sobrecargarte de información.</p>
               </div>
               <div className="grid gap-1 text-center p-4 rounded-lg hover:bg-secondary/50 transition-colors">
                  <ShieldCheck className="h-8 w-8 mx-auto text-primary" />
-                <h3 className="text-lg font-bold font-headline">Privacidad y Seguridad</h3>
+                <h3 className="text-lg font-bold font-headline">Santuario Seguro</h3>
                 <p className="text-sm text-muted-foreground">Toda la comunicación está protegida, garantizando la confidencialidad de la información de tu empresa.</p>
               </div>
             </div>
@@ -123,23 +123,23 @@ export default function Home() {
                 <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-1 md:gap-12 lg:grid-cols-3 lg:max-w-none mt-12">
                      <Card className="p-6 text-center">
                         <PlusCircle className="h-10 w-10 mx-auto text-primary mb-4" />
-                        <CardTitle className="font-headline mb-2">1. Crea una Conexión</CardTitle>
+                        <CardTitle className="font-headline mb-2">1. Abre un Portal</CardTitle>
                         <CardContent className="p-0 text-muted-foreground">
-                            Inicia una nueva conversación con un cliente, proveedor o empleado, definiendo un propósito claro para la interacción.
+                            Inicia una nueva conexión, definiendo un propósito claro para el viaje que comienza.
                         </CardContent>
                     </Card>
                      <Card className="p-6 text-center">
                         <Activity className="h-10 w-10 mx-auto text-primary mb-4" />
-                        <CardTitle className="font-headline mb-2">2. Comunícate</CardTitle>
+                        <CardTitle className="font-headline mb-2">2. Transita la Conexión</CardTitle>
                          <CardContent className="p-0 text-muted-foreground">
-                            Utiliza el chat para enviar mensajes, compartir archivos y asignar tareas. Todo se guarda para consulta futura.
+                            Utiliza el chat para un diálogo profundo. Todo se guarda como memoria del viaje.
                         </CardContent>
                     </Card>
                      <Card className="p-6 text-center">
                         <Wand2 className="h-10 w-10 mx-auto text-primary mb-4" />
-                        <CardTitle className="font-headline mb-2">3. Gestiona y Finaliza</CardTitle>
+                        <CardTitle className="font-headline mb-2">3. Cierra el Ciclo</CardTitle>
                          <CardContent className="p-0 text-muted-foreground">
-                            Mueve la conexión a través de los estados "En Progreso" y "Terminada" para mantener tu tablero siempre organizado.
+                            Mueve la conexión a través de sus estados naturales para mantener tu espacio interior en armonía.
                         </CardContent>
                     </Card>
                 </div>
@@ -149,9 +149,9 @@ export default function Home() {
         <section id="why-us" className="w-full py-12 md:py-24 lg:py-32 bg-secondary/30">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">¿Por Qué Elegir AFKDpu?</h2>
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight font-headline">¿Por Qué AFKDpu?</h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                En un mundo que exige inmediatez, AFKDpu te devuelve el control sobre tu tiempo. Fomenta una comunicación más reflexiva y menos reactiva, mejorando la productividad y reduciendo el estrés para todo tu equipo.
+                En un mundo de inmediatez, AFKDpu te invita a la presencia. Fomenta una comunicación más reflexiva y menos reactiva, transformando la productividad en un acto de conciencia y reduciendo el estrés.
               </p>
             </div>
           </div>
@@ -160,9 +160,9 @@ export default function Home() {
         <section id="join" className="w-full py-12 md:py-24 lg:py-32">
             <div className="container text-center">
                 <Heart className="h-12 w-12 mx-auto text-primary mb-4" />
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">Únete a AFKDpu</h2>
+                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl font-headline">Entra al Portal</h2>
                 <p className="max-w-2xl mx-auto text-muted-foreground md:text-xl/relaxed mt-4">
-                    Transforma la manera en que tu empresa se comunica. Fomenta la claridad, la organización y el respeto por el tiempo de todos.
+                    Transforma la manera en que te conectas. Fomenta la claridad, la organización y el respeto por tu propio tiempo y el de los demás.
                 </p>
                 <div className="mt-8">
                      <Button size="lg" asChild>

@@ -18,7 +18,7 @@ export const CurrencyIcon = ({ className, ...props }: React.SVGProps<SVGSVGEleme
     <circle cx="300" cy="300" r="280" stroke="#4b0082" strokeWidth="4" fill="url(#portalGradient)" />
     <circle cx="300" cy="300" r="200" stroke="#8a2be2" strokeWidth="2" strokeDasharray="10,10" />
     <path d="M300 120 Q320 300 300 480 Q280 300 300 120 Z" fill="#ffffff22" stroke="#ffffffaa" strokeWidth="2"/>
-    <text x="300" y="315" fontSize="32" textAnchor="middle" fill="#ffffff" style={{fontFamily: "var(--font-space-grotesk), sans-serif"}}>
+    <text x="300" y="310" fontSize="24" textAnchor="middle" fill="#ffffff" style={{fontFamily: "serif"}}>
       ENTRA
     </text>
   </svg>

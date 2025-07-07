@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Share2, Loader2, ArrowRight, User, Briefcase, UserCog } from "lucide-react";
+import { Loader2, ArrowRight, User, Briefcase, UserCog } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { type User as AppUser } from '@/lib/mock-data';
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Logo } from '@/components/Logo';
 
 const roleData: { role: AppUser['role'], icon: React.ElementType, description: string }[] = [
   {
@@ -113,14 +114,13 @@ export default function RegisterPage() {
     <div className="flex items-center justify-center min-h-screen bg-secondary/50 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <Link href="/" className="flex items-center gap-2 justify-center mb-4">
-             <Share2 className="h-6 w-6 text-primary" />
-             <span className="text-2xl font-bold font-headline text-primary">AFKDpu</span>
-           </Link>
+          <div className="flex justify-center mb-4">
+            <Logo href="/" />
+          </div>
            {step === 1 && (
             <>
-                <CardTitle className="text-2xl font-headline">Crear una cuenta (Paso 1 de 2)</CardTitle>
-                <CardDescription>Ingresa tus datos básicos para empezar.</CardDescription>
+                <CardTitle className="text-2xl font-headline">Iniciar el Viaje (Paso 1 de 2)</CardTitle>
+                <CardDescription>Crea tu identidad para entrar al portal.</CardDescription>
             </>
            )}
            {step === 2 && (
@@ -218,7 +218,7 @@ export default function RegisterPage() {
                         href="/login"
                         className="underline underline-offset-4 hover:text-primary"
                     >
-                        Iniciar sesión
+                        Cruzar el Umbral
                     </Link>
                     </p>
                 </CardFooter>

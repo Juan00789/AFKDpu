@@ -56,8 +56,8 @@ function ActiveConnectionsSummary() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Conexiones Activas</CardTitle>
-          <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
+          <CardTitle>Portales Activos</CardTitle>
+          <CardDescription>Un resumen de tus viajes actuales.</CardDescription>
         </CardHeader>
         <CardContent className="flex h-48 items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin" />
@@ -70,8 +70,8 @@ function ActiveConnectionsSummary() {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-            <CardTitle>Conexiones Activas</CardTitle>
-            <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
+            <CardTitle>Portales Activos</CardTitle>
+            <CardDescription>Un resumen de tus viajes actuales.</CardDescription>
         </div>
         {appUser && <AddConnectionDialog />}
       </CardHeader>
@@ -80,7 +80,7 @@ function ActiveConnectionsSummary() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Propósito</TableHead>
+                <TableHead>Propósito del Portal</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Participantes</TableHead>
                 <TableHead>Duración</TableHead>
@@ -109,7 +109,7 @@ function ActiveConnectionsSummary() {
                       <Button variant="ghost" size="icon" asChild>
                           <Link href={`/dashboard/connections/${conn.id}`}>
                               <ArrowRight className="h-4 w-4" />
-                              <span className="sr-only">Ver conexión</span>
+                              <span className="sr-only">Ver portal</span>
                           </Link>
                       </Button>
                   </TableCell>
@@ -118,7 +118,7 @@ function ActiveConnectionsSummary() {
             </TableBody>
           </Table>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-8">No tienes conexiones activas en este momento.</p>
+          <p className="text-sm text-muted-foreground text-center py-8">No tienes portales activos en este momento.</p>
         )}
       </CardContent>
     </Card>
@@ -132,21 +132,21 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold font-headline">¡Bienvenido, {appUser?.name}!</h1>
-        <p className="text-muted-foreground">Aquí tienes un resumen de tu actividad reciente en AFKDpu.</p>
+        <h1 className="text-3xl font-bold font-headline">¡Bienvenido a tu Espacio Interior, {appUser?.name}!</h1>
+        <p className="text-muted-foreground">Aquí tienes un resumen de tus portales activos y tu viaje reciente en AFKDpu.</p>
       </div>
       <ActiveConnectionsSummary />
        <Card>
         <CardHeader>
-            <CardTitle>Historial Reciente</CardTitle>
-            <CardDescription>Los últimos eventos importantes en tus conexiones.</CardDescription>
+            <CardTitle>Memorias Recientes</CardTitle>
+            <CardDescription>Los últimos eventos importantes en tus viajes.</CardDescription>
         </CardHeader>
         <CardContent>
              <div className="text-center text-muted-foreground py-8">
                 <HistoryIcon className="mx-auto h-12 w-12 text-gray-300" />
-                <p className="mt-4">El historial de eventos aparecerá aquí.</p>
+                <p className="mt-4">El archivo de memorias aparecerá aquí.</p>
                 <Button variant="secondary" className="mt-4" asChild>
-                    <Link href="/dashboard/history">Ver todo el historial</Link>
+                    <Link href="/dashboard/history">Ver todas las memorias</Link>
                 </Button>
             </div>
         </CardContent>

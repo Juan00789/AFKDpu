@@ -102,9 +102,9 @@ function UserMenu() {
 }
 
 const baseNavItems = [
-    { href: "/dashboard", icon: Home, label: "Panel General" },
-    { href: "/dashboard/connections", icon: Users, label: "Mis Conexiones" },
-    { href: "/dashboard/history", icon: History, label: "Historial" },
+    { href: "/dashboard", icon: Home, label: "Tu Espacio Interior" },
+    { href: "/dashboard/connections", icon: Users, label: "Mis Portales" },
+    { href: "/dashboard/history", icon: History, label: "Memorias" },
 ];
 
 const advertisingNavItem = { href: "/dashboard/advertising", icon: Megaphone, label: "Publicidad" };
@@ -142,9 +142,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   ];
 
   const getPageTitle = () => {
-    if (pathname === '/dashboard') return "Panel General";
-    if (pathname.startsWith('/dashboard/users/')) return "Perfil de Usuario";
-    const activeItem = navItems.find(item => item.href !== '/dashboard' && pathname.startsWith(item.href));
+    if (pathname.startsWith('/dashboard/users/')) return "Perfil de Viajero";
+    const activeItem = navItems.find(item => pathname.startsWith(item.href));
     return activeItem?.label || "AFKDpu";
   }
 

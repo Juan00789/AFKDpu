@@ -101,15 +101,15 @@ export default function ConnectionsKanbanPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold font-headline">Tablero de Conexiones</h2>
-          <p className="text-muted-foreground">Gestiona tus conversaciones y tareas por estado.</p>
+          <h2 className="text-2xl font-bold font-headline">Tablero de Portales</h2>
+          <p className="text-muted-foreground">Gestiona tus viajes por su ciclo de vida.</p>
         </div>
         {appUser && <AddConnectionDialog />}
       </div>
       <div className="grid md:grid-cols-3 gap-6 items-start">
         <Card className="bg-secondary/50">
           <CardHeader>
-            <CardTitle>Activo ({activeConnections.length})</CardTitle>
+            <CardTitle>Ciclo: Activo ({activeConnections.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {activeConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
@@ -117,7 +117,7 @@ export default function ConnectionsKanbanPage() {
         </Card>
         <Card className="bg-secondary/50">
           <CardHeader>
-            <CardTitle>En espera ({waitingConnections.length})</CardTitle>
+            <CardTitle>Ciclo: En espera ({waitingConnections.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {waitingConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
@@ -125,7 +125,7 @@ export default function ConnectionsKanbanPage() {
         </Card>
         <Card className="bg-secondary/50">
           <CardHeader>
-            <CardTitle>Cerrado ({closedConnections.length})</CardTitle>
+            <CardTitle>Ciclo: Cerrado ({closedConnections.length})</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {closedConnections.map(conn => <ConnectionCard key={conn.id} connection={conn} />)}
