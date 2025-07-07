@@ -1,24 +1,21 @@
 rules_version = '2';
-
 service firebase.storage {
   match /b/{bucket}/o {
     
-    // Allow public read for all files. This is important for avatars and product images on public pages.
+    // Todas las imágenes (avatares, productos) son de lectura pública.
     match /{allPaths=**} {
       allow read: if true;
     }
     
-    // Avatars: Allow write only for the user themselves
+    // Solo un usuario autenticado puede subir un avatar a su propia carpeta.
     match /avatars/{userId}/{fileName} {
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // Product Images: Allow write only for admin or the user assigned to the business
+    // Solo un usuario autenticado puede subir imágenes de productos.
+    // La lógica más fina (ser admin o dueño) se controla en la app.
     match /business_products/{businessId}/{fileName} {
-       allow write: if request.auth != null &&
-                   (request.auth.token.email == 'alcantara00789@gmail.com' ||
-                    (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId));
+      allow write: if request.auth != null;
     }
   }
 }

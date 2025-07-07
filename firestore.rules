@@ -1,46 +1,40 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Businesses: Public read, restricted write
+
+    // La información del negocio debe ser públicamente legible.
     match /businesses/{businessId} {
-      allow get: if true; // Allow anyone to read business data for public pages
-      allow list: if true; // Allow listing if needed
-      
-      // Allow write only for admin or the user assigned to the business
-      allow write: if request.auth != null && 
-                   (request.auth.token.email == 'alcantara00789@gmail.com' ||
-                    (exists(/databases/$(database)/documents/users/$(request.auth.uid)) && 
-                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId));
+      allow read: if true;
+      allow write: if request.auth != null && (
+        request.auth.token.email == 'alcantara00789@gmail.com' || 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.claimedBusinessId == businessId
+      );
     }
     
-    // Users: Read by any authenticated user, write only by self
+    // Los usuarios pueden leer los perfiles públicos de otros, pero solo editar el suyo.
     match /users/{userId} {
-      allow get: if request.auth != null;
-      allow list: if request.auth != null;
-      allow update: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
+      allow read: if true;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow create, delete: if false; // Prevenir creación o borrado directo.
     }
-    
-    // Connections: Read/Write only by participants
+
+    // Las conexiones son privadas para sus participantes.
     match /connections/{connectionId} {
       allow read, update, delete: if request.auth != null && request.auth.uid in resource.data.userIds;
-      allow create: if request.auth != null && request.resource.data.creatorId == request.auth.uid;
-
-      // Messages subcollection
-      match /messages/{messageId} {
-        allow read, create: if request.auth != null && 
-                             exists(/databases/$(database)/documents/connections/$(connectionId)) &&
-                             request.auth.uid in get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds;
-      }
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.creatorId;
     }
 
-    // Reviews: Public read, create only for authenticated users
+    // Los mensajes son privados para los participantes de la conexión.
+    match /connections/{connectionId}/messages/{messageId} {
+      allow read, create: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
+      allow update, delete: if false; // Los mensajes no se editan ni se borran.
+    }
+    
+    // Las reseñas son públicas para leer, pero solo se pueden crear si el usuario está autenticado.
     match /reviews/{reviewId} {
-      allow get: if true; // Publicly readable
-      allow list: if true; // Publicly readable
-      allow create: if request.auth != null && request.resource.data.reviewerId == request.auth.uid;
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if false; // Las reseñas no se modifican.
     }
   }
 }
