@@ -15,7 +15,7 @@ export type Connection = {
   participants: User[];
 };
 
-export type Task = {
+export type Service = {
   id: string;
   title: string;
   status: "Abierto" | "En Progreso" | "Terminadas";
@@ -39,7 +39,7 @@ export const mockConnections: Connection[] = [
   { id: 'conn-4', name: 'Integración API', status: 'Vibrante', duration: '40 días restantes', participants: [mockUsers[2], mockUsers[1]] },
 ];
 
-export const mockTasks: Task[] = [
+export const mockServices: Service[] = [
   { id: 'task-1', title: 'Definir KPIs de campaña', status: 'En Progreso', connectionId: 'conn-2', connectionName: 'Campaña de Marketing Q3', participants: [mockUsers[2], mockUsers[3]] },
   { id: 'task-2', title: 'Revisión de wireframes', status: 'Terminadas', connectionId: 'conn-3', connectionName: 'Desarrollo App Móvil', participants: [mockUsers[0], mockUsers[3]] },
   { id: 'task-3', title: 'Kick-off del proyecto', status: 'Terminadas', connectionId: 'conn-1', connectionName: 'Proyecto Phoenix', participants: [mockUsers[0], mockUsers[1]] },

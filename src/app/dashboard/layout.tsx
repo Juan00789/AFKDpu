@@ -19,7 +19,7 @@ import {
 import {
   Home,
   Users,
-  ListTodo,
+  Briefcase,
   History,
   Settings,
   LogOut,
@@ -102,7 +102,7 @@ function UserMenu() {
 const navItems = [
     { href: "/dashboard", icon: Home, label: "Inicio" },
     { href: "/dashboard/connections", icon: Users, label: "Mis Conexiones" },
-    { href: "/dashboard/tasks", icon: ListTodo, label: "Mis Tareas" },
+    { href: "/dashboard/tasks", icon: Briefcase, label: "Mis Servicios" },
     { href: "/dashboard/history", icon: History, label: "Historial" },
     { href: "/dashboard/settings", icon: Settings, label: "Configuración" },
     { href: "/dashboard/quiz", icon: HelpCircle, label: "Cuestionario" },
@@ -139,7 +139,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                  <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
                         asChild
-                        isActive={pathname === item.href}
+                        isActive={pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard')}
                         tooltip={{children: item.label}}
                     >
                         <Link href={item.href}>
@@ -160,7 +160,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                  <SidebarTrigger className="sm:hidden" />
                  <div className="flex-1">
                     <h1 className="font-headline text-2xl font-semibold tracking-tight">
-                        {navItems.find(item => pathname.startsWith(item.href))?.label || "AFKDpu"}
+                        {navItems.find(item => pathname.startsWith(item.href) && (item.href !== '/dashboard' || pathname === '/dashboard'))?.label || "AFKDpu"}
                     </h1>
                  </div>
             </header>

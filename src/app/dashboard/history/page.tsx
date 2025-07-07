@@ -17,7 +17,7 @@ const historyEvents = [
     type: "task_completed",
     icon: Edit3,
     color: "text-blue-500",
-    title: "Tarea completada: 'Revisión de wireframes'",
+    title: "Servicio completado: 'Revisión de wireframes'",
     description: "En la conexión 'Desarrollo App Móvil'.",
     timestamp: "hace 1 día",
   },

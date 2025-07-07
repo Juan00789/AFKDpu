@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { mockConnections, mockTasks, Task } from "@/lib/mock-data"
+import { mockConnections, mockServices, Service } from "@/lib/mock-data"
 import { cva } from "class-variance-authority"
 import { MoreHorizontal, Users, ArrowRight } from "lucide-react"
 import Link from "next/link"
@@ -74,18 +74,18 @@ function ConnectionsTable() {
   )
 }
 
-function TaskCard({ task }: { task: Task }) {
+function ServiceCard({ service }: { service: Service }) {
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-4">
-        <p className="text-sm font-medium">{task.title}</p>
+        <p className="text-sm font-medium">{service.title}</p>
         <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
             <div className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
-                <span>{task.connectionName}</span>
+                <span>{service.connectionName}</span>
             </div>
           <div className="flex items-center -space-x-1">
-             {task.participants.map(p => (
+             {service.participants.map(p => (
                 <Avatar key={p.id} className="h-5 w-5 border-2 border-card">
                   <AvatarImage src={p.avatar} />
                   <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
@@ -98,34 +98,34 @@ function TaskCard({ task }: { task: Task }) {
   )
 }
 
-function TasksBoard() {
-  const openTasks = mockTasks.filter(t => t.status === "Abierto");
-  const inProgressTasks = mockTasks.filter(t => t.status === "En Progreso");
-  const doneTasks = mockTasks.filter(t => t.status === "Terminadas");
+function ServicesBoard() {
+  const openServices = mockServices.filter(t => t.status === "Abierto");
+  const inProgressServices = mockServices.filter(t => t.status === "En Progreso");
+  const doneServices = mockServices.filter(t => t.status === "Terminadas");
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mis Tareas</CardTitle>
-        <CardDescription>Tareas asociadas a tus conexiones, organizadas por estado.</CardDescription>
+        <CardTitle>Mis Servicios</CardTitle>
+        <CardDescription>Servicios asociados a tus conexiones, organizados por estado.</CardDescription>
       </CardHeader>
       <CardContent className="grid md:grid-cols-3 gap-6">
         <div className="space-y-4">
-          <h3 className="font-headline font-semibold">Abierto ({openTasks.length})</h3>
+          <h3 className="font-headline font-semibold">Abierto ({openServices.length})</h3>
           <div className="space-y-2">
-            {openTasks.map(task => <TaskCard key={task.id} task={task} />)}
+            {openServices.map(service => <ServiceCard key={service.id} service={service} />)}
           </div>
         </div>
         <div className="space-y-4">
-          <h3 className="font-headline font-semibold">En Progreso ({inProgressTasks.length})</h3>
+          <h3 className="font-headline font-semibold">En Progreso ({inProgressServices.length})</h3>
           <div className="space-y-2">
-            {inProgressTasks.map(task => <TaskCard key={task.id} task={task} />)}
+            {inProgressServices.map(service => <ServiceCard key={service.id} service={service} />)}
           </div>
         </div>
         <div className="space-y-4">
-          <h3 className="font-headline font-semibold">Terminadas ({doneTasks.length})</h3>
+          <h3 className="font-headline font-semibold">Terminadas ({doneServices.length})</h3>
           <div className="space-y-2">
-            {doneTasks.map(task => <TaskCard key={task.id} task={task} />)}
+            {doneServices.map(service => <ServiceCard key={service.id} service={service} />)}
           </div>
         </div>
       </CardContent>
@@ -137,7 +137,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <ConnectionsTable />
-      <TasksBoard />
+      <ServicesBoard />
     </div>
   )
 }
