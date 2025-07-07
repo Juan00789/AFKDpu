@@ -1,15 +1,45 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // Reglas para la colección 'users'
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-    match /connections/{connectionId} {
-      // A user can read or update a connection if they are a participant.
-      allow read, update: if request.auth != null && resource.data.userIds.hasAny([request.auth.uid]);
+      // Cualquier usuario autenticado puede crear su propio perfil.
+      allow create: if request.auth != null && request.auth.uid == userId;
       
-      // A user can create a connection if they are listed as a participant in the new connection.
-      allow create: if request.auth != null && request.resource.data.userIds.hasAny([request.auth.uid]);
+      // Solo el propietario del perfil puede leerlo y actualizarlo.
+      allow read, update: if request.auth != null && request.auth.uid == userId;
+      
+      // Nadie puede eliminar perfiles por ahora para mantener la integridad.
+      allow delete: if false;
+    }
+
+    // Reglas para la colección 'connections'
+    match /connections/{connectionId} {
+      // Un usuario puede leer una conexión si su ID está en la lista de participantes.
+      allow read: if request.auth != null && request.auth.uid in resource.data.userIds;
+      
+      // Un usuario puede crear una conexión si su ID está en la lista de participantes.
+      allow create: if request.auth != null && request.auth.uid in request.resource.data.userIds;
+
+      // Un usuario puede actualizar una conexión si su ID está en la lista de participantes.
+      allow update: if request.auth != null && request.auth.uid in resource.data.userIds;
+      
+      // Nadie puede eliminar conexiones por ahora.
+      allow delete: if false;
+
+      // Reglas para la subcolección 'messages'
+      match /messages/{messageId} {
+        // Permite leer mensajes solo si el usuario es participante de la conexión padre.
+        allow read: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]);
+
+        // Permite crear mensajes si el usuario es participante y es el remitente.
+        allow create: if request.auth != null && get(/databases/$(database)/documents/connections/$(connectionId)).data.userIds.hasAny([request.auth.uid]) && request.resource.data.senderId == request.auth.uid;
+        
+        // No se permite actualizar ni borrar mensajes para mantener el historial.
+        allow update, delete: if false;
+      }
     }
   }
 }

@@ -11,7 +11,7 @@ export type Connection = {
   id: string;
   purpose: string;
   status: "Abierto" | "En Progreso" | "Terminadas";
-  participants: User[];
+  participants: Omit<User, 'objectives'>[];
   userIds: string[];
   duration: string;
   rules: string;
@@ -19,4 +19,13 @@ export type Connection = {
     seconds: number;
     nanoseconds: number;
   }
+};
+
+export type Message = {
+  id: string;
+  text: string;
+  createdAt: any; // Firestore Timestamp
+  senderId: string;
+  senderName: string;
+  senderAvatar: string;
 };

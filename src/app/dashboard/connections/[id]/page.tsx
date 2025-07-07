@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,46 +7,96 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Connection } from "@/lib/mock-data";
+import { Connection, Message } from "@/lib/mock-data";
 import { Send, Loader2, AlertTriangle } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, addDoc, serverTimestamp, query, onSnapshot, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import React from 'react';
+import { formatRelative } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 export default function ConnectionDetailPage({ params }: { params: { id: string } }) {
   const { appUser } = useAuth();
   const [connection, setConnection] = useState<Connection | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+
+  const [connectionLoading, setConnectionLoading] = useState(true);
+  const [messagesLoading, setMessagesLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (!params.id) return;
+    if (params.id) {
+      const fetchConnection = async () => {
+        setConnectionLoading(true);
+        setError(null);
+        try {
+          const connectionRef = doc(db, 'connections', params.id);
+          const connectionSnap = await getDoc(connectionRef);
 
-    const fetchConnection = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const connectionRef = doc(db, 'connections', params.id);
-        const connectionSnap = await getDoc(connectionRef);
-
-        if (connectionSnap.exists()) {
-          setConnection({ id: connectionSnap.id, ...connectionSnap.data() } as Connection);
-        } else {
-          setError("No se encontró la conexión.");
+          if (connectionSnap.exists()) {
+            setConnection({ id: connectionSnap.id, ...connectionSnap.data() } as Connection);
+          } else {
+            setError("No se encontró la conexión.");
+          }
+        } catch (err) {
+          console.error(err);
+          setError("Error al cargar la conexión.");
+        } finally {
+          setConnectionLoading(false);
         }
-      } catch (err) {
-        console.error(err);
-        setError("Error al cargar la conexión.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
+      fetchConnection();
 
-    fetchConnection();
+      const messagesQuery = query(collection(db, 'connections', params.id, 'messages'), orderBy('createdAt', 'asc'));
+      const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
+        const messagesData: Message[] = [];
+        querySnapshot.forEach((doc) => {
+          messagesData.push({ id: doc.id, ...doc.data() } as Message);
+        });
+        setMessages(messagesData);
+        setMessagesLoading(false);
+      }, (err) => {
+        console.error("Error fetching messages:", err);
+        setError("Error al cargar los mensajes.");
+        setMessagesLoading(false);
+      });
+
+      return () => unsubscribe();
+    }
   }, [params.id]);
 
-  if (loading) {
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [messages]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !appUser || !params.id) return;
+
+    try {
+      await addDoc(collection(db, 'connections', params.id, 'messages'), {
+        text: newMessage,
+        createdAt: serverTimestamp(),
+        senderId: appUser.id,
+        senderName: appUser.name,
+        senderAvatar: appUser.avatar,
+      });
+      setNewMessage("");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setError("No se pudo enviar el mensaje. Revisa los permisos.");
+    }
+  };
+
+  const isLoading = connectionLoading;
+
+  if (isLoading) {
     return (
         <div className="flex h-screen items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
@@ -72,7 +122,12 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
     );
   }
 
-  const otherParticipant = connection.participants.find(p => p.id !== appUser.id) || connection.participants[0];
+  const formatTimestamp = (timestamp: any) => {
+    if (!timestamp) return 'Ahora';
+    const date = timestamp.toDate();
+    return formatRelative(date, new Date(), { locale: es });
+  };
+
 
   return (
     <div className="grid md:grid-cols-1 gap-6">
@@ -99,48 +154,56 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
             <div className="h-[60vh] flex flex-col">
                  <p className="text-center text-xs text-muted-foreground py-2">Los mensajes se guardan hasta que el destinatario los vea.</p>
                 <Separator />
-              <ScrollArea className="flex-1 p-4">
+              <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
                 <div className="space-y-4">
-                  <div className="flex items-end gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={otherParticipant.avatar} />
-                      <AvatarFallback>{otherParticipant.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="rounded-lg bg-muted p-3 max-w-[75%]">
-                      <p className="text-sm">Hola, te escribo para confirmar que hemos recibido el pago. Quedamos a la espera de la documentación pendiente.</p>
-                      <p className="text-xs text-muted-foreground text-right mt-1">Ayer a las 4:30 PM</p>
+                  {messagesLoading ? (
+                    <div className="flex justify-center items-center h-full">
+                      <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
-                  </div>
-                   <div className="flex items-end gap-2 justify-end">
-                     <div className="rounded-lg bg-primary text-primary-foreground p-3 max-w-[75%]">
-                      <p className="text-sm">Perfecto, gracias por confirmar. Enviaré los documentos mañana por la mañana.</p>
-                       <p className="text-xs text-primary-foreground/80 text-right mt-1">Hace 2 minutos</p>
+                  ) : messages.length === 0 ? (
+                     <div className="text-center text-muted-foreground py-16">
+                      <p>No hay mensajes todavía.</p>
+                      <p className="text-sm">¡Sé el primero en iniciar la conversación!</p>
                     </div>
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={appUser.avatar} />
-                      <AvatarFallback>{appUser.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </div>
-                   <div className="flex items-end gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={otherParticipant.avatar} />
-                      <AvatarFallback>{otherParticipant.name.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="rounded-lg bg-muted p-3 max-w-[75%]">
-                      <p className="text-sm">Entendido, estaré atento.</p>
-                      <p className="text-xs text-muted-foreground text-right mt-1">Ahora</p>
-                    </div>
-                  </div>
+                  ) : (
+                    messages.map((msg) => (
+                      <div key={msg.id} className={`flex items-end gap-2 ${msg.senderId === appUser.id ? 'justify-end' : ''}`}>
+                         {msg.senderId !== appUser.id && (
+                           <Avatar className="h-8 w-8">
+                             <AvatarImage src={msg.senderAvatar} />
+                             <AvatarFallback>{msg.senderName.charAt(0)}</AvatarFallback>
+                           </Avatar>
+                         )}
+                        <div className={`rounded-lg p-3 max-w-[75%] ${msg.senderId === appUser.id ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                          <p className="text-sm">{msg.text}</p>
+                          <p className={`text-xs mt-1 text-right ${msg.senderId === appUser.id ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                            {formatTimestamp(msg.createdAt)}
+                          </p>
+                        </div>
+                         {msg.senderId === appUser.id && (
+                           <Avatar className="h-8 w-8">
+                             <AvatarImage src={msg.senderAvatar} />
+                             <AvatarFallback>{msg.senderName.charAt(0)}</AvatarFallback>
+                           </Avatar>
+                         )}
+                      </div>
+                    ))
+                  )}
                 </div>
               </ScrollArea>
-              <div className="p-4 border-t">
+              <form className="p-4 border-t" onSubmit={handleSendMessage}>
                 <div className="relative">
-                  <Input placeholder="Escribe un mensaje..." className="pr-12" />
-                  <Button variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8">
+                  <Input 
+                    placeholder="Escribe un mensaje..." 
+                    className="pr-12"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                  />
+                  <Button type="submit" variant="ghost" size="icon" className="absolute top-1/2 right-1 -translate-y-1/2 h-8 w-8" disabled={!newMessage.trim()}>
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
-              </div>
+              </form>
             </div>
           </CardContent>
         </Card>
