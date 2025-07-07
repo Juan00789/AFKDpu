@@ -1,0 +1,57 @@
+type User @table {
+  firebaseUid: String!
+  displayName: String!
+  email: String!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  profilePictureUrl: String
+  bio: String
+}
+
+type Movie @table {
+  title: String!
+  releaseYear: Int!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  summary: String
+  runtimeMinutes: Int
+  posterUrl: String
+  director: String
+}
+
+type Genre @table {
+  name: String!
+}
+
+type MovieGenre @table(key: ["movie", "genre"]) {
+  movie: Movie!
+  genre: Genre!
+  createdAt: Timestamp!
+}
+
+type Rating @table(key: ["user", "movie"]) {
+  user: User!
+  movie: Movie!
+  ratingValue: Int!
+  isPublic: Boolean!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  reviewText: String
+}
+
+type List @table {
+  user: User!
+  name: String!
+  isPublic: Boolean!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  description: String
+}
+
+type ListItem @table(key: ["list", "movie"]) {
+  list: List!
+  movie: Movie!
+  createdAt: Timestamp!
+  position: Int
+  notes: String
+}

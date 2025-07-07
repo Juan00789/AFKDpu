@@ -12,12 +12,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { type User } from "@/lib/mock-data"
-import { Edit, Upload, Loader2, Save, Star } from "lucide-react"
+import { Edit, Upload, Loader2, Save } from "lucide-react"
 import { storage, db } from '@/lib/firebase';
 import { ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, updateDoc, increment, DocumentData, PartialWithFieldValue } from "firebase/firestore";
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { CurrencyIcon } from '@/components/CurrencyIcon';
 
 function ReputationCard({ user }: { user: User }) {
     const getReputationLevel = (points: number) => {
@@ -37,7 +38,7 @@ function ReputationCard({ user }: { user: User }) {
             </CardHeader>
             <CardContent className="text-center space-y-4">
                 <div className="text-5xl font-bold text-primary flex items-center justify-center gap-2">
-                    <Star className="h-10 w-10" />
+                    <CurrencyIcon className="h-10 w-10" />
                     <span>{user.points}</span>
                 </div>
                 <Badge className={`${color} text-white text-lg`}>{level}</Badge>
