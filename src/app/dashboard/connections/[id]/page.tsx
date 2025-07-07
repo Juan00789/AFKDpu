@@ -176,8 +176,8 @@ export default function ConnectionDetailPage({ params }: { params: { id: string 
               </div>
             </div>
              <div className="flex items-center -space-x-2">
-                {connection.participants.map(p => (
-                  <Avatar key={p.id} className="h-10 w-10 border-2 border-background">
+                {connection.participants.map((p, index) => (
+                  <Avatar key={`${p.id}-${index}`} className="h-10 w-10 border-2 border-background">
                     <AvatarImage src={p.avatar} />
                     <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
                   </Avatar>

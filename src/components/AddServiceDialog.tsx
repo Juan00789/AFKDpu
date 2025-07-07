@@ -60,14 +60,15 @@ export function AddConnectionDialog() {
   });
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && appUser) {
       const fetchProviders = async () => {
         setLoadingProviders(true);
         try {
           const q = query(collection(db, 'users'), where('role', '==', 'Proveedor'));
           const querySnapshot = await getDocs(q);
           const providersData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
-          setProviders(providersData);
+          // A user cannot create a connection with themselves, so filter them out.
+          setProviders(providersData.filter(provider => provider.id !== appUser.id));
         } catch (error) {
           console.error('Error fetching providers:', error);
           toast({
@@ -81,7 +82,7 @@ export function AddConnectionDialog() {
       };
       fetchProviders();
     }
-  }, [isOpen, toast]);
+  }, [isOpen, appUser, toast]);
 
   const onSubmit = async (data: AddConnectionForm) => {
     if (!appUser) {

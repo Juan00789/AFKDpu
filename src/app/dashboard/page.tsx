@@ -9,7 +9,7 @@ import { ArrowRight, History as HistoryIcon, Loader2 } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { collection, query, where, onSnapshot, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { AddConnectionDialog } from "@/components/AddServiceDialog";
 
@@ -25,27 +25,27 @@ function ActiveConnectionsSummary() {
       collection(db, "connections"),
       where("userIds", "array-contains", appUser.id)
     );
+  
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+        let allConnections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Connection));
+        
+        // Sort connections by createdAt on the client side to avoid composite index
+        allConnections.sort((a, b) => {
+            if (a.createdAt && b.createdAt) {
+                return b.createdAt.seconds - a.createdAt.seconds;
+            }
+            return 0;
+        });
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const allConnections = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Connection));
-      
-      // Sort connections by createdAt on the client side to avoid composite index
-      allConnections.sort((a, b) => {
-        if (a.createdAt && b.createdAt) {
-          return b.createdAt.seconds - a.createdAt.seconds;
-        }
-        return 0;
-      });
+        const activeAndWaitingConnections = allConnections
+            .filter(c => c.status === "Activo" || c.status === "En espera")
+            .slice(0, 5);
 
-      const activeAndWaitingConnections = allConnections
-        .filter(c => c.status === "Activo" || c.status === "En espera")
-        .slice(0, 5);
-
-      setConnections(activeAndWaitingConnections);
-      setLoading(false);
+        setConnections(activeAndWaitingConnections);
+        setLoading(false);
     }, (error) => {
-      console.error("Error fetching active connections:", error);
-      setLoading(false);
+        console.error("Error fetching active connections:", error);
+        setLoading(false);
     });
 
     return () => unsubscribe();
@@ -73,7 +73,7 @@ function ActiveConnectionsSummary() {
             <CardTitle>Conexiones Activas</CardTitle>
             <CardDescription>Un resumen de tus conversaciones y tareas actuales.</CardDescription>
         </div>
-        <AddConnectionDialog />
+        {appUser && <AddConnectionDialog />}
       </CardHeader>
       <CardContent>
         {connections.length > 0 ? (
@@ -96,8 +96,8 @@ function ActiveConnectionsSummary() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center -space-x-2">
-                      {conn.participants.map(p => (
-                        <Avatar key={p.id} className="h-8 w-8 border-2 border-background">
+                      {conn.participants.map((p, index) => (
+                        <Avatar key={`${p.id}-${index}`} className="h-8 w-8 border-2 border-background">
                           <AvatarImage src={p.avatar} />
                           <AvatarFallback>{p.name.charAt(0)}</AvatarFallback>
                         </Avatar>
