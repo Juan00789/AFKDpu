@@ -9,11 +9,11 @@ export const stories: Story[] = [
     content: 'Una idea que surgió de la simple necesidad de resolver un problema cotidiano, convirtiéndose en una lección sobre velocidad y eficiencia.',
   },
   {
-    title: 'La Caída de Ledpop',
-    category: 'Aprendizaje',
+    title: 'El Resurgimiento de Ledpop',
+    category: 'Resiliencia',
     audioUrl: '',
-    quote: 'A veces, para ver la luz, primero todo tiene que apagarse.',
-    content: 'El fracaso más grande nos enseñó sobre la importancia de la resiliencia y cómo encontrar oportunidades en la adversidad.',
+    quote: 'Lo que parece un final es a menudo un nuevo comienzo.',
+    content: 'Transformar un fracaso en la base para algo nuevo y más fuerte nos enseñó que cada final es una oportunidad para resurgir.',
   },
   {
     title: 'Conexiones Inesperadas',
