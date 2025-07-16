@@ -5,9 +5,17 @@ const Footer = () => {
         <div className="grid gap-8 lg:grid-cols-2">
           <div>
             <h2 className="font-headline text-3xl font-bold tracking-tight text-primary-foreground">Sobre AFKDpu</h2>
-            <p className="mt-4 text-muted-foreground">
-              AFKDpu nació de una pérdida, un final abrupto que nos obligó a mirar hacia adentro. Fue en ese vacío donde encontramos los fragmentos de un propósito que nunca supimos que estábamos construyendo. Esta plataforma es el resultado de esa reconstrucción: un espacio para compartir el conocimiento, las lecciones y las chispas de creatividad que surgen de lo invisible, de lo no planificado.
-            </p>
+            <div className="mt-4 space-y-4 text-muted-foreground">
+              <p>
+                AFKDpu es mi proyecto de vida. Nació de lo que perdí y de lo que aprendí sin saberlo. Una chispa invisible que creció entre manuales espontáneos, amistades entrañables, y plataformas que se fueron… pero dejaron huella.
+              </p>
+              <p>
+                Este sitio es más que código. Es la reconstrucción de propósito, un homenaje a quienes me acompañaron cuando el mundo parecía apagarse. Aquí conecto QuickieRapidito, Ledpop, Pos Vesta, y todas esas ideas que me enseñaron a crear desde el corazón.
+              </p>
+              <p>
+                AFKDpu no pretende impresionar. Pretende recordar, guiar y reflejar. Es una casa digital para lo que fue invisible, y ahora vive… para quienes lo quieran sentir.
+              </p>
+            </div>
           </div>
           <div>
             <h3 className="font-headline text-2xl font-bold text-primary-foreground">Manifiesto</h3>
