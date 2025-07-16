@@ -1,8 +1,10 @@
+import { Phone, MessageCircle } from 'lucide-react';
+
 const Footer = () => {
   return (
     <footer className="w-full bg-card text-card-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-8 lg:grid-cols-3">
           <div>
             <h2 className="font-headline text-3xl font-bold tracking-tight text-primary-foreground">Sobre AFKDpu</h2>
             <div className="mt-4 space-y-4 text-muted-foreground">
@@ -22,6 +24,22 @@ const Footer = () => {
             <blockquote className="mt-4 border-l-2 border-accent pl-4 italic text-muted-foreground">
               Creemos en el poder de lo que se rompe. En la sabiduría que reside en los errores. En los manuales que se escriben sin tinta, con experiencia. Celebramos la fractura que precede a la transformación y el renacimiento que sigue. Aquí, lo que nunca se vio no solo se honra, sino que se convierte en faro.
             </blockquote>
+          </div>
+          <div>
+            <h3 className="font-headline text-2xl font-bold text-primary-foreground">Contacto Directo</h3>
+            <div className="mt-4 space-y-4 text-muted-foreground">
+              <p>
+                Para colaborar, conversar o compartir ideas invisibles que aún no han brillado, puedes escribirme.
+              </p>
+              <div className="flex items-center gap-3">
+                <Phone className="h-5 w-5 text-primary" />
+                <a href="tel:+18299226556" className="hover:underline">+1 (829) 922-6556</a>
+              </div>
+              <div className="flex items-center gap-3">
+                 <MessageCircle className="h-5 w-5 text-primary" />
+                 <span>Disponible vía WhatsApp y llamadas.</span>
+              </div>
+            </div>
           </div>
         </div>
         <div className="mt-8 border-t border-border pt-6 text-center text-sm text-muted-foreground">
