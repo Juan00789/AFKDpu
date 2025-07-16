@@ -2,11 +2,11 @@ import type { Story, TimelineEvent, Manual, CardContent } from './types';
 
 export const stories: Story[] = [
   {
-    title: 'El Nacimiento de QuickieRapidito',
-    category: 'Emprendimiento',
+    title: 'De QuickieRapidito a Ledpop',
+    category: 'Evolución',
     audioUrl: '',
-    quote: 'La necesidad es la madre de la invención, pero la frustración es el padre.',
-    content: 'Una idea que surgió de la simple necesidad de resolver un problema cotidiano, convirtiéndose en una lección sobre velocidad y eficiencia.',
+    quote: 'A veces, algo debe morir para que algo nuevo pueda nacer.',
+    content: 'QuickieRapidito no fue un fracaso, fue un sacrificio. Su estructura y aprendizaje fueron la semilla que permitió el nacimiento de Ledpop, enseñándonos que la verdadera innovación a menudo requiere dejar ir lo que funciona para construir algo que transforma.',
   },
   {
     title: 'El Resurgimiento de Ledpop',
