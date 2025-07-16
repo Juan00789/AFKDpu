@@ -29,6 +29,7 @@ export async function provideEmotionalResponse(input: ProvideEmotionalResponseIn
 
 const emotionalResponsePrompt = ai.definePrompt({
   name: 'emotionalResponsePrompt',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: {schema: ProvideEmotionalResponseInputSchema},
   output: {schema: z.object({response: z.string()})},
   prompt: `You are an AI Reflection Tool that analyzes user input and connects it with moments of wisdom, providing responses with visual and emotional spark.\n\nUser Input: {{{userInput}}}\n\nResponse:`,
