@@ -43,6 +43,11 @@ const provideEmotionalResponseFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await emotionalResponsePrompt(input);
+    const responseText = output?.response;
+
+    if (!responseText) {
+      throw new Error('Failed to generate a text response.');
+    }
 
      // Generate audio spark
     const { media: audioSpark } = await ai.generate({
@@ -55,7 +60,7 @@ const provideEmotionalResponseFlow = ai.defineFlow(
           },
         },
       },
-      prompt: output?.response ?? '',
+      prompt: responseText,
     });
 
     if (!audioSpark?.url) {
@@ -69,7 +74,7 @@ const provideEmotionalResponseFlow = ai.defineFlow(
     const audioWav = 'data:audio/wav;base64,' + (await toWav(audioBuffer))
 
     return {
-      response: output!.response,
+      response: responseText,
       sparkAudioUrl: audioWav
     };
   }
