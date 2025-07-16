@@ -4,7 +4,6 @@ import Hero from '@/components/sections/Hero';
 import Stories from '@/components/sections/Stories';
 import Timeline from '@/components/sections/Timeline';
 import Manuals from '@/components/sections/Manuals';
-import ReflectionTool from '@/components/sections/ReflectionTool';
 import GoodNews from '@/components/sections/GoodNews';
 
 export default function Home() {
@@ -17,7 +16,6 @@ export default function Home() {
         <Timeline />
         <Manuals />
         <GoodNews />
-        <ReflectionTool />
       </main>
       <Footer />
     </div>
