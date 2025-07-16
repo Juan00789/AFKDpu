@@ -4,8 +4,6 @@ export const stories: Story[] = [
   {
     title: 'El Nacimiento de QuickieRapidito',
     category: 'Emprendimiento',
-    image: 'https://placehold.co/600x400.png',
-    imageHint: 'startup office',
     audioUrl: '',
     quote: 'La necesidad es la madre de la invención, pero la frustración es el padre.',
     content: 'Una idea que surgió de la simple necesidad de resolver un problema cotidiano, convirtiéndose en una lección sobre velocidad y eficiencia.',
@@ -13,8 +11,6 @@ export const stories: Story[] = [
   {
     title: 'La Caída de Ledpop',
     category: 'Aprendizaje',
-    image: 'https://placehold.co/600x400.png',
-    imageHint: 'broken lightbulb',
     audioUrl: '',
     quote: 'A veces, para ver la luz, primero todo tiene que apagarse.',
     content: 'El fracaso más grande nos enseñó sobre la importancia de la resiliencia y cómo encontrar oportunidades en la adversidad.',
@@ -22,8 +18,6 @@ export const stories: Story[] = [
   {
     title: 'Conexiones Inesperadas',
     category: 'Comunidad',
-    image: 'https://placehold.co/600x400.png',
-    imageHint: 'friends talking',
     audioUrl: '',
     quote: 'Las mejores colaboraciones no se buscan, se encuentran en el camino.',
     content: 'Historias de cómo las amistades y alianzas fortuitas se convirtieron en el pilar de nuestros proyectos más significativos.',

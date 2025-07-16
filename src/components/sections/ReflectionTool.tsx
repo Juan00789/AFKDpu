@@ -1,8 +1,7 @@
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { provideEmotionalResponse, ProvideEmotionalResponseOutput } from '@/ai/flows/provide-emotional-response';
@@ -17,7 +16,6 @@ type State = ProvideEmotionalResponseOutput & {
 
 const initialState: State = {
   response: '',
-  sparkImageUrl: '',
   sparkAudioUrl: '',
   error: null,
 };
@@ -100,22 +98,9 @@ const ReflectionTool = () => {
               <Terminal className="h-4 w-4" />
               <AlertTitle className="font-headline">Tu Chispa de Sabiduría</AlertTitle>
               <AlertDescription className="mt-4">
-                <div className="grid gap-6 md:grid-cols-2">
-                    <div>
-                        <p className="text-foreground">{state.response}</p>
-                        {state.sparkAudioUrl && <audio ref={audioRef} controls className="mt-4 w-full" />}
-                    </div>
-                    {state.sparkImageUrl && (
-                        <div className="relative aspect-square">
-                        <Image
-                            src={state.sparkImageUrl}
-                            alt="Chispa visual generada por IA"
-                            layout="fill"
-                            objectFit="cover"
-                            className="rounded-lg"
-                        />
-                        </div>
-                    )}
+                <div>
+                    <p className="text-foreground">{state.response}</p>
+                    {state.sparkAudioUrl && <audio ref={audioRef} controls className="mt-4 w-full" />}
                 </div>
               </AlertDescription>
             </Alert>

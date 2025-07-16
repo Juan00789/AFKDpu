@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PlayCircle } from 'lucide-react';
@@ -18,16 +17,6 @@ const Stories = () => {
           {stories.map((story, index) => (
             <Card key={index} className="flex flex-col overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl">
               <CardHeader>
-                <div className="relative h-48 w-full">
-                  <Image
-                    src={story.image}
-                    alt={story.title}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-t-lg"
-                    data-ai-hint={story.imageHint}
-                  />
-                </div>
                 <CardTitle className="mt-4 font-headline text-2xl">{story.title}</CardTitle>
                 <Badge variant="outline" className="mt-1 w-fit bg-accent text-accent-foreground">{story.category}</Badge>
               </CardHeader>

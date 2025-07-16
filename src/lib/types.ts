@@ -1,8 +1,6 @@
 export type Story = {
   title: string;
   category: string;
-  image: string;
-  imageHint: string;
   audioUrl: string;
   quote: string;
   content: string;

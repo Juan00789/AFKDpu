@@ -19,7 +19,6 @@ export type ProvideEmotionalResponseInput = z.infer<typeof ProvideEmotionalRespo
 
 const ProvideEmotionalResponseOutputSchema = z.object({
   response: z.string().describe('The AI generated response with emotional connection.'),
-  sparkImageUrl: z.string().describe('URL of the generated visual spark image.'),
   sparkAudioUrl: z.string().describe('URL of the generated audio spark.'),
 });
 export type ProvideEmotionalResponseOutput = z.infer<typeof ProvideEmotionalResponseOutputSchema>;
@@ -43,19 +42,6 @@ const provideEmotionalResponseFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await emotionalResponsePrompt(input);
-
-    // Generate visual spark image
-    const {media: visualSpark} = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `Generate a visual representation of a spark, reflecting the wisdom and connection in the response: ${output?.response}`,
-      config: {
-        responseModalities: ['TEXT', 'IMAGE'],
-      },
-    });
-
-    if (!visualSpark?.url) {
-      throw new Error('Failed to generate visual spark image.');
-    }
 
      // Generate audio spark
     const { media: audioSpark } = await ai.generate({
@@ -83,7 +69,6 @@ const provideEmotionalResponseFlow = ai.defineFlow(
 
     return {
       response: output!.response,
-      sparkImageUrl: visualSpark.url,
       sparkAudioUrl: audioWav
     };
   }
@@ -115,4 +100,3 @@ async function toWav(
     writer.end();
   });
 }
-
