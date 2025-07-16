@@ -15,9 +15,11 @@ export type TimelineEvent = {
   description: string;
 };
 
-export type Manual = {
+export type CardContent = {
   title: string;
   description: string;
-  category: 'Diseño' | 'Código' | 'Emoción' | 'Comunidad';
+  category: 'Diseño' | 'Código' | 'Emoción' | 'Comunidad' | 'Impacto Social' | 'Innovación';
   tags: string[];
 };
+
+export type Manual = CardContent;
