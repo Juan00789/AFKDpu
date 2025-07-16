@@ -6,6 +6,13 @@ const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+const PatreonIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M15.225 4.075c-2.48 0-4.49 2.01-4.49 4.49s2.01 4.49 4.49 4.49 4.49-2.01 4.49-4.49-2.01-4.49-4.49-4.49zM3 4.075v15.85h3.63V4.075H3z" />
+  </svg>
+);
+
+
 const Footer = () => {
   return (
     <footer className="w-full bg-card text-card-foreground">
@@ -48,6 +55,10 @@ const Footer = () => {
                <div className="flex items-center gap-3">
                 <FacebookIcon className="h-5 w-5 text-primary" />
                 <a href="https://www.facebook.com/juanismael.alcantara" target="_blank" rel="noopener noreferrer" className="hover:underline">Juan Ismael Alcántara</a>
+              </div>
+              <div className="flex items-center gap-3">
+                <PatreonIcon className="h-5 w-5 text-primary" />
+                <a href="https://www.patreon.com/c/afkdpu" target="_blank" rel="noopener noreferrer" className="hover:underline">Apoya el proyecto en Patreon</a>
               </div>
             </div>
           </div>
