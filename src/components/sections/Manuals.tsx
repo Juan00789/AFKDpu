@@ -16,12 +16,12 @@ const Manuals = () => {
     : manuals.filter(manual => manual.category === activeFilter || manual.tags.includes(activeFilter));
 
   return (
-    <section id="manuals" className="bg-card">
+    <section id="manuals" className="bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Manuales Invisibles</h2>
+          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Mi Filosofía de Trabajo</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
-            Fragmentos de conocimiento que creamos sin saberlo.
+            Estos no son dogmas, son los principios que guían mi forma de crear, nacidos de la experiencia.
           </p>
         </div>
         <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -38,7 +38,7 @@ const Manuals = () => {
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredManuals.map((manual, index) => (
-            <Card key={index} className="transform transition-transform duration-300 hover:-translate-y-1">
+            <Card key={index} className="transform transition-transform duration-300 hover:-translate-y-1 bg-card">
               <CardHeader>
                 <CardTitle className="font-headline text-xl">{manual.title}</CardTitle>
                 <Badge variant="secondary" className="w-fit">{manual.category}</Badge>

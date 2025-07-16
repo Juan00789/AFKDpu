@@ -21,9 +21,9 @@ const Timeline = () => {
     <section id="timeline" className="bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Nuestra Línea de Tiempo</h2>
+          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Mi Trayectoria</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
-            Un viaje a través de las fases que nos dieron forma: Ignición, Fractura, Transformación y Renacimiento.
+            Un viaje a través de las fases que me dieron la experiencia para poder ayudarte hoy.
           </p>
         </div>
         <div className="relative mt-12">

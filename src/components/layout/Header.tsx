@@ -8,10 +8,10 @@ const Header = () => {
           AFKDpu
         </Link>
         <nav className="hidden space-x-4 md:flex">
-          <Link href="#stories" className="text-sm font-medium hover:underline underline-offset-4">Historias</Link>
-          <Link href="#timeline" className="text-sm font-medium hover:underline underline-offset-4">Línea de Tiempo</Link>
-          <Link href="#manuals" className="text-sm font-medium hover:underline underline-offset-4">Archivos</Link>
-          <Link href="#good-news" className="text-sm font-medium hover:underline underline-offset-4">Buenas Noticias</Link>
+          <Link href="#services" className="text-sm font-medium hover:underline underline-offset-4">Servicios</Link>
+          <Link href="#stories" className="text-sm font-medium hover:underline underline-offset-4">Mi Experiencia</Link>
+          <Link href="#timeline" className="text-sm font-medium hover:underline underline-offset-4">Trayectoria</Link>
+          <Link href="#manuals" className="text-sm font-medium hover:underline underline-offset-4">Filosofía</Link>
         </nav>
       </div>
     </header>
