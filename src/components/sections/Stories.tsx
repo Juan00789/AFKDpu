@@ -27,11 +27,13 @@ const Stories = () => {
                 <p className="mt-4 text-sm">{story.content}</p>
               </CardContent>
               <CardFooter>
-                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <PlayCircle className="h-5 w-5 text-primary" />
-                    <span>Escuchar la historia</span>
-                    <audio src={story.audioUrl} className="hidden"></audio>
-                </div>
+                 {story.audioUrl && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <PlayCircle className="h-5 w-5 text-primary" />
+                        <span>Escuchar la historia</span>
+                        <audio src={story.audioUrl} className="hidden"></audio>
+                    </div>
+                  )}
               </CardFooter>
             </Card>
           ))}
