@@ -15,3 +15,4 @@ Firebase es el hogar técnico donde AFKDpu vive y evoluciona. Aquí se implement
 *   **Firestore** como archivo de recuerdos, historias y manuales invisibles
 *   **Authentication** para proteger la intimidad del usuario y sus reflexiones
 *   **Funciones de backend** que permiten conectar la historia personal del visitante con insights automatizados usando IA
+# AFKDpu
