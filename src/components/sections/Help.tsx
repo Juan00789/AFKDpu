@@ -1,29 +1,26 @@
 import { Button } from '@/components/ui/button';
-import { ArrowDown, HeartHandshake } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 const Help = () => {
   return (
-    <section id="help" className="flex min-h-[70vh] items-center justify-center text-center bg-background">
+    <section 
+      id="help" 
+      className="flex min-h-[80vh] items-center justify-center text-center text-white bg-gradient-to-br from-blue-900 via-gray-800 to-orange-700"
+    >
       <div className="container mx-auto px-4 md:px-6">
         <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-          ¿Cómo puedo ayudarte?
+          Tu tecnología. Tu historia. Nuestro compromiso.
         </h1>
-        <p className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground md:text-xl">
-          Mi experiencia, nacida de la prueba y el error, está a tu disposición. Si tienes una idea, un proyecto atascado o necesitas una nueva perspectiva, conversemos.
+        <p className="mx-auto mt-6 max-w-3xl text-lg text-gray-200 md:text-xl">
+          Traduzco lo complejo en soluciones accesibles para que emprendas con seguridad. En AFKDpu, tu idea importa, tu éxito nos inspira.
         </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-           <Button asChild size="lg" variant="outline">
+        <div className="mt-8 flex justify-center">
+           <Button asChild size="lg">
             <Link href="#services">
               Ver mis servicios
-              <ArrowDown className="ml-2 h-5 w-5" />
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
-          </Button>
-          <Button asChild size="lg">
-            <a href="https://www.patreon.com/c/afkdpu" target="_blank" rel="noopener noreferrer">
-              Únete a la Causa
-              <HeartHandshake className="ml-2 h-5 w-5" />
-            </a>
           </Button>
         </div>
       </div>
