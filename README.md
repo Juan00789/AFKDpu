@@ -16,3 +16,4 @@ Firebase es el hogar técnico donde AFKDpu vive y evoluciona. Aquí se implement
 *   **Authentication** para proteger la intimidad del usuario y sus reflexiones
 *   **Funciones de backend** que permiten conectar la historia personal del visitante con insights automatizados usando IA
 # AFKDpu
+# Juan00789-AFKDpu
