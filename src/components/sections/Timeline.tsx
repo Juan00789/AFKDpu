@@ -10,10 +10,10 @@ const phaseIcons: { [key: string]: LucideIcon } = {
 };
 
 const phaseColors: { [key: string]: string } = {
-    'Ignición': 'text-orange-500',
-    'Fractura': 'text-red-500',
-    'Transformación': 'text-blue-500',
-    'Renacimiento': 'text-green-500',
+    'Ignición': 'text-[hsl(var(--chart-1))]',
+    'Fractura': 'text-[hsl(var(--chart-2))]',
+    'Transformación': 'text-[hsl(var(--chart-3))]',
+    'Renacimiento': 'text-[hsl(var(--chart-5))]',
 };
 
 const Timeline = () => {
