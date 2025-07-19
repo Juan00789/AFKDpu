@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { afkEcosystemFeatures } from '@/lib/data';
 import type { Feature } from '@/lib/types';
 import { Store, GraduationCap, LandPlot, Users, LayoutDashboard, GanttChartSquare } from 'lucide-react';
+import Link from 'next/link';
 
 const featureIcons: { [key: string]: React.ReactNode } = {
   'Marketplace local': <Store className="h-8 w-8 text-primary" />,
@@ -28,15 +29,17 @@ const Services = () => {
             <h3 className="font-headline text-2xl font-bold tracking-tight text-center mb-8">¿Qué incluye AFKEcosystem?</h3>
             <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {afkEcosystemFeatures.map((feature: Feature, index: number) => (
-                <Card key={index} className="flex flex-col transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg">
-                <CardHeader className="items-center text-center">
-                    {featureIcons[feature.title] || featureIcons['Default']}
-                    <CardTitle className="font-headline text-xl mt-4">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="flex-grow text-center">
-                    <p className="text-muted-foreground">{feature.description}</p>
-                </CardContent>
+              <Link href="https://studio--afkecosystem.us-central1.hosted.app" key={index} target="_blank" rel="noopener noreferrer" className="block">
+                <Card className="h-full flex flex-col transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-lg">
+                  <CardHeader className="items-center text-center">
+                      {featureIcons[feature.title] || featureIcons['Default']}
+                      <CardTitle className="font-headline text-xl mt-4">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex-grow text-center">
+                      <p className="text-muted-foreground">{feature.description}</p>
+                  </CardContent>
                 </Card>
+              </Link>
             ))}
             </div>
         </div>
