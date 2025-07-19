@@ -1,4 +1,4 @@
-import type { Story, TimelineEvent, Manual, CardContent } from './types';
+import type { Story, TimelineEvent, Manual, CardContent, Feature } from './types';
 
 export const stories: Story[] = [
   {
@@ -109,4 +109,28 @@ export const goodNews: CardContent[] = [
     description: 'Una aplicación para conectar vecinos y cuidar espacios verdes urbanos, nacida de la necesidad de reconectar con la naturaleza tras un burnout.',
     tags: ['Bienestar', 'Tecnología'],
   },
+];
+
+
+export const afkEcosystemFeatures: Feature[] = [
+    {
+        title: 'Marketplace local',
+        description: 'Espacio para ofrecer y encontrar servicios dentro de tu comunidad.',
+    },
+    {
+        title: 'Microcursos exprés',
+        description: 'Capacitación rápida (5–10 minutos) en temas como validación de ideas, marketing y finanzas.',
+    },
+    {
+        title: 'Microcréditos colaborativos',
+        description: 'Fondos rotatorios para apoyar proyectos emergentes.',
+    },
+    {
+        title: 'Mentorías y foros',
+        description: 'Conexión con expertos y otros emprendedores para compartir experiencias.',
+    },
+    {
+        title: 'Panel de control personalizado',
+        description: 'Donde cada usuario puede gestionar su perfil, cursos y oportunidades.',
+    },
 ];

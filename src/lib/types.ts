@@ -21,3 +21,8 @@ export type CardContent = {
 };
 
 export type Manual = CardContent;
+
+export type Feature = {
+  title: string;
+  description: string;
+};
