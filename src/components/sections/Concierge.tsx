@@ -1,16 +1,19 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import ReCAPTCHA from 'react-google-recaptcha';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader, Wand2 } from 'lucide-react';
+import { Loader, Wand2, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { askConcierge } from '@/ai/flows/concierge-flow';
+import { ImageUpload } from '@/components/ui/image-upload';
 
 const Concierge = () => {
   const [question, setQuestion] = useState('');
+  const [photoDataUri, setPhotoDataUri] = useState<string | null>(null);
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
@@ -19,6 +22,14 @@ const Concierge = () => {
 
   const handleRecaptchaChange = (token: string | null) => {
     setRecaptchaToken(token);
+  };
+
+  const handleImageUpload = (dataUri: string) => {
+    setPhotoDataUri(dataUri);
+  };
+  
+  const handleRemoveImage = () => {
+    setPhotoDataUri(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,7 +55,7 @@ const Concierge = () => {
     setIsLoading(true);
     setAnswer('');
     try {
-      const response = await askConcierge({ question, recaptchaToken });
+      const response = await askConcierge({ question, recaptchaToken, photoDataUri: photoDataUri || undefined });
       setAnswer(response.answer);
     } catch (error) {
       console.error('Error con la conserjería:', error);
@@ -66,7 +77,7 @@ const Concierge = () => {
         <div className="text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Tu Conserje Personal</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
-            ¿Atascado en un problema? ¿Necesitas una perspectiva diferente? Describe tu situación y recibirás una guía basada en mi experiencia y filosofía.
+            ¿Atascado en un problema? ¿Necesitas una perspectiva diferente? Describe tu situación, muéstrame una imagen si quieres, y recibirás una guía basada en mi experiencia y filosofía.
           </p>
         </div>
         <div className="mt-12 max-w-2xl mx-auto">
@@ -83,6 +94,28 @@ const Concierge = () => {
                   rows={4}
                   disabled={isLoading}
                 />
+                 {photoDataUri ? (
+                  <div className="relative">
+                    <Image
+                      src={photoDataUri}
+                      alt="Vista previa de la imagen"
+                      width={200}
+                      height={200}
+                      className="rounded-md object-contain max-h-48 w-auto"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 bg-background/50 hover:bg-background/80"
+                      onClick={handleRemoveImage}
+                    >
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Eliminar imagen</span>
+                    </Button>
+                  </div>
+                ) : (
+                  <ImageUpload onImageUploaded={handleImageUpload} disabled={isLoading} />
+                )}
                 <ReCAPTCHA
                   ref={recaptchaRef}
                   sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}

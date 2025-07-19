@@ -13,6 +13,9 @@ import { manuals } from '@/lib/data';
 const ConciergeInputSchema = z.object({
   question: z.string().describe("La pregunta o problema del usuario."),
   recaptchaToken: z.string().describe("El token de reCAPTCHA para verificación."),
+  photoDataUri: z.string().optional().describe(
+    "Una foto opcional relacionada con la pregunta, como un data URI que debe incluir un MIME type y usar Base64 encoding. Formato esperado: 'data:<mimetype>;base64,<encoded_data>'."
+  ),
 });
 type ConciergeInput = z.infer<typeof ConciergeInputSchema>;
 
@@ -30,7 +33,7 @@ const philosophy = manuals.map(m => `Principio: ${m.title} (${m.category}) - ${m
 
 const prompt = ai.definePrompt({
   name: 'conciergePrompt',
-  input: { schema: z.string() },
+  input: { schema: ConciergeInputSchema },
   output: { schema: ConciergeOutputSchema },
   prompt: `Eres una IA para AFKDpu, un proyecto sobre reconstruir con propósito. Tu tarea es responder a la pregunta de un usuario mediante un diálogo entre dos personajes:
 
@@ -40,10 +43,15 @@ const prompt = ai.definePrompt({
 Tu conocimiento se basa en la siguiente filosofía y manuales:
 ${philosophy}
 
-Un usuario tiene la siguiente pregunta. Crea un diálogo corto pero profundo entre el Fundador y el Amigo que aborde la pregunta del usuario. La respuesta debe ser útil, reflexiva y multifacética.
+Un usuario tiene la siguiente pregunta. {{#if photoDataUri}}También ha adjuntado una imagen para dar más contexto.{{/if}} Crea un diálogo corto pero profundo entre el Fundador y el Amigo que aborde la pregunta del usuario. La respuesta debe ser útil, reflexiva y multifacética.
 
 Pregunta del usuario:
-"{{{input}}}"
+"{{{question}}}"
+
+{{#if photoDataUri}}
+Imagen de referencia:
+{{media url=photoDataUri}}
+{{/if}}
 
 Formatea tu respuesta como un diálogo. Por ejemplo:
 Amigo: [Su pregunta o comentario]
@@ -75,7 +83,7 @@ const conciergeFlow = ai.defineFlow(
       throw new Error('Verificación de reCAPTCHA fallida.');
     }
 
-    const { output } = await prompt(input.question);
+    const { output } = await prompt(input);
     return output!;
   }
 );
