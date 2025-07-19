@@ -1,7 +1,7 @@
 export type Story = {
   title: string;
   category: string;
-  audioUrl: string;
+  audioUrl: string | null;
   quote: string;
   content: string;
 };

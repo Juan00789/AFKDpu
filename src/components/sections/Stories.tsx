@@ -1,9 +1,60 @@
+'use client';
+
+import { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { PlayCircle } from 'lucide-react';
-import { stories } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import { PlayCircle, Loader, XCircle } from 'lucide-react';
+import { stories as initialStories } from '@/lib/data';
+import type { Story } from '@/lib/types';
+import { generateAudio } from '@/ai/flows/generate-audio-flow';
+import { useToast } from '@/hooks/use-toast';
 
 const Stories = () => {
+  const [stories, setStories] = useState<Story[]>(initialStories);
+  const [loadingStory, setLoadingStory] = useState<string | null>(null);
+  const [activeAudio, setActiveAudio] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const handlePlayAudio = async (story: Story) => {
+    if (activeAudio === story.title) {
+      setActiveAudio(null);
+      return;
+    }
+    
+    if (story.audioUrl) {
+      setActiveAudio(story.title);
+      return;
+    }
+
+    setLoadingStory(story.title);
+    setActiveAudio(null);
+
+    try {
+      const textToSynthesize = `${story.title}. ${story.quote}. ${story.content}`;
+      const response = await generateAudio(textToSynthesize);
+      
+      if (response.media) {
+        const updatedStories = stories.map(s => 
+          s.title === story.title ? { ...s, audioUrl: response.media } : s
+        );
+        setStories(updatedStories);
+        setActiveAudio(story.title);
+      } else {
+        throw new Error('No se pudo generar el audio.');
+      }
+    } catch (error) {
+      console.error('Error generating audio:', error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo generar el audio para esta historia. Por favor, inténtalo de nuevo.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingStory(null);
+    }
+  };
+
   return (
     <section id="stories" className="bg-card">
       <div className="container mx-auto px-4 md:px-6">
@@ -26,14 +77,35 @@ const Stories = () => {
                 </blockquote>
                 <p className="mt-4 text-sm">{story.content}</p>
               </CardContent>
-              <CardFooter>
-                 {story.audioUrl && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <PlayCircle className="h-5 w-5 text-primary" />
-                        <span>Escuchar la historia</span>
-                        <audio src={story.audioUrl} className="hidden"></audio>
-                    </div>
+              <CardFooter className="flex flex-col items-start gap-4">
+                <Button
+                  onClick={() => handlePlayAudio(story)}
+                  disabled={loadingStory === story.title}
+                  variant="ghost"
+                  className="p-0 h-auto text-muted-foreground hover:text-primary"
+                >
+                  {loadingStory === story.title ? (
+                    <>
+                      <Loader className="h-5 w-5 mr-2 animate-spin" />
+                      <span>Generando audio...</span>
+                    </>
+                  ) : activeAudio === story.title ? (
+                     <>
+                      <XCircle className="h-5 w-5 mr-2 text-primary" />
+                      <span>Ocultar reproductor</span>
+                    </>
+                  ) : (
+                    <>
+                      <PlayCircle className="h-5 w-5 mr-2 text-primary" />
+                      <span>Escuchar la historia</span>
+                    </>
                   )}
+                </Button>
+                {activeAudio === story.title && story.audioUrl && (
+                  <audio controls src={story.audioUrl} className="w-full h-10">
+                    Your browser does not support the audio element.
+                  </audio>
+                )}
               </CardFooter>
             </Card>
           ))}
