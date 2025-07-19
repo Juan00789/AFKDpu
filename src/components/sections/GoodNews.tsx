@@ -3,14 +3,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { goodNews } from '@/lib/data';
-import { Award, Lightbulb, Users } from 'lucide-react';
+import { Award, Lightbulb, Users, HeartHandshake, Palette, Code2 } from 'lucide-react';
 
-const categoryIcons = {
+const categoryIcons: { [key: string]: React.ReactNode } = {
   'Impacto Social': <Users className="h-6 w-6 text-primary" />,
   'Innovación': <Lightbulb className="h-6 w-6 text-primary" />,
-  'Comunidad': <Users className="h-6 w-6 text-primary" />,
-  'Diseño': <Award className="h-6 w-6 text-primary" />,
-  'Código': <Award className="h-6 w-6 text-primary" />,
+  'Comunidad': <HeartHandshake className="h-6 w-6 text-primary" />,
+  'Diseño': <Palette className="h-6 w-6 text-primary" />,
+  'Código': <Code2 className="h-6 w-6 text-primary" />,
   'Emoción': <Award className="h-6 w-6 text-primary" />,
 };
 
