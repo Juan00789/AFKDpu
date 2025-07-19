@@ -9,6 +9,7 @@ const Header = () => {
         </Link>
         <nav className="hidden space-x-4 md:flex">
           <Link href="#services" className="text-sm font-medium hover:underline underline-offset-4">Servicios</Link>
+          <Link href="#concierge" className="text-sm font-medium hover:underline underline-offset-4">Conserjería</Link>
           <Link href="#stories" className="text-sm font-medium hover:underline underline-offset-4">Mi Experiencia</Link>
           <Link href="#timeline" className="text-sm font-medium hover:underline underline-offset-4">Trayectoria</Link>
           <Link href="#manuals" className="text-sm font-medium hover:underline underline-offset-4">Filosofía</Link>
