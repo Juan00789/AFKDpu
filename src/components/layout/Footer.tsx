@@ -21,7 +21,7 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-card text-card-foreground">
+    <footer id="contact" className="w-full bg-card text-card-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
         <div className="grid gap-8 lg:grid-cols-3">
           <div>

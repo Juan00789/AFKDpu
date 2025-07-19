@@ -13,6 +13,7 @@ const Header = () => {
           <Link href="#stories" className="text-sm font-medium hover:underline underline-offset-4">Mi Experiencia</Link>
           <Link href="#timeline" className="text-sm font-medium hover:underline underline-offset-4">Trayectoria</Link>
           <Link href="#manuals" className="text-sm font-medium hover:underline underline-offset-4">Filosofía</Link>
+          <Link href="#contact" className="text-sm font-medium hover:underline underline-offset-4">Contacto</Link>
         </nav>
       </div>
     </header>
