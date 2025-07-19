@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -64,49 +65,61 @@ const Stories = () => {
             Estas no son solo historias, son la base de mi conocimiento. Cada lección aprendida es una herramienta que ahora puedo usar para ayudarte.
           </p>
         </div>
-        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-1">
           {stories.map((story, index) => (
-            <Card key={index} className="flex flex-col overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl">
-              <CardHeader>
-                <CardTitle className="mt-4 font-headline text-2xl">{story.title}</CardTitle>
-                <Badge variant="outline" className="mt-1 w-fit bg-accent text-accent-foreground">{story.category}</Badge>
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <blockquote className="border-l-2 border-primary pl-4 italic text-muted-foreground">
-                  "{story.quote}"
-                </blockquote>
-                <p className="mt-4 text-sm">{story.content}</p>
-              </CardContent>
-              <CardFooter className="flex flex-col items-start gap-4">
-                <Button
-                  onClick={() => handlePlayAudio(story)}
-                  disabled={loadingStory === story.title}
-                  variant="ghost"
-                  className="p-0 h-auto text-muted-foreground hover:text-primary"
-                >
-                  {loadingStory === story.title ? (
-                    <>
-                      <Loader className="h-5 w-5 mr-2 animate-spin" />
-                      <span>Generando audio...</span>
-                    </>
-                  ) : activeAudio === story.title ? (
-                     <>
-                      <XCircle className="h-5 w-5 mr-2 text-primary" />
-                      <span>Ocultar reproductor</span>
-                    </>
-                  ) : (
-                    <>
-                      <PlayCircle className="h-5 w-5 mr-2 text-primary" />
-                      <span>Escuchar la historia</span>
-                    </>
+            <Card key={index} className="flex flex-col md:flex-row overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl">
+              <div className="md:w-1/3">
+                 <Image
+                  src={story.imageUrl}
+                  alt={story.title}
+                  width={600}
+                  height={400}
+                  data-ai-hint={story.imageHint}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="md:w-2/3 flex flex-col">
+                <CardHeader>
+                  <CardTitle className="mt-4 font-headline text-2xl">{story.title}</CardTitle>
+                  <Badge variant="outline" className="mt-1 w-fit bg-accent text-accent-foreground">{story.category}</Badge>
+                </CardHeader>
+                <CardContent className="flex-grow">
+                  <blockquote className="border-l-2 border-primary pl-4 italic text-muted-foreground">
+                    "{story.quote}"
+                  </blockquote>
+                  <p className="mt-4 text-sm">{story.content}</p>
+                </CardContent>
+                <CardFooter className="flex flex-col items-start gap-4">
+                  <Button
+                    onClick={() => handlePlayAudio(story)}
+                    disabled={loadingStory === story.title}
+                    variant="ghost"
+                    className="p-0 h-auto text-muted-foreground hover:text-primary"
+                  >
+                    {loadingStory === story.title ? (
+                      <>
+                        <Loader className="h-5 w-5 mr-2 animate-spin" />
+                        <span>Generando audio...</span>
+                      </>
+                    ) : activeAudio === story.title ? (
+                      <>
+                        <XCircle className="h-5 w-5 mr-2 text-primary" />
+                        <span>Ocultar reproductor</span>
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="h-5 w-5 mr-2 text-primary" />
+                        <span>Escuchar la historia</span>
+                      </>
+                    )}
+                  </Button>
+                  {activeAudio === story.title && story.audioUrl && (
+                    <audio controls src={story.audioUrl} className="w-full h-10">
+                      Your browser does not support the audio element.
+                    </audio>
                   )}
-                </Button>
-                {activeAudio === story.title && story.audioUrl && (
-                  <audio controls src={story.audioUrl} className="w-full h-10">
-                    Your browser does not support the audio element.
-                  </audio>
-                )}
-              </CardFooter>
+                </CardFooter>
+              </div>
             </Card>
           ))}
         </div>

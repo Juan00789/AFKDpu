@@ -7,6 +7,8 @@ export const stories: Story[] = [
     audioUrl: null,
     quote: 'A veces, algo debe morir para que algo nuevo pueda nacer.',
     content: 'QuickieRapidito no fue un fracaso, fue un sacrificio. Su estructura y aprendizaje fueron la semilla que permitió el nacimiento de Ledpop, enseñándonos que la verdadera innovación a menudo requiere dejar ir lo que funciona para construir algo que transforma.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'phoenix rising',
   },
   {
     title: 'La Meta: El Resurgimiento',
@@ -14,6 +16,8 @@ export const stories: Story[] = [
     audioUrl: null,
     quote: 'Las cenizas no son el final, son el fertilizante para lo que vendrá.',
     content: 'El objetivo ahora es claro: reconstruir y relanzar tanto Ledpop como QuickieRapidito. No como eran antes, sino como siempre debieron ser. Con la lección aprendida, la comunidad como pilar y un propósito inquebrantable.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'sprout growing',
   },
   {
     title: 'Conexiones Inesperadas',
@@ -21,6 +25,8 @@ export const stories: Story[] = [
     audioUrl: null,
     quote: 'Las mejores colaboraciones no se buscan, se encuentran en el camino.',
     content: 'Historias de cómo las amistades y alianzas fortuitas se convirtieron en el pilar de nuestros proyectos más significativos.',
+    imageUrl: 'https://placehold.co/600x400.png',
+    imageHint: 'linked hands',
   },
 ];
 
