@@ -10,14 +10,20 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { manuals } from '@/lib/data';
 
+const ConciergeInputSchema = z.object({
+  question: z.string().describe("La pregunta o problema del usuario."),
+  recaptchaToken: z.string().describe("El token de reCAPTCHA para verificación."),
+});
+type ConciergeInput = z.infer<typeof ConciergeInputSchema>;
+
 const ConciergeOutputSchema = z.object({
   answer: z.string().describe("La respuesta reflexiva y orientadora a la pregunta del usuario."),
 });
 
 export type ConciergeOutput = z.infer<typeof ConciergeOutputSchema>;
 
-export async function askConcierge(question: string): Promise<ConciergeOutput> {
-  return conciergeFlow(question);
+export async function askConcierge(input: ConciergeInput): Promise<ConciergeOutput> {
+  return conciergeFlow(input);
 }
 
 const philosophy = manuals.map(m => `Principio: ${m.title} (${m.category}) - ${m.description}`).join('\n');
@@ -43,11 +49,25 @@ Tu respuesta debe ser un párrafo o dos. Sé conciso pero impactante.
 const conciergeFlow = ai.defineFlow(
   {
     name: 'conciergeFlow',
-    inputSchema: z.string(),
+    inputSchema: ConciergeInputSchema,
     outputSchema: ConciergeOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+    if (!secretKey) {
+      throw new Error('La clave secreta de reCAPTCHA no está configurada.');
+    }
+
+    const verificationUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${input.recaptchaToken}`;
+
+    const response = await fetch(verificationUrl, { method: 'POST' });
+    const data = await response.json();
+
+    if (!data.success || data.score < 0.5) {
+      throw new Error('Verificación de reCAPTCHA fallida.');
+    }
+
+    const { output } = await prompt(input.question);
     return output!;
   }
 );

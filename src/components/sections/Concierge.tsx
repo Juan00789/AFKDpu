@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import ReCAPTCHA from 'react-google-recaptcha';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,13 @@ const Concierge = () => {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { toast } = useToast();
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  const handleRecaptchaChange = (token: string | null) => {
+    setRecaptchaToken(token);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,10 +32,19 @@ const Concierge = () => {
       return;
     }
 
+    if (!recaptchaToken) {
+      toast({
+        title: 'Verificación requerida',
+        description: 'Por favor, completa el CAPTCHA.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
     setAnswer('');
     try {
-      const response = await askConcierge(question);
+      const response = await askConcierge({ question, recaptchaToken });
       setAnswer(response.answer);
     } catch (error) {
       console.error('Error con la conserjería:', error);
@@ -39,6 +55,8 @@ const Concierge = () => {
       });
     } finally {
       setIsLoading(false);
+      setRecaptchaToken(null);
+      recaptchaRef.current?.reset();
     }
   };
 
@@ -65,7 +83,13 @@ const Concierge = () => {
                   rows={4}
                   disabled={isLoading}
                 />
-                <Button type="submit" disabled={isLoading} className="w-full">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                  onChange={handleRecaptchaChange}
+                  theme="light"
+                />
+                <Button type="submit" disabled={isLoading || !recaptchaToken} className="w-full">
                   {isLoading ? (
                     <>
                       <Loader className="mr-2 h-4 w-4 animate-spin" />
