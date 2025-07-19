@@ -4,8 +4,6 @@ export type Story = {
   audioUrl: string | null;
   quote: string;
   content: string;
-  imageUrl: string;
-  imageHint: string;
 };
 
 export type TimelineEvent = {

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -65,20 +64,10 @@ const Stories = () => {
             Estas no son solo historias, son la base de mi conocimiento. Cada lección aprendida es una herramienta que ahora puedo usar para ayudarte.
           </p>
         </div>
-        <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-1">
+        <div className="mt-12 grid gap-8 md:grid-cols-1">
           {stories.map((story, index) => (
-            <Card key={index} className="flex flex-col md:flex-row overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl">
-              <div className="md:w-1/3">
-                 <Image
-                  src={story.imageUrl}
-                  alt={story.title}
-                  width={600}
-                  height={400}
-                  data-ai-hint={story.imageHint}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="md:w-2/3 flex flex-col">
+            <Card key={index} className="flex flex-col overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl">
+              <div className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="mt-4 font-headline text-2xl">{story.title}</CardTitle>
                   <Badge variant="outline" className="mt-1 w-fit bg-accent text-accent-foreground">{story.category}</Badge>
