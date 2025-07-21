@@ -16,7 +16,7 @@ export type TimelineEvent = {
 export type CardContent = {
   title: string;
   description: string;
-  category: 'Diseño' | 'Código' | 'Emoción' | 'Comunidad' | 'Impacto Social' | 'Innovación' | 'Filosofía';
+  category: 'Diseño' | 'Código' | 'Emoción' | 'Comunidad' | 'Filosofía';
   tags: string[];
 };
 

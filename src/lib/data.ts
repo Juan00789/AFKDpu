@@ -1,4 +1,4 @@
-import type { Story, TimelineEvent, Manual, CardContent, Feature } from './types';
+import type { Story, TimelineEvent, Manual, Feature } from './types';
 
 export const stories: Story[] = [
   {
@@ -95,28 +95,6 @@ export const manuals: Manual[] = [
     tags: ['aprendimos perdiendo'],
   },
 ];
-
-export const goodNews: CardContent[] = [
-  {
-    title: 'De Fracaso a Mentoría',
-    category: 'Impacto Social',
-    description: 'Ex-fundadores de startups fallidas ahora dedican su tiempo a guiar a nuevos emprendedores, transformando su experiencia en un activo para la comunidad.',
-    tags: ['Renacimiento', 'Comunidad'],
-  },
-  {
-    title: 'Código Abierto para Causas Nobles',
-    category: 'Innovación',
-    description: 'Un proyecto que nació de un "hackathon" interno se ha convertido en una herramienta de código abierto utilizada por ONGs para gestionar voluntariado.',
-    tags: ['Código', 'Impacto Social'],
-  },
-  {
-    title: 'El Jardín Comunitario Digital',
-    category: 'Comunidad',
-    description: 'Una aplicación para conectar vecinos y cuidar espacios verdes urbanos, nacida de la necesidad de reconectar con la naturaleza tras un burnout.',
-    tags: ['Bienestar', 'Tecnología'],
-  },
-];
-
 
 export const afkEcosystemFeatures: Feature[] = [
     {
