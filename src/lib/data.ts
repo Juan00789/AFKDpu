@@ -77,6 +77,12 @@ export const manuals: Manual[] = [
     tags: ['aprendimos perdiendo'],
   },
   {
+    title: 'Autenticidad vs. Etiqueta',
+    category: 'Filosofía',
+    description: 'Fumar de vez en cuando no define tu valor, ni borra lo que construyes. Tu enfoque es lo que habla por ti, lo demás es ruido. “Quien se obsesiona con lo que otros consumen, suele ignorar lo que ellos construyen.”',
+    tags: ['Filosofía callejera', 'autenticidad'],
+  },
+  {
     title: 'El Arte de Pivotar',
     category: 'Código',
     description: 'Cuándo y cómo cambiar de dirección sin perder el alma del proyecto. Una guía técnica y estratégica.',

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { manuals } from '@/lib/data';
 
-const allFilters = ['Todos', 'Diseño', 'Código', 'Emoción', 'Comunidad', 'nos pasó sin querer', 'aprendimos perdiendo'];
+const allFilters = ['Todos', 'Diseño', 'Código', 'Emoción', 'Comunidad', 'Filosofía', 'nos pasó sin querer', 'aprendimos perdiendo'];
 
 const Manuals = () => {
   const [activeFilter, setActiveFilter] = useState('Todos');
