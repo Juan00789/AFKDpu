@@ -105,11 +105,33 @@ export const manuals: Manual[] = [
     },
     tags: ['Filosofía', 'Emoción'],
   },
-  {
+    {
     title: 'Diseño Emocional',
     category: 'Diseño',
-    description: 'Cómo crear interfaces que no solo funcionen bien, sino que también conecten emocionalmente con el usuario.',
-    tags: ['aprendimos perdiendo'],
+    description: {
+      premise: 'No es solo cómo se ve algo, sino cómo te hace sentir. Es crear experiencias que conectan con la piel, la memoria y lo invisible.',
+      sections: [
+        {
+          title: 'Niveles de Diseño Emocional',
+          points: [
+            'Visceral: La primera impresión. Colores, formas y sonidos.',
+            'Conductual: La sensación de uso. Fluidez, intuición y placer en la interacción.',
+            'Reflexivo: El significado que perdura. Memoria, identidad y transformación personal.',
+          ],
+        },
+        {
+          title: 'Aplicación en AFK',
+          points: [
+            'Una app que no te exige, te espera.',
+            'Interfaces que se adaptan a tu estado emocional.',
+            'Mensajes que no venden éxito, sino resonancia.',
+            'Celebrar los pequeños pasos: "Hoy abriste la app. Eso es presencia."',
+          ],
+        },
+      ],
+      lema: 'Diseñar para la emoción es diseñar para la humanidad.',
+    },
+    tags: ['Diseño', 'Emoción', 'UX'],
   },
   {
     title: 'Código Resiliente',
