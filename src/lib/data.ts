@@ -78,6 +78,34 @@ export const manuals: Manual[] = [
     tags: ['Filosofía', 'Comunidad', 'Emoción'],
   },
   {
+    title: 'La Farsa del Logro',
+    category: 'Filosofía',
+    description: {
+      premise: 'Hay logros que, por su forma, su contexto o su intención, dejan de ser un verdadero avance y se convierten en una especie de farsa social.',
+      sections: [
+        {
+          title: '¿Por qué algunos logros se vuelven hipócritas?',
+          points: [
+            'Se alcanzan pisando a otros, pero se venden como “éxito”.',
+            'Se anuncian como “esfuerzo”, cuando fueron privilegio o atajo.',
+            'Se muestran como “inspiración”, pero sin compasión por quienes no llegaron.',
+            'Se celebran sin conciencia del contexto desigual en el que ocurrieron.'
+          ],
+        },
+        {
+          title: '¿Qué es un logro valioso?',
+          points: [
+            'Logro no es solo ganar. Es no traicionarte.',
+            'Logro es seguir siendo humano en medio de un mundo que premia lo contrario.',
+            'Logro es resistir sin aplastar a nadie.',
+          ],
+        }
+      ],
+      lema: 'Valorar lo que va más allá de los aplausos no es rabia vacía. Es ética profunda.',
+    },
+    tags: ['Filosofía', 'Emoción'],
+  },
+  {
     title: 'Diseño Emocional',
     category: 'Diseño',
     description: 'Cómo crear interfaces que no solo funcionen bien, sino que también conecten emocionalmente con el usuario.',
