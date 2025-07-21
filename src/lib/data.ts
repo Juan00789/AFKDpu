@@ -46,6 +46,38 @@ export const timelineEvents: TimelineEvent[] = [
 
 export const manuals: Manual[] = [
   {
+    title: 'Teoría de los Ciclos de Deseo',
+    category: 'Filosofía',
+    description: {
+      premise: 'No existen "viciosos", sino personas que transitan rutas de intensidad emocional, buscando conexión, alivio o expansión de conciencia.',
+      sections: [
+        {
+          title: 'Eliminación de etiquetas fijas',
+          points: ['En lugar de llamar “vicioso” a alguien, se dice que está en un momento de intensidad compulsiva o atravesando una cumbre de deseo.'],
+        },
+        {
+          title: 'Neutralidad afectiva del hábito',
+          points: ['Los comportamientos repetitivos no son defectos, sino intentos de autorregulación emocional. No hay castigo ni culpa, solo observación y acompañamiento.'],
+        },
+        {
+          title: 'Cambio de lenguaje',
+          points: [
+            'Palabras como "adicto", "vicioso" o "dependiente" son reemplazadas por:',
+            '– Buscador de alivio',
+            '– Persona en ciclo',
+            '– Transitor de intensidad',
+          ],
+        },
+        {
+          title: 'Sistema de apoyo, no corrección',
+          points: ['La comunidad no busca “curar”, sino escuchar, acompañar y transformar. AFK podría aplicar esta idea para conectar a quienes están en “tramos de alta necesidad” con actividades, personas o lugares que actúen como puentes.'],
+        }
+      ],
+      lema: 'Nadie es vicioso. Solo hay quienes sienten mucho y buscan cómo contenerlo.',
+    },
+    tags: ['Filosofía', 'Comunidad', 'Emoción'],
+  },
+  {
     title: 'Diseño Emocional',
     category: 'Diseño',
     description: 'Cómo crear interfaces que no solo funcionen bien, sino que también conecten emocionalmente con el usuario.',
@@ -81,13 +113,8 @@ export const manuals: Manual[] = [
     description: 'Cuándo y cómo cambiar de dirección sin perder el alma del proyecto. Una guía técnica y estratégica.',
     tags: ['nos pasó sin querer'],
   },
-  {
-    title: 'Feedback que Construye',
-    category: 'Diseño',
-    description: 'Cómo dar y recibir críticas de diseño que eleven el producto en lugar de destruir la moral del equipo.',
-    tags: ['aprendimos perdiendo'],
-  },
 ];
+
 
 export const afkEcosystemFeatures: Feature[] = [
     {

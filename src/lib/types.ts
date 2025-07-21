@@ -13,14 +13,23 @@ export type TimelineEvent = {
   description: string;
 };
 
-export type CardContent = {
-  title: string;
-  description: string;
-  category: 'Diseño' | 'Código' | 'Emoción' | 'Comunidad' | 'Filosofía';
-  tags: string[];
+type ManualDescriptionSimple = string;
+
+type ManualDescriptionRich = {
+  premise: string;
+  sections: {
+    title: string;
+    points: string[];
+  }[];
+  lema: string;
 };
 
-export type Manual = CardContent;
+export type Manual = {
+  title: string;
+  category: 'Diseño' | 'Código' | 'Emoción' | 'Comunidad' | 'Filosofía';
+  description: ManualDescriptionSimple | ManualDescriptionRich;
+  tags: string[];
+};
 
 export type Feature = {
   title: string;

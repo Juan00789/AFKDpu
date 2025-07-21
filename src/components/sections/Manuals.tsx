@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { manuals } from '@/lib/data';
+import type { Manual } from '@/lib/types';
 
 const allFilters = ['Todos', 'Diseño', 'Código', 'Emoción', 'Comunidad', 'Filosofía', 'nos pasó sin querer', 'aprendimos perdiendo'];
 
@@ -36,15 +37,30 @@ const Manuals = () => {
             </Button>
           ))}
         </div>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredManuals.map((manual, index) => (
-            <Card key={index} className="transform transition-transform duration-300 hover:-translate-y-1 bg-card">
+        <div className="mt-12 grid gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          {filteredManuals.map((manual: Manual, index: number) => (
+            <Card key={index} className="flex flex-col transform transition-transform duration-300 hover:-translate-y-1 bg-card">
               <CardHeader>
                 <CardTitle className="font-headline text-xl">{manual.title}</CardTitle>
                 <Badge variant="secondary" className="w-fit">{manual.category}</Badge>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">{manual.description}</p>
+              <CardContent className="flex-grow">
+                {typeof manual.description === 'string' ? (
+                  <p className="text-muted-foreground">{manual.description}</p>
+                ) : (
+                  <div className="space-y-4 text-sm">
+                    {manual.description.premise && <p className="italic text-muted-foreground">{manual.description.premise}</p>}
+                    {manual.description.sections && manual.description.sections.map((section, sIndex) => (
+                      <div key={sIndex}>
+                        <h4 className="font-bold text-foreground">{section.title}</h4>
+                        <ul className="list-disc pl-5 mt-1 space-y-1 text-muted-foreground">
+                          {section.points.map((point, pIndex) => <li key={pIndex}>{point}</li>)}
+                        </ul>
+                      </div>
+                    ))}
+                    {manual.description.lema && <blockquote className="mt-4 border-l-2 border-primary pl-4 font-bold text-foreground">{manual.description.lema}</blockquote>}
+                  </div>
+                )}
                 <div className="mt-4 flex flex-wrap gap-2">
                   {manual.tags.map(tag => (
                     <Badge key={tag} variant="outline">{tag}</Badge>
