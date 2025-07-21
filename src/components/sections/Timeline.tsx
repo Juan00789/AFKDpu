@@ -23,7 +23,7 @@ const Timeline = () => {
         <div className="text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Mi Trayectoria</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
-            Un viaje a través de las fases que me dieron la experiencia para poder ayudarte hoy.
+            Mi historia no es solo un mapa de lo que viví, sino la prueba de que cada caída es la fuerza para transformar vidas.
           </p>
         </div>
         <div className="relative mt-12">
