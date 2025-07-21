@@ -9,13 +9,6 @@ export const stories: Story[] = [
     content: 'QuickieRapidito no fue un fracaso, fue un sacrificio. Su estructura y aprendizaje fueron la semilla que permitió el nacimiento de Ledpop, enseñándonos que la verdadera innovación a menudo requiere dejar ir lo que funciona para construir algo que transforma.',
   },
   {
-    title: 'La Meta: El Resurgimiento',
-    category: 'Meta',
-    audioUrl: null,
-    quote: 'Las cenizas no son el final, son el fertilizante para lo que vendrá.',
-    content: 'El objetivo ahora es claro: reconstruir y relanzar tanto Ledpop como QuickieRapidito. No como eran antes, sino como siempre debieron ser. Con la lección aprendida, la comunidad como pilar y un propósito inquebrantable.',
-  },
-  {
     title: 'Conexiones Inesperadas',
     category: 'Comunidad',
     audioUrl: null,

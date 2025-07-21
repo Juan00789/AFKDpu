@@ -9,6 +9,7 @@ import { stories as initialStories } from '@/lib/data';
 import type { Story } from '@/lib/types';
 import { generateAudio } from '@/ai/flows/generate-audio-flow';
 import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 const Stories = () => {
   const [stories, setStories] = useState<Story[]>(initialStories);
@@ -66,7 +67,9 @@ const Stories = () => {
         </div>
         <div className="mt-12 grid gap-8 md:grid-cols-1">
           {stories.map((story, index) => (
-            <Card key={index} className="flex flex-col overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl">
+            <Card key={index} className={cn("flex flex-col overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl", {
+              'border-primary shadow-lg': activeAudio === story.title,
+            })}>
               <div className="flex flex-col">
                 <CardHeader>
                   <CardTitle className="mt-4 font-headline text-2xl">{story.title}</CardTitle>
@@ -103,7 +106,7 @@ const Stories = () => {
                     )}
                   </Button>
                   {activeAudio === story.title && story.audioUrl && (
-                    <audio controls src={story.audioUrl} className="w-full h-10">
+                    <audio controls autoPlay src={story.audioUrl} className="w-full h-10">
                       Your browser does not support the audio element.
                     </audio>
                   )}
