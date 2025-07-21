@@ -113,6 +113,12 @@ export const manuals: Manual[] = [
     description: 'Cuándo y cómo cambiar de dirección sin perder el alma del proyecto. Una guía técnica y estratégica.',
     tags: ['nos pasó sin querer'],
   },
+  {
+    title: 'El Empujón que Sostiene',
+    category: 'Filosofía',
+    description: 'No todos los empujones te llevan lejos. Algunos solo evitan que te hundas. Y eso, aunque no se note, ya es un acto de amor.',
+    tags: ['Filosofía', 'Comunidad', 'Emoción'],
+  },
 ];
 
 
