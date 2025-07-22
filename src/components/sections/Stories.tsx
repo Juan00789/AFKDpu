@@ -20,6 +20,10 @@ const Stories = () => {
   const handlePlayAudio = async (story: Story) => {
     if (activeAudio === story.title) {
       setActiveAudio(null);
+      // Stop any browser-based speech synthesis
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
       return;
     }
     
@@ -30,9 +34,9 @@ const Stories = () => {
 
     setLoadingStory(story.title);
     setActiveAudio(null);
+    const textToSynthesize = `${story.title}. ${story.quote}. ${story.content}`;
 
     try {
-      const textToSynthesize = `${story.title}. ${story.quote}. ${story.content}`;
       const response = await generateAudio(textToSynthesize);
       
       if (response.media) {
@@ -42,17 +46,38 @@ const Stories = () => {
         setStories(updatedStories);
         setActiveAudio(story.title);
       } else {
-        throw new Error('No se pudo generar el audio.');
+        throw new Error('No se pudo generar el audio a través de la API.');
       }
     } catch (error) {
-      console.error('Error generating audio:', error);
+      console.error('Error generando audio con Genkit:', error);
       toast({
-        title: 'Error',
-        description: 'No se pudo generar el audio para esta historia. Por favor, inténtalo de nuevo.',
+        title: 'Voz Principal No Disponible',
+        description: 'Intentando con una voz alternativa del sistema. La experiencia puede variar.',
         variant: 'destructive',
       });
+      // Fallback to browser's Speech Synthesis
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(textToSynthesize);
+        utterance.lang = 'es-ES';
+        utterance.onend = () => {
+           setActiveAudio(null);
+           setLoadingStory(null);
+        };
+        window.speechSynthesis.speak(utterance);
+        setActiveAudio(story.title); // Visually activate while browser speaks
+      } else {
+         toast({
+          title: 'Error Crítico',
+          description: 'Tu navegador no soporta la síntesis de voz. No se pudo reproducir la historia.',
+          variant: 'destructive',
+        });
+      }
     } finally {
-      setLoadingStory(null);
+      // For Genkit flow, loading is stopped inside the try/catch.
+      // For browser synthesis, it's stopped onend.
+      if (!( 'speechSynthesis' in window)) {
+         setLoadingStory(null);
+      }
     }
   };
 
@@ -96,7 +121,7 @@ const Stories = () => {
                     ) : activeAudio === story.title ? (
                       <>
                         <XCircle className="h-5 w-5 mr-2 text-primary" />
-                        <span>Ocultar reproductor</span>
+                        <span>Detener la historia</span>
                       </>
                     ) : (
                       <>
@@ -106,7 +131,7 @@ const Stories = () => {
                     )}
                   </Button>
                   {activeAudio === story.title && story.audioUrl && (
-                    <audio controls autoPlay src={story.audioUrl} className="w-full h-10">
+                    <audio controls autoPlay src={story.audioUrl} onEnded={() => setActiveAudio(null)} className="w-full h-10">
                       Your browser does not support the audio element.
                     </audio>
                   )}
