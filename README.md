@@ -8,6 +8,9 @@
 ## 🌱 Descripción del Proyecto:
 AFKDpu es una plataforma reconstruida desde la experiencia, nacida de la pérdida, transformada en propósito. Utiliza tecnología moderna para albergar historias reales, conocimientos invisibles y herramientas reflexivas que guían al usuario en una exploración emocional y creativa. Cada línea de código honra el pasado y da voz a los vínculos que marcaron el camino.
 
+##  simbiosis AFKDpu & AFKEcosystem
+AFKDpu es el espacio de inspiración. AFKEcosystem es el espacio de protección. Juntos forman un universo donde el conocimiento no es propiedad... es legado.
+
 ## 🚀 Misión Firebase:
 Firebase es el hogar técnico donde AFKDpu vive y evoluciona. Aquí se implementan:
 
