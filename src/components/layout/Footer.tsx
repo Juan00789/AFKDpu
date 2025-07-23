@@ -1,4 +1,12 @@
-import { Phone, MessageCircle } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { Phone, MessageCircle, PlayCircle, Loader, XCircle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { generateAudio } from '@/ai/flows/generate-audio-flow';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
+
 
 const FacebookIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
@@ -20,9 +28,106 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 
 const Footer = () => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [audioUrl, setAudioUrl] = useState<string | null>(null);
+    const { toast } = useToast();
+
+    const handlePlayAudio = async () => {
+      if (audioUrl) {
+        setAudioUrl(null);
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
+        return;
+      }
+      
+      setIsLoading(true);
+      setAudioUrl(null);
+
+      const sobreText = `Sobre AFKDpu. AFKDpu es mi proyecto de vida. Nació de lo que perdí y de lo que aprendí sin saberlo. Una chispa invisible que creció entre manuales espontáneos, amistades entrañables, y plataformas que se fueron… pero dejaron huella. Este sitio es más que código. Es la reconstrucción de propósito, un homenaje a quienes me acompañaron cuando el mundo parecía apagarse. Aquí conecto QuickieRapidito, Ledpop, Pos Vesta, y todas esas ideas que me enseñaron a crear desde el corazón. AFKDpu no pretende impresionar. Pretende recordar, guiar y reflejar. Es una casa digital para lo que fue invisible, y ahora vive… para quienes lo quieran sentir.`;
+      const manifiestoText = `Manifiesto. Creemos en el poder de lo que se rompe. En la sabiduría que reside en los errores. En los manuales que se escriben sin tinta, con experiencia. Celebramos la fractura que precede a la transformación y el renacimiento que sigue. Aquí, lo que nunca se vio no solo se honra, sino que se convierte en faro.`;
+      const contactoText = `Contacto Directo. Para colaborar, conversar o compartir ideas invisibles que aún no han brillado, puedes escribirme al +1 (829) 922-6556. Disponible vía WhatsApp y llamadas. También puedes encontrarme en Facebook como Juan Ismael Alcántara, en Patreon como AFKDpu, o en Instagram como @blessed_frenzy.`;
+
+      const fullText = `${sobreText} ${manifiestoText} ${contactoText}`;
+
+      try {
+        const response = await generateAudio(fullText);
+        if (response.media) {
+            setAudioUrl(response.media);
+        } else {
+            throw new Error('No se pudo generar el audio a través de la API.');
+        }
+      } catch (error) {
+        console.error('Error generando audio con Genkit:', error);
+        toast({
+            title: 'Voz Principal No Disponible',
+            description: 'Intentando con una voz alternativa del sistema. La experiencia puede variar.',
+            variant: 'destructive',
+        });
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(fullText);
+            utterance.lang = 'es-ES';
+            utterance.onend = () => {
+                setAudioUrl(null);
+                setIsLoading(false);
+            };
+            window.speechSynthesis.speak(utterance);
+            // We set a placeholder URL to show the stop button
+            setAudioUrl('speaking'); 
+        } else {
+            toast({
+                title: 'Error Crítico',
+                description: 'Tu navegador no soporta la síntesis de voz.',
+                variant: 'destructive',
+            });
+        }
+      } finally {
+        if (!('speechSynthesis' in window)) {
+           setIsLoading(false);
+        }
+      }
+    };
+
+
   return (
     <footer id="contact" className="w-full bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
+        <div className="mb-8 p-6 rounded-lg bg-background/50 border border-border shadow-lg">
+            <h2 className="font-headline text-2xl font-bold tracking-tight text-center text-primary mb-4">La Voz del Proyecto</h2>
+            <p className="text-center text-muted-foreground mb-6">Presiona el botón para escuchar la historia, el manifiesto y la misión de AFKDpu en una sola voz.</p>
+             <div className="flex flex-col items-center gap-4">
+                  <Button
+                    onClick={handlePlayAudio}
+                    disabled={isLoading}
+                    variant="default"
+                    size="lg"
+                    className={cn({ 'border-primary shadow-primary/20': !!audioUrl })}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader className="h-5 w-5 mr-2 animate-spin" />
+                        <span>Generando la voz...</span>
+                      </>
+                    ) : audioUrl ? (
+                      <>
+                        <XCircle className="h-5 w-5 mr-2 text-primary" />
+                        <span>Detener la narración</span>
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="h-5 w-5 mr-2" />
+                        <span>Escuchar el proyecto</span>
+                      </>
+                    )}
+                  </Button>
+                  {audioUrl && audioUrl !== 'speaking' && (
+                    <audio controls autoPlay src={audioUrl} onEnded={() => setAudioUrl(null)} className="w-full max-w-md h-10 mt-4">
+                      Tu navegador no soporta el elemento de audio.
+                    </audio>
+                  )}
+            </div>
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-3">
           <div>
             <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground">Sobre AFKDpu</h2>
