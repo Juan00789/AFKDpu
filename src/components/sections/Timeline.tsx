@@ -21,7 +21,7 @@ const Timeline = () => {
     <section id="timeline" className="bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Mi Trayectoria</h2>
+          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Mi Trayectoria</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
             Mi historia no es solo un mapa de lo que viví, sino la prueba de que cada caída es la fuerza para transformar vidas.
           </p>
@@ -35,15 +35,15 @@ const Timeline = () => {
             return (
               <div key={index} className={`relative mb-8 flex w-full items-center ${isLeft ? 'justify-start' : 'justify-end'}`}>
                 <div className={`hidden lg:block w-5/12`}></div>
-                <div className="absolute left-1/2 top-1/2 z-10 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary"></div>
-                <div className="w-full rounded-lg bg-card p-6 shadow-md lg:w-5/12">
+                <div className="absolute left-1/2 top-1/2 z-10 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary ring-4 ring-background"></div>
+                <div className="w-full rounded-lg bg-secondary/50 p-6 shadow-md lg:w-5/12 border border-border">
                   <div className="mb-2 flex items-center justify-between">
                     <span className={`font-bold ${color}`}>{event.phase}</span>
                     <span className="text-sm font-medium text-muted-foreground">{event.year}</span>
                   </div>
-                  <h3 className="mb-2 font-headline text-xl font-bold">{event.title}</h3>
+                  <h3 className="mb-2 font-headline text-xl font-bold text-foreground">{event.title}</h3>
                   <p className="text-sm text-muted-foreground">{event.description}</p>
-                   <Icon className={`absolute top-4 ${isLeft ? 'lg:right-[-4.5rem]' : 'lg:left-[-4.5rem]'} hidden lg:block h-12 w-12 p-2 rounded-full bg-card shadow-md ${color}`} />
+                   <Icon className={`absolute top-4 ${isLeft ? 'lg:right-[-4.5rem]' : 'lg:left-[-4.5rem]'} hidden lg:block h-12 w-12 p-2 rounded-full bg-secondary/80 shadow-md ${color}`} />
                 </div>
               </div>
             );

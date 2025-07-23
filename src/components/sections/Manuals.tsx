@@ -20,7 +20,7 @@ const Manuals = () => {
     <section id="manuals" className="bg-background">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Mi Filosofía de Trabajo</h2>
+          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Mi Filosofía de Trabajo</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
             Estos no son dogmas, son los principios que guían mi forma de crear, nacidos de la experiencia.
           </p>
@@ -39,9 +39,9 @@ const Manuals = () => {
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {filteredManuals.map((manual: Manual, index: number) => (
-            <Card key={index} className="flex flex-col transform transition-transform duration-300 hover:-translate-y-1 bg-card">
+            <Card key={index} className="flex flex-col transform transition-transform duration-300 hover:-translate-y-1 bg-secondary/50 border-border hover:border-primary/50 hover:shadow-primary/10 shadow-lg">
               <CardHeader>
-                <CardTitle className="font-headline text-xl">{manual.title}</CardTitle>
+                <CardTitle className="font-headline text-xl text-foreground">{manual.title}</CardTitle>
                 <Badge variant="secondary" className="w-fit">{manual.category}</Badge>
               </CardHeader>
               <CardContent className="flex-grow">

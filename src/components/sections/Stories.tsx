@@ -82,29 +82,30 @@ const Stories = () => {
   };
 
   return (
-    <section id="stories" className="bg-card">
+    <section id="stories" className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Mi Experiencia a tu Servicio</h2>
+          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Mi Experiencia a tu Servicio</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
             Estas no son solo historias, son la base de mi conocimiento. Cada lección aprendida es una herramienta que ahora puedo usar para ayudarte.
           </p>
         </div>
         <div className="mt-12 grid gap-8 md:grid-cols-1">
           {stories.map((story, index) => (
-            <Card key={index} className={cn("flex flex-col overflow-hidden shadow-md transition-shadow duration-300 hover:shadow-xl", {
-              'border-primary shadow-lg': activeAudio === story.title,
+            <Card key={index} className={cn(
+              "flex flex-col overflow-hidden shadow-lg transition-all duration-300 bg-background/50 border border-border", {
+              'border-primary shadow-primary/20': activeAudio === story.title,
             })}>
               <div className="flex flex-col">
                 <CardHeader>
-                  <CardTitle className="mt-4 font-headline text-2xl">{story.title}</CardTitle>
+                  <CardTitle className="mt-4 font-headline text-2xl text-foreground">{story.title}</CardTitle>
                   <Badge variant="outline" className="mt-1 w-fit bg-accent text-accent-foreground">{story.category}</Badge>
                 </CardHeader>
                 <CardContent className="flex-grow">
                   <blockquote className="border-l-2 border-primary pl-4 italic text-muted-foreground">
                     "{story.quote}"
                   </blockquote>
-                  <p className="mt-4 text-sm">{story.content}</p>
+                  <p className="mt-4 text-sm text-muted-foreground">{story.content}</p>
                 </CardContent>
                 <CardFooter className="flex flex-col items-start gap-4">
                   <Button

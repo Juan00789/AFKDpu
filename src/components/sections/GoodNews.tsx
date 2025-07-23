@@ -4,15 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const GoodNews = () => {
   return (
-    <section id="good-news" className="bg-background">
+    <section id="good-news" className="bg-secondary">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center">
-          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl">Protocolo: Salvación</h2>
+          <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Protocolo: Salvación</h2>
         </div>
         <div className="mt-12 flex justify-center">
-            <Card className="max-w-2xl w-full bg-card shadow-lg">
+            <Card className="max-w-2xl w-full bg-background/80 border-primary/20 shadow-lg shadow-primary/10">
                 <CardHeader>
-                    <CardTitle className="text-center font-body text-xl tracking-wider">
+                    <CardTitle className="text-center font-body text-xl tracking-wider text-foreground">
                     <span role="img" aria-label="stop sign">🛑</span> Protocolo: Salvación [activo]
                     </CardTitle>
                 </CardHeader>

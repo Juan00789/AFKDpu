@@ -21,11 +21,11 @@ const InstagramIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 const Footer = () => {
   return (
-    <footer id="contact" className="w-full bg-card text-card-foreground">
+    <footer id="contact" className="w-full bg-secondary text-secondary-foreground">
       <div className="container mx-auto px-4 py-12 md:px-6 md:py-16">
         <div className="grid gap-8 lg:grid-cols-3">
           <div>
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-primary-foreground">Sobre AFKDpu</h2>
+            <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground">Sobre AFKDpu</h2>
             <div className="mt-4 space-y-4 text-muted-foreground">
               <p>
                 AFKDpu es mi proyecto de vida. Nació de lo que perdí y de lo que aprendí sin saberlo. Una chispa invisible que creció entre manuales espontáneos, amistades entrañables, y plataformas que se fueron… pero dejaron huella.
@@ -39,36 +39,36 @@ const Footer = () => {
             </div>
           </div>
           <div>
-            <h3 className="font-headline text-2xl font-bold text-primary-foreground">Manifiesto</h3>
-            <blockquote className="mt-4 border-l-2 border-accent pl-4 italic text-muted-foreground">
+            <h3 className="font-headline text-2xl font-bold text-foreground">Manifiesto</h3>
+            <blockquote className="mt-4 border-l-2 border-primary pl-4 italic text-muted-foreground">
               Creemos en el poder de lo que se rompe. En la sabiduría que reside en los errores. En los manuales que se escriben sin tinta, con experiencia. Celebramos la fractura que precede a la transformación y el renacimiento que sigue. Aquí, lo que nunca se vio no solo se honra, sino que se convierte en faro.
             </blockquote>
           </div>
           <div>
-            <h3 className="font-headline text-2xl font-bold text-primary-foreground">Contacto Directo</h3>
+            <h3 className="font-headline text-2xl font-bold text-foreground">Contacto Directo</h3>
             <div className="mt-4 space-y-4 text-muted-foreground">
               <p>
                 Para colaborar, conversar o compartir ideas invisibles que aún no han brillado, puedes escribirme.
               </p>
-              <a href="tel:+18299226556" className="flex items-center gap-3 hover:underline">
+              <a href="tel:+18299226556" className="flex items-center gap-3 transition-colors hover:text-primary">
                 <Phone className="h-5 w-5 text-primary" />
                 <span>+1 (829) 922-6556</span>
               </a>
-              <a href="tel:+18299226556" className="flex items-center gap-3 hover:underline">
+              <a href="tel:+18299226556" className="flex items-center gap-3 transition-colors hover:text-primary">
                  <MessageCircle className="h-5 w-5 text-primary" />
                  <span>Disponible vía WhatsApp y llamadas.</span>
               </a>
                <div className="flex items-center gap-3">
                 <FacebookIcon className="h-5 w-5 text-primary" />
-                <a href="https://www.facebook.com/juanismael.alcantara" target="_blank" rel="noopener noreferrer" className="hover:underline">Juan Ismael Alcántara</a>
+                <a href="https://www.facebook.com/juanismael.alcantara" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">Juan Ismael Alcántara</a>
               </div>
               <div className="flex items-center gap-3">
                 <PatreonIcon className="h-5 w-5 text-primary" />
-                <a href="https://www.patreon.com/c/afkdpu" target="_blank" rel="noopener noreferrer" className="hover:underline">Apoya el proyecto en Patreon</a>
+                <a href="https://www.patreon.com/c/afkdpu" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">Apoya el proyecto en Patreon</a>
               </div>
               <div className="flex items-center gap-3">
                 <InstagramIcon className="h-5 w-5 text-primary" />
-                <a href="https://www.instagram.com/blessed_frenzy/" target="_blank" rel="noopener noreferrer" className="hover:underline">@blessed_frenzy</a>
+                <a href="https://www.instagram.com/blessed_frenzy/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-primary">@blessed_frenzy</a>
               </div>
             </div>
           </div>
