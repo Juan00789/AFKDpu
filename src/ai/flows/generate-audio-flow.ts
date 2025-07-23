@@ -9,7 +9,6 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import wav from 'wav';
-import { googleAI } from '@genkit-ai/googleai';
 
 const GenerateAudioOutputSchema = z.object({
   media: z.string().describe("The generated audio as a base64-encoded data URI."),
@@ -55,7 +54,7 @@ const generateAudioFlow = ai.defineFlow(
   },
   async (query) => {
     const { media } = await ai.generate({
-      model: googleAI.model('gemini-2.5-flash-preview-tts'),
+      model: 'googleai/gemini-2.5-flash-preview-tts',
       config: {
         responseModalities: ['AUDIO'],
         speechConfig: {
