@@ -6,9 +6,15 @@ const Help = () => {
   return (
     <section 
       id="help" 
-      className="flex min-h-[70vh] items-center justify-center text-center bg-background"
+      className="relative flex min-h-[70vh] items-center justify-center text-center bg-background overflow-hidden"
     >
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="absolute inset-0 z-0 opacity-30">
+        <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-primary/20 filter blur-3xl animate-[float_8s_ease-in-out_infinite]"></div>
+        <div className="absolute -bottom-20 -right-10 h-80 w-80 rounded-full bg-accent/20 filter blur-3xl animate-[float-reverse_10s_ease-in-out_infinite]"></div>
+        <div className="absolute top-1/2 -right-20 h-56 w-56 rounded-full bg-primary/10 filter blur-2xl animate-[float_12s_ease-in-out_infinite_2s]"></div>
+         <div className="absolute bottom-1/4 -left-20 h-48 w-48 rounded-full bg-accent/10 filter blur-2xl animate-[float-reverse_9s_ease-in-out_infinite_1s]"></div>
+      </div>
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         <h1 className="font-headline text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
           Cada idea tiene el poder de transformar vidas.
         </h1>
