@@ -48,6 +48,7 @@ export const manuals: Manual[] = [
   {
     title: 'Teoría de los Ciclos de Deseo',
     category: 'Filosofía',
+    audioUrl: null,
     description: {
       premise: 'No existen "viciosos", sino personas que transitan rutas de intensidad emocional, buscando conexión, alivio o expansión de conciencia.',
       sections: [
@@ -80,6 +81,7 @@ export const manuals: Manual[] = [
   {
     title: 'La Farsa del Logro',
     category: 'Filosofía',
+    audioUrl: null,
     description: {
       premise: 'Hay logros que, por su forma, su contexto o su intención, dejan de ser un verdadero avance y se convierten en una especie de farsa social.',
       sections: [
@@ -108,6 +110,7 @@ export const manuals: Manual[] = [
     {
     title: 'Diseño Emocional',
     category: 'Diseño',
+    audioUrl: null,
     description: {
       premise: 'No es solo cómo se ve algo, sino cómo te hace sentir. Es crear experiencias que conectan con la piel, la memoria y lo invisible.',
       sections: [
@@ -136,36 +139,42 @@ export const manuals: Manual[] = [
   {
     title: 'Código Resiliente',
     category: 'Código',
+    audioUrl: null,
     description: 'Estrategias para escribir código que sobrevive al caos, a los cambios de equipo y a los giros inesperados del proyecto.',
     tags: ['nos pasó sin querer'],
   },
   {
     title: 'La Comunidad como Red de Apoyo',
     category: 'Comunidad',
+    audioUrl: null,
     description: 'Lecciones sobre cómo construir y mantener una comunidad que sostiene, apoya e impulsa en los momentos difíciles.',
     tags: ['aprendimos perdiendo'],
   },
   {
     title: 'Gestionar la Incertidumbre',
     category: 'Emoción',
+    audioUrl: null,
     description: 'Un manual no técnico sobre cómo navegar la montaña rusa emocional de emprender y crear.',
     tags: ['aprendimos perdiendo'],
   },
   {
     title: 'Autenticidad vs. Etiqueta',
     category: 'Filosofía',
+    audioUrl: null,
     description: 'Fumar de vez en cuando no define tu valor, ni borra lo que construyes. Tu enfoque es lo que habla por ti, lo demás es ruido. “Quien se obsesiona con lo que otros consumen, suele ignorar lo que ellos construyen.”',
     tags: ['Filosofía callejera', 'autenticidad'],
   },
   {
     title: 'El Arte de Pivotar',
     category: 'Código',
+    audioUrl: null,
     description: 'Cuándo y cómo cambiar de dirección sin perder el alma del proyecto. Una guía técnica y estratégica.',
     tags: ['nos pasó sin querer'],
   },
   {
     title: 'El Empujón que Sostiene',
     category: 'Filosofía',
+    audioUrl: null,
     description: 'No todos los empujones te llevan lejos. Algunos solo evitan que te hundas. Y eso, aunque no se note, ya es un acto de amor.',
     tags: ['Filosofía', 'Comunidad', 'Emoción'],
   },

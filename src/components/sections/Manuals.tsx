@@ -1,20 +1,99 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { manuals } from '@/lib/data';
+import { manuals as initialManuals } from '@/lib/data';
 import type { Manual } from '@/lib/types';
+import { PlayCircle, Loader, XCircle } from 'lucide-react';
+import { generateAudio } from '@/ai/flows/generate-audio-flow';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 const allFilters = ['Todos', 'Diseño', 'Código', 'Emoción', 'Comunidad', 'Filosofía', 'nos pasó sin querer', 'aprendimos perdiendo'];
 
 const Manuals = () => {
+  const [manuals, setManuals] = useState<Manual[]>(initialManuals);
   const [activeFilter, setActiveFilter] = useState('Todos');
+  const [loadingManual, setLoadingManual] = useState<string | null>(null);
+  const [activeAudio, setActiveAudio] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const filteredManuals = activeFilter === 'Todos' 
     ? manuals 
     : manuals.filter(manual => manual.category === activeFilter || manual.tags.includes(activeFilter));
+
+  const handlePlayAudio = async (manual: Manual) => {
+    if (activeAudio === manual.title) {
+      setActiveAudio(null);
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      return;
+    }
+    
+    if (manual.audioUrl) {
+      setActiveAudio(manual.title);
+      return;
+    }
+
+    setLoadingManual(manual.title);
+    setActiveAudio(null);
+
+    let textToSynthesize = manual.title + ". ";
+    if (typeof manual.description === 'string') {
+      textToSynthesize += manual.description;
+    } else {
+      textToSynthesize += manual.description.premise + " ";
+      manual.description.sections.forEach(section => {
+        textToSynthesize += section.title + ". " + section.points.join('. ') + ". ";
+      });
+      textToSynthesize += manual.description.lema;
+    }
+
+
+    try {
+      const response = await generateAudio(textToSynthesize);
+      
+      if (response.media) {
+        const updatedManuals = manuals.map(m => 
+          m.title === manual.title ? { ...m, audioUrl: response.media } : m
+        );
+        setManuals(updatedManuals);
+        setActiveAudio(manual.title);
+      } else {
+        throw new Error('No se pudo generar el audio a través de la API.');
+      }
+    } catch (error) {
+      console.error('Error generando audio con Genkit:', error);
+      toast({
+        title: 'Voz Principal No Disponible',
+        description: 'Intentando con una voz alternativa del sistema. La experiencia puede variar.',
+        variant: 'destructive',
+      });
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(textToSynthesize);
+        utterance.lang = 'es-ES';
+        utterance.onend = () => {
+           setActiveAudio(null);
+           setLoadingManual(null);
+        };
+        window.speechSynthesis.speak(utterance);
+        setActiveAudio(manual.title);
+      } else {
+         toast({
+          title: 'Error Crítico',
+          description: 'Tu navegador no soporta la síntesis de voz. No se pudo reproducir la filosofía.',
+          variant: 'destructive',
+        });
+      }
+    } finally {
+      if (!( 'speechSynthesis' in window)) {
+         setLoadingManual(null);
+      }
+    }
+  };
 
   return (
     <section id="manuals" className="bg-background">
@@ -39,7 +118,10 @@ const Manuals = () => {
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {filteredManuals.map((manual: Manual, index: number) => (
-            <Card key={index} className="flex flex-col transform transition-transform duration-300 hover:-translate-y-1 bg-secondary/50 border-border hover:border-primary/50 hover:shadow-primary/10 shadow-lg">
+            <Card key={index} className={cn(
+              "flex flex-col transform transition-transform duration-300 hover:-translate-y-1 bg-secondary/50 border-border hover:border-primary/50 hover:shadow-primary/10 shadow-lg",
+              { 'border-primary shadow-primary/20': activeAudio === manual.title }
+            )}>
               <CardHeader>
                 <CardTitle className="font-headline text-xl text-foreground">{manual.title}</CardTitle>
                 <Badge variant="secondary" className="w-fit">{manual.category}</Badge>
@@ -67,6 +149,36 @@ const Manuals = () => {
                   ))}
                 </div>
               </CardContent>
+               <CardFooter className="flex flex-col items-start gap-4 pt-4">
+                  <Button
+                    onClick={() => handlePlayAudio(manual)}
+                    disabled={loadingManual === manual.title}
+                    variant="ghost"
+                    className="p-0 h-auto text-muted-foreground hover:text-primary"
+                  >
+                    {loadingManual === manual.title ? (
+                      <>
+                        <Loader className="h-5 w-5 mr-2 animate-spin" />
+                        <span>Generando audio...</span>
+                      </>
+                    ) : activeAudio === manual.title ? (
+                      <>
+                        <XCircle className="h-5 w-5 mr-2 text-primary" />
+                        <span>Detener la filosofía</span>
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="h-5 w-5 mr-2 text-primary" />
+                        <span>Escuchar la filosofía</span>
+                      </>
+                    )}
+                  </Button>
+                  {activeAudio === manual.title && manual.audioUrl && (
+                    <audio controls autoPlay src={manual.audioUrl} onEnded={() => setActiveAudio(null)} className="w-full h-10">
+                      Your browser does not support the audio element.
+                    </audio>
+                  )}
+                </CardFooter>
             </Card>
           ))}
         </div>

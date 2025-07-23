@@ -29,6 +29,7 @@ export type Manual = {
   category: 'Diseño' | 'Código' | 'Emoción' | 'Comunidad' | 'Filosofía';
   description: ManualDescriptionSimple | ManualDescriptionRich;
   tags: string[];
+  audioUrl: string | null;
 };
 
 export type Feature = {
