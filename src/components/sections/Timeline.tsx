@@ -18,8 +18,18 @@ const phaseColors: { [key: string]: string } = {
 
 const Timeline = () => {
   return (
-    <section id="timeline" className="bg-background">
-      <div className="container mx-auto px-4 md:px-6">
+    <section 
+      id="timeline" 
+      className="relative bg-background py-16 md:py-24 lg:py-32"
+    >
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-10" 
+        style={{ backgroundImage: `url('/placeholder.svg')` }}
+        data-ai-hint="wolf spirit"
+      ></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background"></div>
+
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="text-center">
           <h2 className="font-headline text-3xl font-bold tracking-tight sm:text-4xl text-foreground">Mi Trayectoria</h2>
           <p className="mt-3 max-w-2xl mx-auto text-lg text-muted-foreground">
