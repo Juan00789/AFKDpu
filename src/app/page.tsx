@@ -1,6 +1,6 @@
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import Help from '@/components/sections/Help';
+import Ritual from '@/components/sections/Ritual';
 import Stories from '@/components/sections/Stories';
 import Timeline from '@/components/sections/Timeline';
 import Services from '@/components/sections/Services';
@@ -12,7 +12,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <Help />
+        <Ritual />
         <Services />
         <Stories />
         <Timeline />

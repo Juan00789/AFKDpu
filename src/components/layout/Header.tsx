@@ -12,6 +12,7 @@ const Header = () => {
           <Link href="#stories" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Mi Experiencia</Link>
           <Link href="#timeline" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Trayectoria</Link>
           <Link href="#manuals" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Filosofía</Link>
+          <Link href="/gastos" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Gastos</Link>
           <Link href="#contact" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">Contacto</Link>
         </nav>
       </div>
